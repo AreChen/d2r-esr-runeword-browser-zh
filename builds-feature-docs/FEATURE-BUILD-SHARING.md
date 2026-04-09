@@ -7,7 +7,6 @@ Add a backend-powered "save and share your build" feature to the existing client
 ## Technology Choice
 
 **Primary: Supabase (BaaS)**
-Alternative fallback: Firebase
 
 Supabase was chosen because:
 
@@ -73,7 +72,30 @@ Not needed at this scale. Adding it would introduce a second state management pa
      - "Continue" button (disabled until checkbox is checked)
    - On acceptance: `privacy_policy_accepted_at` timestamp is set, user proceeds to their intended destination
 5. Subsequent logins skip the consent gate entirely and return to the page the user was on before clicking Sign In
-6. Email addresses are never exposed publicly — only `display_name#discriminator` from the `profiles` table is visible to other users
+6. **Post-auth redirect**: Before initiating the OAuth/magic link flow, the app stores the current URL (or intended destination) in `sessionStorage`. After auth completes and the consent gate (if needed) is passed, the app navigates back to that stored URL. This way, a user clicking "Sign In" from `/builds/new` returns to `/builds/new` after login.
+7. Email addresses are never exposed publicly — only `display_name#discriminator` from the `profiles` table is visible to other users
+
+### Sign-In UI
+
+Clicking the "Sign In" button opens a **Dialog modal** (centered overlay using the existing Dialog component) with:
+- **"Sign in with Discord"** button (primary, prominent)
+- Separator: "or"
+- **Email input** + **"Send magic link"** button
+
+The dialog closes on successful auth initiation (Discord redirects away; magic link shows a "Check your email" confirmation).
+
+**Auth errors** (Discord denied/cancelled, magic link expired, session refresh failure): Show a **toast notification** (Sonner) with the error message (e.g., "Sign-in was cancelled", "Magic link expired — please try again"). User stays on the current page and can retry by reopening the Sign In dialog.
+
+### Consent Gate
+
+After first login, a **full-page modal overlay** is rendered (non-dismissible, covers the entire viewport). It cannot be closed — the user must accept to proceed.
+
+The overlay contains:
+- Privacy policy link + unchecked acceptance checkbox
+- Display name field (pre-filled from Discord username or "Adventurer")
+- "Continue" button (disabled until checkbox is checked)
+
+**Implementation:** The auth saga detects `privacy_policy_accepted_at IS NULL` after login, sets a `needsConsent` flag in Redux. A top-level component renders the full-page overlay when this flag is true, blocking all other interaction. On acceptance, the saga updates the profile and clears the flag.
 
 ### Auth Code (Reference)
 
@@ -93,10 +115,10 @@ const { error } = await supabase.auth.signInWithOtp({
 
 ### Desktop
 
-The header navigation adds "Builds" as the 4th item:
+The header navigation adds "Builds" as the last content item (after the existing Ascendancies link):
 
 ```
-[Runewords] [Socketables] [Uniques] [Builds]  ...  [Sign In] [Settings]
+[Runewords] [Socketables] [Uniques] [Mythicals] [Ascendancies] [Builds]  ...  [Sign In] [Settings]
 ```
 
 - **Signed out**: "Sign In" button appears next to the Settings gear icon
@@ -129,9 +151,9 @@ No modal dialogs or page redirects — keep prompts lightweight and non-disrupti
 
 | Column                     | Type      | Notes                                                                     |
 | -------------------------- | --------- | ------------------------------------------------------------------------- |
-| id                         | uuid (PK) | References `auth.users.id`                                                |
+| id                         | uuid (PK) | FK → `auth.users.id` with `ON DELETE CASCADE`                             |
 | display_name               | text      | Chosen by user, visible publicly                                          |
-| discriminator              | smallint  | Random 1000-9999, NOT NULL, DEFAULT `floor(random() * 9000 + 1000)::smallint` |
+| discriminator              | smallint  | Random 1000-9999, NOT NULL, DEFAULT `floor(random() * 9000 + 1000)::smallint`. On collision during display name change, retry with a new random value (max 10 attempts). |
 | avatar_url                 | text      | Optional, from Discord metadata                                           |
 | privacy_policy_accepted_at | timestamp | Set on first consent, required to use build features                      |
 | created_at                 | timestamp | Default `now()`                                                           |
@@ -140,7 +162,8 @@ No modal dialogs or page redirects — keep prompts lightweight and non-disrupti
 **Constraints:**
 - `UNIQUE(display_name, discriminator)` — prevents true duplicates while allowing same display names with different discriminators
 - Display format everywhere: `Name#1234` (always visible, like old Discord style)
-- On display name change, a new discriminator is generated
+- On display name change, a new discriminator is generated. If the `(new_name, new_discriminator)` pair collides with an existing one, retry with a new random discriminator (up to 10 attempts before returning an error)
+- `updated_at` is auto-set on every row update via a PostgreSQL trigger (using `moddatetime` extension or a custom trigger)
 
 #### `builds`
 
@@ -156,7 +179,11 @@ No modal dialogs or page redirects — keep prompts lightweight and non-disrupti
 | esr_version_updated | text      | ESR version when last edited. Null if never edited.           |
 | likes_count         | integer   | Default `0`, updated via trigger                              |
 | created_at          | timestamp | Default `now()`                                               |
-| updated_at          | timestamp | Auto-updated                                                  |
+| updated_at          | timestamp | Auto-updated via trigger (same as profiles)                   |
+
+**Constraints:**
+- `builds.user_id` → `profiles.id` with `ON DELETE CASCADE` (deleting a profile cascades to all their builds)
+- `updated_at` auto-set on every row update via trigger
 
 All builds are public. There is no private/draft state.
 
@@ -164,9 +191,12 @@ All builds are public. There is no private/draft state.
 
 | Column   | Type      | Notes                                                        |
 | -------- | --------- | ------------------------------------------------------------ |
-| build_id | uuid (FK) | References `builds.id`                                       |
-| user_id  | uuid (FK) | References `profiles.id`                                     |
-|          |           | Unique constraint on `(build_id, user_id)` — one like per user per build |
+| build_id | uuid (FK) | References `builds.id` with `ON DELETE CASCADE`              |
+| user_id  | uuid (FK) | References `profiles.id` with `ON DELETE CASCADE`            |
+
+**Constraints:**
+- `PRIMARY KEY (build_id, user_id)` — composite PK, enforces one like per user per build
+- Cascading deletes: deleting a build removes all its likes; deleting a profile removes all their likes
 
 ### `build_data` JSONB Structure
 
@@ -174,9 +204,9 @@ The database stores **typed item references** with full item snapshots. Each equ
 
 #### Item Reference Types
 
-There are three types of item references:
+There are four types of item references:
 
-**Unique item** — references a unique item by its auto-increment ID, includes a full snapshot of the item's stats at the time the build was created/edited:
+**Unique item** — references a unique item from `htmUniqueItems` by its auto-increment ID, includes a full snapshot of the item's stats at the time the build was created/edited:
 ```json
 {
   "type": "unique",
@@ -191,6 +221,25 @@ There are three types of item references:
 }
 ```
 
+Snapshot fields for uniques: `name`, `baseItem`, `category`, `reqLevel`, `properties` (stored as strings — the `rawText` values from `Affix` objects where applicable). Other `htmUniqueItems` fields (`baseItemCode`, `itemLevel`, `isAncientCoupon`, `gambleItem`) are not included — they're not useful for display on a build page.
+
+**Mythical unique** — references a mythical unique item from `mythicalUniques` by its ID, includes a snapshot:
+```json
+{
+  "type": "mythical",
+  "id": 7,
+  "snapshot": {
+    "name": "Tyrael's Might",
+    "baseItem": "Sacred Armor",
+    "category": "Body Armor",
+    "reqLevel": 84,
+    "properties": ["+2 to All Skills", "+150% Enhanced Defense", "..."]
+  }
+}
+```
+
+Snapshot fields for mythicals: `name`, `baseItem`, `category`, `reqLevel`, `properties` (matching the unique snapshot structure for consistent display).
+
 **Runeword** — references a runeword by its compound key (`name` + `variant`), includes a full snapshot:
 ```json
 {
@@ -202,11 +251,17 @@ There are three types of item references:
     "runes": ["Jah", "Ith", "Ber"],
     "gems": [],
     "allowedItems": ["Body Armor"],
-    "affixes": ["+2 to All Skills", "+45% Faster Run/Walk", "+1 to Teleport", "..."],
+    "columnAffixes": {
+      "weaponsGloves": ["+2 to All Skills", "+45% Faster Run/Walk", "..."],
+      "helmsBoots": ["+2 to All Skills", "+45% Faster Run/Walk", "..."],
+      "armorShieldsBelts": ["+2 to All Skills", "+45% Faster Run/Walk", "+1 to Teleport", "..."]
+    },
     "reqLevel": 65
   }
 }
 ```
+
+Snapshot stores all three bonus columns from `columnAffixes`. Each column's affixes are stored as `rawText` strings extracted from the `Affix` objects. The display logic picks the correct column based on which equipment slot the runeword occupies (e.g., armor slot → `armorShieldsBelts`). Storing all three columns ensures snapshots survive slot changes during edits.
 
 **Freetext** — user-typed name for items not in the database (rares, crafted, magic items). No snapshot:
 ```json
@@ -222,7 +277,7 @@ There are three types of item references:
 {
   "items": {
     "helmet": { "type": "unique", "id": 42, "snapshot": { "name": "Harlequin Crest", "baseItem": "Shako", "properties": ["..."] } },
-    "armor": { "type": "runeword", "name": "Enigma", "variant": 1, "snapshot": { "runes": ["Jah", "Ith", "Ber"], "affixes": ["..."] } },
+    "armor": { "type": "runeword", "name": "Enigma", "variant": 1, "snapshot": { "runes": ["Jah", "Ith", "Ber"], "columnAffixes": { "weaponsGloves": ["..."], "helmsBoots": ["..."], "armorShieldsBelts": ["..."] } } },
     "weapon": { "type": "unique", "id": 105, "snapshot": { "name": "Grief", "baseItem": "Phase Blade", "properties": ["..."] } },
     "shield": { "type": "unique", "id": 78, "snapshot": { "name": "Herald of Zakarum", "properties": ["..."] } },
     "gloves": { "type": "freetext", "name": "3/20 rare java gloves" },
@@ -233,13 +288,13 @@ There are three types of item references:
     "ring2": { "type": "unique", "id": 215, "snapshot": { "name": "Bul-Kathos' Wedding Band", "properties": ["..."] } }
   },
   "weaponSwap": {
-    "weapon2": { "type": "runeword", "name": "Call to Arms", "variant": 1, "snapshot": { "runes": ["..."], "affixes": ["..."] } },
-    "shield2": { "type": "runeword", "name": "Spirit", "variant": 1, "snapshot": { "runes": ["..."], "affixes": ["..."] } }
+    "weapon2": { "type": "runeword", "name": "Call to Arms", "variant": 1, "snapshot": { "runes": ["..."], "columnAffixes": { "weaponsGloves": ["..."], "helmsBoots": ["..."], "armorShieldsBelts": ["..."] } } },
+    "shield2": { "type": "runeword", "name": "Spirit", "variant": 1, "snapshot": { "runes": ["..."], "columnAffixes": { "weaponsGloves": ["..."], "helmsBoots": ["..."], "armorShieldsBelts": ["..."] } } }
   },
   "mercenary": {
     "helmet": { "type": "unique", "id": 150, "snapshot": { "name": "Andariel's Visage", "properties": ["..."] } },
-    "armor": { "type": "runeword", "name": "Fortitude", "variant": 1, "snapshot": { "affixes": ["..."] } },
-    "weapon": { "type": "runeword", "name": "Infinity", "variant": 1, "snapshot": { "affixes": ["..."] } },
+    "armor": { "type": "runeword", "name": "Fortitude", "variant": 1, "snapshot": { "runes": ["..."], "columnAffixes": { "weaponsGloves": ["..."], "helmsBoots": ["..."], "armorShieldsBelts": ["..."] } } },
+    "weapon": { "type": "runeword", "name": "Infinity", "variant": 1, "snapshot": { "runes": ["..."], "columnAffixes": { "weaponsGloves": ["..."], "helmsBoots": ["..."], "armorShieldsBelts": ["..."] } } },
     "shield": null,
     "gloves": null,
     "boots": null,
@@ -270,7 +325,7 @@ There are three types of item references:
 create function public.handle_new_user()
 returns trigger as $$
 begin
-  insert into public.profiles (id, display_name, discriminator)
+  insert into public.profiles (id, display_name, discriminator, avatar_url)
   values (
     new.id,
     coalesce(
@@ -278,7 +333,8 @@ begin
       new.raw_user_meta_data->>'user_name',
       'Adventurer'
     ),
-    floor(random() * 9000 + 1000)::smallint
+    floor(random() * 9000 + 1000)::smallint,
+    new.raw_user_meta_data->>'avatar_url'
   );
   return new;
 end;
@@ -288,6 +344,8 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function handle_new_user();
 ```
+
+Note: `avatar_url` is extracted from Discord OAuth metadata. For email magic link users, this will be `null` (no avatar).
 
 ### Database Trigger: Auto-Update `likes_count`
 
@@ -334,16 +392,30 @@ create trigger on_like_changed
 
 ## Key Queries
 
-### Browse Popular Builds
+### Browse Builds (Newest)
 
 ```sql
 select
   b.*,
   p.display_name,
-  p.discriminator
+  p.discriminator,
+  p.avatar_url
 from builds b
 join profiles p on p.id = b.user_id
-order by b.likes_count desc, b.created_at desc;
+order by b.created_at desc, b.id desc;
+```
+
+### Browse Builds (Most Liked)
+
+```sql
+select
+  b.*,
+  p.display_name,
+  p.discriminator,
+  p.avatar_url
+from builds b
+join profiles p on p.id = b.user_id
+order by b.likes_count desc, b.created_at desc, b.id desc;
 ```
 
 ### Check if Current User Liked a Build
@@ -369,60 +441,17 @@ The standard 7 Diablo 2 Resurrected classes:
 
 Each class can have an ascendancy (see below).
 
-## Ascendancies
+## Ascendancies in Builds
 
-ESR adds an ascendancy system where characters earn a special item granting tiered bonuses.
+ESR adds an ascendancy system where characters earn a special item granting tiered bonuses. The ascendancy feature is already implemented in the app (v1.9.0) — 15 ascendancies are parsed from `easternsunresurrected.com/ascendancies.htm`, stored in IndexedDB, and displayed on the `/ascendancies` page.
 
-### Data Source
-
-Ascendancy names and tier bonuses are parsed from the ESR documentation:
-`https://easternsunresurrected.com/ascendancies.htm`
-
-Only the ascendancies and their bonuses at each tier are needed — challenges/requirements are not parsed.
-
-### Ascendancy Data Model
-
-There are **15 ascendancies** in total. Ascendancies are **NOT class-specific** — all 15 are available to all character classes.
-
-Each ascendancy has **5 tiers** with escalating bonuses (freetext bonus strings, similar to existing affix strings).
-
-#### IndexedDB Table: `ascendancies`
-
-| Column | Type                                    | Notes                                 |
-| ------ | --------------------------------------- | ------------------------------------- |
-| name   | string (PK)                             | Ascendancy name (e.g., "Battlemage")  |
-| tiers  | Array<{ tier: number, bonuses: string[] }> | 5 tiers with bonus strings each    |
-
-#### TypeScript Interface
-
-```typescript
-interface Ascendancy {
-  readonly name: string;
-  readonly tiers: readonly AscendancyTier[];
-}
-
-interface AscendancyTier {
-  readonly tier: number;       // 1-5
-  readonly bonuses: readonly string[];  // Freetext bonus strings
-}
-```
-
-### Ascendancy Parsing
-
-- Parser implementation is similar to existing parsers (gems, runewords, uniques)
-- Parses flexbox divs with `<font>` tags from the HTM source
-- Runs during the **existing startup data pipeline** as an additional HTML fetch (the 7th file)
-- Subject to the same version checks as other data (both ESR version and app version)
-- Stored in IndexedDB alongside gems, runes, runewords, and unique items
-
-### Ascendancies in Builds
+For the builds feature, ascendancies are used as follows:
 
 - **Build form**: A simple dropdown of all 15 ascendancy names (optional field). The dropdown is NOT filtered by class selection — all ascendancies are available to all classes.
-- **Build detail page**: Shows the ascendancy name along with its tier bonuses (pulled from the viewer's local parsed data)
+- **Build detail page**: Shows the ascendancy name along with its tier bonuses (pulled from the viewer's local parsed data). All 5 tiers are shown — the build does not store which tier the character has reached.
+- **Build data**: Stores only the ascendancy name string (e.g., `"ascendancy": "Battlemage"`). No tier data stored.
 
-### Complete Ascendancy List
-
-Battlemage, Blademaster, Arcanist, Bloodmage, Awakened, Ironbolt, Starborn, Lifebreaker, Worldshaper, Soul Warden, Stance Dancer, Nomad, Sharpshooter, Mana Warden, Berserker.
+Complete list: Battlemage, Blademaster, Arcanist, Bloodmage, Awakened, Ironbolt, Starborn, Lifebreaker, Worldshaper, Soul Warden, Stance Dancer, Nomad, Sharpshooter, Mana Warden, Berserker.
 
 ## Screens & Routes
 
@@ -447,6 +476,8 @@ Unauthenticated users navigating directly to `/builds/new` or `/builds/:buildId/
 | `/` | Runewords browser (home) |
 | `/socketables` | Socketables browser |
 | `/uniques` | Unique items browser |
+| `/mythicals` | Mythical uniques browser |
+| `/ascendancies` | Ascendancies browser |
 
 ## Builds Listing Screen (`/builds`)
 
@@ -478,7 +509,7 @@ Minimal card design — optimized for scanning:
 Each card shows:
 - Build name
 - Character class
-- Author display name with discriminator (clickable, links to `/user/:userId`)
+- Small author avatar (20-24px) + display name with discriminator (clickable, links to `/user/:userId`)
 - Like count
 - Created date
 - ESR version badge (visually distinct if it differs from the viewer's current ESR version)
@@ -490,15 +521,17 @@ No item preview on cards — keep them lightweight.
 - **Search**: By build name — **server-side** using Supabase `ilike` query (text input)
 - **Filter**: By character class (dropdown or chips)
 - **Sort**: Newest first (default) or Most liked
-- **My Builds toggle**: When logged in, a toggle to switch between "All Builds" and "My Builds". Filters to show only builds authored by the current user.
+- **My Builds toggle**: When logged in, a toggle to switch between "All Builds" and "My Builds". Filters to show only builds authored by the current user. **Not included in shareable URLs** — this is local-only state (sharing a "My Builds" URL would show the recipient's builds, not yours).
 
 No ascendancy filter — keep it simple.
 
 ### Pagination
 
-**Cursor-based pagination** using a `(created_at, id)` composite cursor for stable ordering. 50 builds per batch. Load more as the user scrolls down (infinite scroll).
+**Cursor-based pagination** with 50 builds per batch. Load more as the user scrolls down (infinite scroll). Cursor-based pagination is used instead of offset-based to avoid missed or duplicated items when `likes_count` changes between page fetches.
 
-Cursor-based pagination is used instead of offset-based to avoid missed or duplicated items when `likes_count` changes between page fetches.
+**Cursor strategy per sort mode:**
+- **Newest first**: Cursor is `(created_at, id)` — both are immutable, so ordering is stable
+- **Most liked**: Cursor is `(likes_count, created_at, id)` — `likes_count` can change between fetches, but the triple cursor minimizes duplicates. Acceptable trade-off for v1.
 
 ### Empty State
 
@@ -578,20 +611,34 @@ On small screens (below `md` breakpoint), the equipment grid stacks to a **verti
 
 ### Item Selection
 
-Each equipment slot uses an **inline autocomplete** picker. Clicking a slot turns it into a search input. The user types to search the app's existing local item database (**unique items** and **runewords**). If the desired item isn't found, the user can type a custom name for rares, crafted, or magic items (stored as freetext).
+Each equipment slot uses an **inline autocomplete** picker. Clicking a slot turns it into a search input. The user types to search the app's existing local item database (**unique items**, **mythical uniques**, and **runewords**). If the desired item isn't found, the user can type a custom name for rares, crafted, or magic items (stored as freetext).
+
+**Autocomplete result presentation:** Results are **grouped by type** using `cmdk` Command component's native group support. Three sections appear in order:
+1. **Unique Items** — from `htmUniqueItems`
+2. **Mythical Uniques** — from `mythicalUniques`
+3. **Runewords** — from `runewords`
+
+Only groups with matches are shown. Empty groups are hidden.
+
+**Runeword variant display:** Runewords with multiple variants show their full `allowedItems` list in parentheses to distinguish them:
+- `Grief (Phase Blade, Berserker Axe)` vs `Grief (Sword, Axe)`
+- `Spirit (Sword)` vs `Spirit (Shield)`
 
 ```
         [Helmet: Shako    ]
-[Weapon: |gri|           ] [Shield: HoZ]
-         |- Grief (PB)    |
-         |- Grief (BA)    |
-         |- Gris Caddy    |
+[Weapon: |gri|                          ] [Shield: HoZ]
+         |--- Unique Items -------------|
+         |   Griswold's Edge            |
+         |--- Runewords ----------------|
+         |   Grief (Phase Blade, ...)   |
+         |   Grief (Sword, Axe)         |
 [Gloves] [Belt]   [Boots]
 [Ring 1] [Amulet] [Ring 2]
 ```
 
 When a user selects an item from the autocomplete:
 - **Unique item**: The reference stores the item's `id` (auto-increment PK from `htmUniqueItems`) and a full snapshot of its current stats
+- **Mythical unique**: The reference stores the item's `id` (from `mythicalUniques`) and a full snapshot — same display structure as regular uniques
 - **Runeword**: The reference stores the runeword's `name` and `variant` (compound key) and a full snapshot of its current stats
 - **Freetext**: If the user's input doesn't match any item, it's stored as a freetext entry with just the typed name
 
@@ -618,12 +665,14 @@ All sections visible on one scrollable page (no wizard, no collapsible sections)
 
 ### Save
 
-Single **"Save Build"** button. The build goes live immediately — no draft state. All builds are public.
+Single **"Save Build"** button. The build goes live immediately — no draft state. All builds are public. Empty builds (name + class only, no items) are allowed — since there's no draft state, this lets users save placeholders to fill in later.
+
+**Save failure:** If the save request fails (network error, Supabase paused), show an error toast and keep the form open with all data intact. Do not clear or navigate away.
 
 On save, the app automatically:
 - Sets `esr_version` to the current ESR version from local IndexedDB metadata (on create)
 - Sets `esr_version_updated` to the current ESR version (on edit)
-- Captures full item snapshots for all referenced items (unique/runeword) at the current point in time
+- Captures full item snapshots for all referenced items (unique/mythical/runeword) at the current point in time
 
 ### Expected Scale
 
@@ -667,7 +716,7 @@ Browser `beforeunload` prompt when navigating away from the create/edit form wit
 ### Text Handling
 
 - **Plain text only** — no markdown, no HTML in any freetext field
-- Basic XSS sanitization on output (escape HTML entities)
+- React escapes HTML by default in JSX — do not use `dangerouslySetInnerHTML` for any user-generated content
 - No profanity filter for v1
 
 ### Rate Limiting
@@ -758,7 +807,7 @@ The project uses **shadcn/ui** patterns (Radix UI primitives + Tailwind CSS + CV
 - Install: `npx shadcn@latest add select`
 
 **Command (Combobox)** — inline autocomplete item picker
-- Used for: equipment slot pickers on create/edit form. Searches local item database (uniques and runewords) with freetext fallback for custom item names.
+- Used for: equipment slot pickers on create/edit form. Searches local item database (uniques, mythical uniques, and runewords) with freetext fallback for custom item names.
 - Dependencies: `cmdk` + existing Popover (combined into "Combobox" pattern per shadcn/ui docs)
 - Install: `npx shadcn@latest add command`
 - Note: Most complex new component. Each equipment slot in the grid becomes a Popover+Command combobox.
@@ -830,14 +879,14 @@ sonner                           (toast notifications)
 ### What Changes
 
 - Add dependencies (see New Dependencies above)
-- Initialize Supabase client with project URL and anon key
+- Initialize Supabase client singleton (`src/core/supabase/client.ts`) with env vars
 - Add auth state management (Redux slice + saga watching `onAuthStateChange`)
 - Add builds state management (Redux slice + saga for listing/CRUD/pagination)
 - Add new shadcn/ui components (DropdownMenu, Avatar, Select, Command, Skeleton, Sonner, Tooltip)
 - Add new routes/views: builds listing, build detail, build creator, author profiles
 - Add like/unlike functionality on shared builds
-- Add ascendancy data parsing from ESR docs (new parser + IndexedDB table, runs in existing startup pipeline)
 - Add post-registration consent gate for privacy policy acceptance
+- Add account deletion flow (Edge Function or `security definer` RPC)
 
 ### What Stays the Same
 
@@ -847,14 +896,15 @@ sonner                           (toast notifications)
 - Supabase only gets involved when a user interacts with the build sharing feature
 - The builds feature is **online-only** — the rest of the app remains offline-capable with cached data
 
-## Supabase Setup Checklist
+## Supabase Client Initialization
 
-1. Create Supabase project
-2. Set up Discord OAuth provider (Discord Developer Portal → create app → copy Client ID & Secret → paste into Supabase Auth settings)
-3. Enable email magic link provider in Supabase Auth settings
-4. Run SQL to create tables, triggers, and RLS policies (all SQL is inline in this document — run manually in Supabase SQL editor)
-5. (Optional) Configure custom SMTP for magic link emails to avoid spam folder issues (e.g., Resend or Brevo free tier)
-6. Add Supabase URL and anon key to the app's environment config (Vite env vars: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`)
+The Supabase client is a singleton initialized in `src/core/supabase/client.ts`. It reads the Vite environment variables (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`) and exports a single `supabase` instance used throughout the app.
+
+**Graceful degradation:** If the Supabase env vars are not set (e.g., a contributor running the app without Supabase), the builds feature is hidden entirely (no "Builds" nav item, no "Sign In" button). The rest of the app (runewords, socketables, uniques, mythicals, ascendancies) works normally. This is checked once at startup and stored in Redux.
+
+## Supabase Setup
+
+See **[SUPABASE-SETUP.md](./SUPABASE-SETUP.md)** for the complete step-by-step setup guide covering both PROD and DEV environments.
 
 ## Error & Loading States
 
@@ -873,18 +923,16 @@ Users must be able to fully delete their account and all associated data. This i
 1. User navigates to account settings and clicks "Delete my account"
 2. A confirmation modal appears with a clear warning: "This will permanently delete your account, all your builds, and your likes. This action cannot be undone."
 3. User must confirm the deletion (e.g., type their display name or click a final "Yes, delete everything" button)
-4. On confirmation, the app calls a Supabase Edge Function (or RPC) that:
-   - Deletes all rows from `likes` where `user_id` matches
-   - Deletes all rows from `builds` where `user_id` matches (this also cascades likes from other users on those builds)
-   - Deletes the `profiles` row
+4. On confirmation, the app calls a Supabase Edge Function or `security definer` RPC that:
+   - Deletes the `profiles` row (cascades to `builds` and `likes` via `ON DELETE CASCADE`)
    - Deletes the `auth.users` record via Supabase Admin API
 5. User is signed out and redirected to the home page
 
 ### Implementation Note
 
-Deleting from `auth.users` requires the Supabase service role key, which must never be exposed client-side. Use a Supabase Edge Function or database function with `security definer` to handle the cascade. Alternatively, set up foreign key `ON DELETE CASCADE` so deleting the profile triggers cleanup of builds and likes automatically.
+Deleting from `auth.users` requires the Supabase service role key, which must never be exposed client-side. Use a Supabase Edge Function or a `security definer` database function to handle this. The cascade from `profiles` to `builds` and `likes` is handled automatically by `ON DELETE CASCADE` foreign keys — no manual deletion of those tables is needed.
 
-The account deletion Edge Function implementation is a follow-up task — not required for v1 launch.
+Account deletion is **required for v1 launch** (GDPR right to erasure).
 
 ## Privacy Policy
 
@@ -911,11 +959,90 @@ The app includes a Privacy Policy (`PRIVACY_POLICY.md`) that is:
 
 Data export for GDPR compliance is handled manually by a developer for v1. No in-app export feature. Users can request an export via the contact email listed in the privacy policy.
 
-## Testing & Release Strategy
+## Environments
 
-- **Single Supabase project** — no separate test environment
-- **Manual testing**: Test with local builds first
-- **Beta release**: The builds menu item is hidden initially. Enable it for internal testing, then release as an experimental/beta feature
+### Dual Supabase Projects
+
+Two separate Supabase projects are used:
+
+| Environment | Purpose | Users |
+|-------------|---------|-------|
+| **PROD** | Published to real users | Real community members |
+| **DEV** | Development and testing | Solo developer + test accounts |
+
+Both environments have identical schema, Discord OAuth, and email magic link configured. Each has its own Discord app in the Discord Developer Portal (separate Client ID/Secret and redirect URLs).
+
+### Vite Environment Variable Switching
+
+Vite natively loads different `.env` files based on the mode:
+- `npm run dev` → loads `.env.development` (DEV Supabase)
+- `npm run build` → loads `.env.production` (PROD Supabase)
+
+No manual switching needed — it's automatic.
+
+**Environment files (committed to repo):**
+
+`.env.development`:
+```
+VITE_SUPABASE_URL=https://xxx-dev.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJ...dev
+```
+
+`.env.production`:
+```
+VITE_SUPABASE_URL=https://xxx-prod.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJ...prod
+```
+
+Anon keys are safe to commit — they're public by design (exposed in the browser bundle). Row Level Security handles authorization.
+
+**Secret file (gitignored via `*.local` pattern):**
+
+`.env.local`:
+```
+# Only used by the seed script — never exposed to the browser
+DEV_SUPABASE_URL=https://xxx-dev.supabase.co
+DEV_SUPABASE_SERVICE_ROLE_KEY=eyJ...secret
+PROD_SUPABASE_URL=https://xxx-prod.supabase.co
+PROD_SUPABASE_ANON_KEY=eyJ...prod
+```
+
+### SQL Migrations
+
+Database schema changes are tracked as numbered SQL migration files in the repository:
+
+```
+supabase/migrations/
+├── 001_initial_schema.sql    # Tables, triggers, RLS, functions
+├── 002_xxx.sql               # Future changes
+└── ...
+```
+
+Migrations are applied manually via the Supabase SQL editor to both PROD and DEV. The initial migration (`001`) contains all table creation, triggers, RLS policies, and functions from this document.
+
+When a new feature requires schema changes, a new numbered migration file is added. Apply to DEV first, test, then apply to PROD before deploying the corresponding code.
+
+### PROD → DEV Data Seeding
+
+A local Node.js script (`scripts/seed-dev-from-prod.ts`) copies real build data from PROD to DEV for realistic testing:
+
+1. Reads all builds from PROD (public SELECT via anon key — no service key needed)
+2. Wipes existing DEV data (clean slate)
+3. Creates test users in DEV via Supabase Admin API (service role key):
+   - Uses test email addresses: `testuser1@example.com`, `testuser2@example.com`, etc.
+   - Each gets a profile with a generated display name + discriminator
+4. Copies builds into DEV, randomly assigning them to test users
+5. Generates random likes across test users for realistic like counts
+
+Run manually: `npx tsx scripts/seed-dev-from-prod.ts`
+
+Requires `.env.local` with DEV service role key (see above). The service role key bypasses RLS and allows creating users via the Admin API.
+
+### Testing & Release Strategy
+
+- **DEV environment** for all development and testing
+- **Manual testing**: Build and test features against DEV Supabase with test accounts
+- **Beta release**: The builds menu item is hidden initially behind a feature check. Enable for internal testing on PROD, then release as an experimental/beta feature
 - **User expectations**: Users are informed the feature is in beta — expect possible bugs
 - **Iterative refinement**: UI polish, edge cases, and additional features (comments, tags, etc.) come after the core feature is stable
 
@@ -941,4 +1068,3 @@ Data export for GDPR compliance is handled manually by a developer for v1. No in
 - Set items (not parsed or stored in the app yet)
 - In-app data export (handled manually by developer for v1)
 - Custom rate limiting (Supabase defaults suffice for v1)
-- Supabase keep-alive cron (auto-resume on first request is acceptable)
