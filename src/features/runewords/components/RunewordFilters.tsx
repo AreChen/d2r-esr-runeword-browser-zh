@@ -38,18 +38,24 @@ export function RunewordFilters() {
   const [localSocketCount, setLocalSocketCount] = useState(socketCount);
   const [localMaxReqLevel, setLocalMaxReqLevel] = useState(maxReqLevel);
 
-  // Sync local state when Redux state changes externally
-  useEffect(() => {
+  // Sync local state when Redux state changes externally (adjust during render)
+  const [prevSearchText, setPrevSearchText] = useState(searchText);
+  if (searchText !== prevSearchText) {
+    setPrevSearchText(searchText);
     setLocalSearchText(searchText);
-  }, [searchText]);
+  }
 
-  useEffect(() => {
+  const [prevSocketCount, setPrevSocketCount] = useState(socketCount);
+  if (socketCount !== prevSocketCount) {
+    setPrevSocketCount(socketCount);
     setLocalSocketCount(socketCount);
-  }, [socketCount]);
+  }
 
-  useEffect(() => {
+  const [prevMaxReqLevel, setPrevMaxReqLevel] = useState(maxReqLevel);
+  if (maxReqLevel !== prevMaxReqLevel) {
+    setPrevMaxReqLevel(maxReqLevel);
     setLocalMaxReqLevel(maxReqLevel);
-  }, [maxReqLevel]);
+  }
 
   // Debounce dispatch to Redux
   useEffect(() => {

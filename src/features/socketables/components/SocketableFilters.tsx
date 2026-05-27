@@ -45,10 +45,12 @@ export function SocketableFilters() {
   // Local state for immediate input feedback
   const [localSearchText, setLocalSearchText] = useState(searchText);
 
-  // Sync local state when Redux state changes externally
-  useEffect(() => {
+  // Sync local state when Redux state changes externally (adjust during render)
+  const [prevSearchText, setPrevSearchText] = useState(searchText);
+  if (searchText !== prevSearchText) {
+    setPrevSearchText(searchText);
     setLocalSearchText(searchText);
-  }, [searchText]);
+  }
 
   // Debounce dispatch to Redux
   useEffect(() => {

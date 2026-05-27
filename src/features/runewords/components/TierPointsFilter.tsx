@@ -34,10 +34,12 @@ function TierPointInput({ config }: { readonly config: TierKeyConfig }) {
   const reduxValue = maxTierPoints[config.key] ?? null;
   const [localValue, setLocalValue] = useState(reduxValue);
 
-  // Sync local state when Redux state changes externally
-  useEffect(() => {
+  // Sync local state when Redux state changes externally (adjust during render)
+  const [prevReduxValue, setPrevReduxValue] = useState(reduxValue);
+  if (reduxValue !== prevReduxValue) {
+    setPrevReduxValue(reduxValue);
     setLocalValue(reduxValue);
-  }, [reduxValue]);
+  }
 
   // Debounce dispatch to Redux
   useEffect(() => {

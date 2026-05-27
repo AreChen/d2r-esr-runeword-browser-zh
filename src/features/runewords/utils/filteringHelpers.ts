@@ -65,7 +65,7 @@ export function getRuneBonusesText(runeword: Runeword, runeBonusMap: RuneBonusMa
  * Build searchable text from gem bonuses for a runeword.
  */
 export function getGemBonusesText(runeword: Runeword, gemBonusMap: GemBonusMap): string {
-  const gems = 'gems' in runeword ? (runeword.gems) : [];
+  const gems = 'gems' in runeword ? runeword.gems : [];
   if (gems.length === 0) return '';
 
   const relevantCategories = getRelevantCategories(runeword.allowedItems);
@@ -319,8 +319,8 @@ export function expandRunewordsByColumn(runewords: readonly Runeword[]): readonl
 
       result.push({
         ...rw,
-        allowedItems: itemsInCategory as readonly string[],
-        excludedItems: excludedInCategory as readonly string[],
+        allowedItems: itemsInCategory,
+        excludedItems: excludedInCategory,
         affixes,
       });
     }

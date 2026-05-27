@@ -79,6 +79,11 @@
       }
     ]
   },
+  "overrides": {
+    "eslint-plugin-react-hooks": {
+      "zod-validation-error": "^4.0.0"
+    }
+  },
   "lint-staged": {
     "src/**/*.{ts,tsx}": [
       "prettier --write",
