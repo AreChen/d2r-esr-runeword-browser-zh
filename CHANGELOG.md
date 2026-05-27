@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.9.2](https://github.com/istvan-panczel/d2r-esr-runeword-browser/compare/v1.9.1...v1.9.2) (2026-05-27)
+
+
+### Chores
+
+* pin Node version to 22 via .nvmrc and ([2bc0775](https://github.com/istvan-panczel/d2r-esr-runeword-browser/commit/2bc0775f7ce3929d5fb595571d6b4966a8d55341))
+
+
+### CI
+
+* bump GitHub Actions to Node 24 versions ([5fb6b24](https://github.com/istvan-panczel/d2r-esr-runeword-browser/commit/5fb6b24f7ea018ad92bd77690e0c817a7215403e))
+
 ## [1.9.1](https://github.com/istvan-panczel/d2r-esr-runeword-browser/compare/v1.9.0...v1.9.1) (2026-05-27)
 
 
