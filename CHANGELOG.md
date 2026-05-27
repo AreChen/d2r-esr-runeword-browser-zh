@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.9.1](https://github.com/istvan-panczel/d2r-esr-runeword-browser/compare/v1.9.0...v1.9.1) (2026-05-27)
+
+
+### Documentation
+
+* update the feature doc for builds based on POCs and plannign with LLMs ([c80f281](https://github.com/istvan-panczel/d2r-esr-runeword-browser/commit/c80f281d843a2df1936da4549bec4ccdcea74576))
+
+
+### Chores
+
+* update dependencies ith audit --fix ([b05542a](https://github.com/istvan-panczel/d2r-esr-runeword-browser/commit/b05542a7f3a33a99f4ec1c89349f9568a8075893))
+* update dependencies within semver ranges and fix lint issues ([8aa905b](https://github.com/istvan-panczel/d2r-esr-runeword-browser/commit/8aa905bc827248831b83db26fb587c3f35a42f80))
+
 ## [1.9.0](https://github.com/istvan-panczel/d2r-esr-runeword-browser/compare/v1.8.0...v1.9.0) (2026-03-29)
 
 
