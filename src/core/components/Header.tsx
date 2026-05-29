@@ -9,7 +9,7 @@ import { openDrawer, selectTheme, setTheme } from '@/features/settings';
 
 const ESR_DOCS_URL = 'https://easternsunresurrected.com/';
 const CHANGELOG_URL = 'https://easternsunresurrected.com/changelogs.html';
-const GITHUB_URL = 'https://github.com/istvan-panczel/d2r-esr-runeword-browser';
+const GITHUB_URL = 'https://github.com/AreChen/d2r-esr-runeword-browser-zh';
 
 const NAV_ITEMS = [
   { to: '/', label: '符文之语', end: true },
