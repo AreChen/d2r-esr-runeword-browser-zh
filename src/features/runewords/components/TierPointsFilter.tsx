@@ -75,7 +75,7 @@ function TierPointInput({ config }: { readonly config: TierKeyConfig }) {
 
   return (
     <div className="w-28">
-      <span className={`text-xs font-medium ${colorClass}`}>{config.label} max</span>
+      <span className={`text-xs font-medium ${colorClass}`}>{config.label} 上限</span>
       <InputGroup>
         <InputGroupInput
           type="number"
@@ -87,7 +87,7 @@ function TierPointInput({ config }: { readonly config: TierKeyConfig }) {
         />
         {localValue !== null && (
           <InputGroupAddon align="inline-end">
-            <InputGroupButton variant="ghost" size="icon-xs" onClick={handleClear} aria-label={`Clear ${config.label} max`}>
+            <InputGroupButton variant="ghost" size="icon-xs" onClick={handleClear} aria-label={`清空 ${config.label} 上限`}>
               <X className="size-3" />
             </InputGroupButton>
           </InputGroupAddon>
@@ -109,14 +109,14 @@ export function TierPointsFilter() {
   return (
     <div className="space-y-1">
       <p className="text-xs text-muted-foreground">
-        Max tier points (leave empty for no limit).
+        最大阶级点数（留空表示不限）。
         <button
           type="button"
           onClick={handleClearAll}
           disabled={!hasAnyValue}
           className="ml-2 text-xs text-primary hover:underline disabled:text-muted-foreground/50 disabled:no-underline disabled:cursor-default"
         >
-          Clear all
+          全部清空
         </button>
       </p>
       <div className="flex flex-wrap gap-2">

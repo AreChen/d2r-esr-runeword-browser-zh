@@ -52,13 +52,13 @@ export function* handleStartupCheck() {
       if (cached.hasData) {
         // We have cached data, use it with a warning
         console.log('[HTML] Using cached data (network unavailable)');
-        yield put(setNetworkWarning('Unable to check for updates. Using cached data.'));
+        yield put(setNetworkWarning('无法检查更新，正在使用缓存数据。'));
         yield put(startupUseCached());
         return;
       } else {
         // No cached data and no network - fatal error
         console.log('[HTML] Fatal: No cached data and no network');
-        yield put(fatalError('Unable to load data. Please check your internet connection and try again.'));
+        yield put(fatalError('无法加载数据。请检查网络连接后重试。'));
         return;
       }
     }
@@ -121,6 +121,6 @@ export function* handleStartupCheck() {
     yield put(initDataLoad({ force: false }));
   } catch (error) {
     console.error('[HTML] Startup error:', error);
-    yield put(fatalError(error instanceof Error ? error.message : 'Startup error'));
+    yield put(fatalError(error instanceof Error ? error.message : '启动失败'));
   }
 }

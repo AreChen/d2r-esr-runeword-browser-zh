@@ -27,8 +27,10 @@ export function ScrollToTopButton() {
       variant="outline"
       size="icon"
       className="fixed bottom-6 right-6 z-50 rounded-full shadow-lg"
-      onClick={() => { window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-      aria-label="Scroll to top"
+      onClick={() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }}
+      aria-label="回到顶部"
     >
       <ChevronUp className="size-5" />
     </Button>

@@ -86,7 +86,7 @@ describe('bonusesToSearchText', () => {
       helmsBoots: [],
       armorShieldsBelts: [],
     };
-    expect(bonusesToSearchText(bonuses)).toBe('fire damage');
+    expect(bonusesToSearchText(bonuses)).toContain('fire damage');
   });
 });
 
@@ -106,6 +106,11 @@ describe('matchesSearch', () => {
     expect(matchesSearch(item, ['perfect'])).toBe(true);
   });
 
+  it('should match translated item names', () => {
+    const item = createSocketable({ name: 'Perfect Topaz' });
+    expect(matchesSearch(item, ['黄玉'])).toBe(true);
+  });
+
   it('should match bonus text', () => {
     const bonuses: SocketableBonuses = {
       weaponsGloves: [createAffix('+50% Fire Damage')],
@@ -114,6 +119,16 @@ describe('matchesSearch', () => {
     };
     const item = createSocketable({ name: 'Test', bonuses });
     expect(matchesSearch(item, ['fire'])).toBe(true);
+  });
+
+  it('should match translated bonus text', () => {
+    const bonuses: SocketableBonuses = {
+      weaponsGloves: [createAffix('+3 to Strength')],
+      helmsBoots: [],
+      armorShieldsBelts: [],
+    };
+    const item = createSocketable({ name: 'Test', bonuses });
+    expect(matchesSearch(item, ['力量'])).toBe(true);
   });
 
   it('should require all terms to match (AND logic)', () => {

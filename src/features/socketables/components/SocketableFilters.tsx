@@ -20,19 +20,19 @@ import {
 } from '../store/socketablesSlice';
 
 const CATEGORY_LABELS: Record<keyof EnabledCategories, string> = {
-  gems: 'Gems',
-  esrRunes: 'ESR Runes',
-  lodRunes: 'LoD Runes',
-  kanjiRunes: 'Kanji Runes',
-  crystals: 'Crystals',
+  gems: '宝石',
+  esrRunes: 'ESR 符文',
+  lodRunes: 'LoD 符文',
+  kanjiRunes: '汉字符文',
+  crystals: '水晶',
 };
 
 const SEARCH_DEBOUNCE_MS = 300;
 
 const SEARCH_EXAMPLES = [
-  { query: 'resist', description: 'items with "resist"' },
-  { query: '"chance of blocking"', description: 'exact phrase' },
-  { query: '"all resistances" mana', description: 'combines phrase + word' },
+  { query: '抗性', description: '包含“抗性”的物品' },
+  { query: '"格挡几率"', description: '精确短语' },
+  { query: '"所有抗性" 法力', description: '短语和关键词组合' },
 ];
 
 export function SocketableFilters() {
@@ -100,7 +100,7 @@ export function SocketableFilters() {
           </label>
         ))}
         <Button variant="outline" size="sm" onClick={handleSelectAll} disabled={allSelected}>
-          All
+          全选
         </Button>
         <label className="flex items-center gap-2 cursor-pointer">
           <Checkbox
@@ -109,7 +109,7 @@ export function SocketableFilters() {
               dispatch(toggleOnlyHighestQuality());
             }}
           />
-          <span className="text-sm">Only highest gem / crystal</span>
+          <span className="text-sm">仅最高级宝石/水晶</span>
         </label>
         <CopyLinkButton getShareUrl={getShareUrl} />
       </div>
@@ -118,24 +118,18 @@ export function SocketableFilters() {
       <div className="max-w-md space-y-1">
         <div className="flex items-center gap-1">
           <p className="text-xs text-muted-foreground">
-            Search by words or <code className="bg-muted px-1 rounded">"exact phrases"</code>
+            支持中文/英文关键词，也可用 <code className="bg-muted px-1 rounded">"精确短语"</code>
           </p>
           <SearchHelpButton examples={SEARCH_EXAMPLES} />
         </div>
         <Label htmlFor="search" className="sr-only">
-          Search
+          搜索
         </Label>
         <InputGroup>
-          <InputGroupInput
-            id="search"
-            type="text"
-            placeholder="Search by name or bonus text..."
-            value={localSearchText}
-            onChange={handleSearchChange}
-          />
+          <InputGroupInput id="search" type="text" placeholder="搜索名称或加成..." value={localSearchText} onChange={handleSearchChange} />
           {localSearchText && (
             <InputGroupAddon align="inline-end">
-              <InputGroupButton variant="ghost" size="icon-xs" onClick={handleClearSearch} aria-label="Clear search">
+              <InputGroupButton variant="ghost" size="icon-xs" onClick={handleClearSearch} aria-label="清空搜索">
                 <X className="size-4" />
               </InputGroupButton>
             </InputGroupAddon>

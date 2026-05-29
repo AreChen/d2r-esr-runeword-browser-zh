@@ -1,14 +1,14 @@
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="zh-CN" class="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <!-- Primary Meta Tags -->
-    <title>ESR Runeword Browser - Eastern Sun Resurrected Runewords for Diablo 2</title>
-    <meta name="title" content="ESR Runeword Browser - Eastern Sun Resurrected Runewords for Diablo 2" />
-    <meta name="description" content="Browse and search all runewords for the Eastern Sun Resurrected (ESR) mod for Diablo 2 Resurrected. Filter by runes, socket count, item type, and bonuses. Includes ESR runes, LoD runes, Kanji runes, gems, and crystals with all socketable bonuses." />
-    <meta name="keywords" content="Eastern Sun Resurrected, ESR, Diablo 2, D2R, runewords, runeword browser, socketables, ESR runes, LoD runes, Kanji runes, gems, crystals, Amethyst, Sapphire, Emerald, Ruby, Diamond, Topaz, Skull, Obsidian, Shadow Quartz, Frozen Soul, Bleeding Stone, Burning Sulphur, Dark Azurite, Bitter Peridot, Pulsing Opal, Enigmatic Cinnabar, Tomb Jade, Solid Mercury, Storm Amber, Tainted Tourmaline, Moon Rune, Fire Rune, Water Rune, Earth Rune, Wind Rune, Thunder Rune, Dragon Rune, Death Rune, Life Rune, Sun Rune, Heaven Rune, God Rune, El Rune, Zod Rune, Jah Rune, Ber Rune, I Rune, Null Rune, mod" />
+    <title>ESR 符文之语浏览器 - 暗黑破坏神 2 Eastern Sun Resurrected 中文查询</title>
+    <meta name="title" content="ESR 符文之语浏览器 - 暗黑破坏神 2 Eastern Sun Resurrected 中文查询" />
+    <meta name="description" content="浏览和搜索暗黑破坏神 2 重制版 Eastern Sun Resurrected（ESR）mod 的符文之语、镶嵌物、暗金物品和神话暗金。支持按符文、孔数、物品类型、等级和属性筛选，并显示中文翻译。" />
+    <meta name="keywords" content="Eastern Sun Resurrected, ESR, Diablo 2, D2R, 暗黑破坏神2, 符文之语, 符文之语浏览器, 镶嵌物, ESR符文, LoD符文, 汉字符文, 宝石, 水晶, 暗金物品, 神话暗金, 中文, mod" />
     <meta name="author" content="D2R ESR Community" />
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://istvan-panczel.github.io/d2r-esr-runeword-browser/" />
@@ -16,15 +16,15 @@
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://istvan-panczel.github.io/d2r-esr-runeword-browser/" />
-    <meta property="og:title" content="ESR Runeword Browser - Eastern Sun Resurrected Runewords" />
-    <meta property="og:description" content="Browse and search all runewords for the Eastern Sun Resurrected mod for Diablo 2 Resurrected. Includes ESR runes, LoD runes, Kanji runes, gems, and crystals." />
-    <meta property="og:site_name" content="ESR Runeword Browser" />
+    <meta property="og:title" content="ESR 符文之语浏览器 - Eastern Sun Resurrected 中文查询" />
+    <meta property="og:description" content="浏览和搜索 Eastern Sun Resurrected mod 的符文之语、镶嵌物与暗金物品，包含中文翻译。" />
+    <meta property="og:site_name" content="ESR 符文之语浏览器" />
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary" />
     <meta property="twitter:url" content="https://istvan-panczel.github.io/d2r-esr-runeword-browser/" />
-    <meta property="twitter:title" content="ESR Runeword Browser - Eastern Sun Resurrected Runewords" />
-    <meta property="twitter:description" content="Browse and search all runewords for the Eastern Sun Resurrected mod for Diablo 2 Resurrected. Includes ESR runes, LoD runes, Kanji runes, gems, and crystals." />
+    <meta property="twitter:title" content="ESR 符文之语浏览器 - Eastern Sun Resurrected 中文查询" />
+    <meta property="twitter:description" content="浏览和搜索 Eastern Sun Resurrected mod 的符文之语、镶嵌物与暗金物品，包含中文翻译。" />
 
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -34,8 +34,8 @@
     {
       "@context": "https://schema.org",
       "@type": "WebApplication",
-      "name": "ESR Runeword Browser",
-      "description": "Browse and search runewords for the Eastern Sun Resurrected mod for Diablo 2 Resurrected",
+      "name": "ESR 符文之语浏览器",
+      "description": "浏览和搜索暗黑破坏神 2 Eastern Sun Resurrected mod 的符文之语、镶嵌物与暗金物品",
       "url": "https://istvan-panczel.github.io/d2r-esr-runeword-browser/",
       "applicationCategory": "GameApplication",
       "operatingSystem": "Any",
@@ -62,6 +62,14 @@
     </script>
     <script type="module" src="/src/main.tsx"></script>
     <!-- Cloudflare Web Analytics -->
-    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "6aa9085c81314d438c8350a88c917aed"}'></script>
+    <script>
+      if (!['localhost', '127.0.0.1', '::1'].includes(location.hostname)) {
+        var analytics = document.createElement('script');
+        analytics.defer = true;
+        analytics.src = 'https://static.cloudflareinsights.com/beacon.min.js';
+        analytics.dataset.cfBeacon = '{"token":"6aa9085c81314d438c8350a88c917aed"}';
+        document.body.appendChild(analytics);
+      }
+    </script>
   </body>
 </html>

@@ -27,16 +27,16 @@ export function CopyLinkButton({ getShareUrl }: CopyLinkButtonProps) {
   };
 
   return (
-    <Button variant="outline" size="sm" onClick={handleCopy} aria-label={copied ? 'Link copied' : 'Copy link to clipboard'}>
+    <Button variant="outline" size="sm" onClick={handleCopy} aria-label={copied ? '链接已复制' : '复制链接到剪贴板'}>
       {copied ? (
         <>
           <Check className="size-4" />
-          Copied!
+          已复制
         </>
       ) : (
         <>
           <Link className="size-4" />
-          Copy Link
+          复制链接
         </>
       )}
     </Button>

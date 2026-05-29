@@ -3,6 +3,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useRuneGroups } from '../hooks/useRuneGroups';
 import { toggleRune, toggleRuneGroup, selectSelectedRunes } from '../store/runewordsSlice';
 import { ESR_TIER_TEXT_COLORS, CATEGORY_TEXT_COLORS } from '../constants/tierColors';
+import { translateGameText } from '@/core/i18n';
 import type { RuneGroup } from '../types';
 
 function getGroupTextColor(group: RuneGroup): string {
@@ -19,6 +20,20 @@ function getTierState(runes: readonly string[], category: string, selectedRunes:
   if (selectedCount === 0) return 'none';
   if (selectedCount === runes.length) return 'all';
   return 'some';
+}
+
+function getRuneGroupLabel(group: RuneGroup): string {
+  if (group.category === 'esrRunes' && group.tier !== null) {
+    return `ESR ${String(group.tier)} 阶`;
+  }
+  if (group.category === 'lodRunes' && group.tier !== null) {
+    const labels: Record<number, string> = { 1: 'LoD 低级', 2: 'LoD 中级', 3: 'LoD 高级' };
+    return labels[group.tier] ?? group.label;
+  }
+  if (group.category === 'kanjiRunes') {
+    return '汉字符文';
+  }
+  return group.label;
 }
 
 interface RuneGroupSectionProps {
@@ -47,7 +62,7 @@ function RuneGroupSection({ group, labelClassName, runeClassName }: RuneGroupSec
           checked={tierState === 'all' ? true : tierState === 'some' ? 'indeterminate' : false}
           onCheckedChange={handleTierToggle}
         />
-        <span className={`font-medium text-sm ${textColorClass}`}>{group.label}:</span>
+        <span className={`font-medium text-sm ${textColorClass}`}>{getRuneGroupLabel(group)}:</span>
       </label>
 
       {/* Individual rune checkboxes */}
@@ -61,7 +76,7 @@ function RuneGroupSection({ group, labelClassName, runeClassName }: RuneGroupSec
                 dispatch(toggleRune({ rune, category: group.category }));
               }}
             />
-            <span className={`text-sm ${textColorClass}`}>{rune.replace(' Rune', '')}</span>
+            <span className={`text-sm ${textColorClass}`}>{translateGameText(rune).replace(/\s*(Rune|符文)$/u, '')}</span>
           </label>
         );
       })}

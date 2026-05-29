@@ -6,6 +6,7 @@ import { RunewordPointsDisplay } from './RunewordPointsDisplay';
 import { useRuneBonuses } from '../hooks/useRuneBonuses';
 import { getRelevantCategories, getCategoryLabel, type BonusCategory } from '../utils/itemCategoryMapping';
 import { isGemName } from '@/features/data-sync/parsers/gemsParser';
+import { translateGameText } from '@/core/i18n';
 import type { Runeword } from '@/core/db/models';
 
 interface RunewordCardProps {
@@ -46,15 +47,17 @@ export function RunewordCard({ runeword }: RunewordCardProps) {
 
   // Check if we have any rune bonuses to show
   const hasRuneBonuses = runeBonuses && relevantCategories.some((cat) => runeBonuses[cat].length > 0);
+  const translatedAllowedItems = allowedItems.map(translateGameText).join(', ');
+  const translatedExcludedItems = excludedItems.map(translateGameText).join(', ');
 
   return (
     <Card className="h-full">
       <CardHeader className="pb-0">
         <div className="flex items-start justify-between gap-2">
-          <CardTitle className="text-lg text-amber-700 dark:text-amber-400">{name}</CardTitle>
+          <CardTitle className="text-lg text-amber-700 dark:text-amber-400">{translateGameText(name)}</CardTitle>
           <div className="flex gap-1">
-            <Badge variant="secondary">{sockets} Socket</Badge>
-            {reqLevel !== undefined && <Badge variant="outline">Lvl {reqLevel}</Badge>}
+            <Badge variant="secondary">{sockets} 孔</Badge>
+            {reqLevel !== undefined && <Badge variant="outline">等级 {reqLevel}</Badge>}
           </div>
         </div>
       </CardHeader>
@@ -69,7 +72,7 @@ export function RunewordCard({ runeword }: RunewordCardProps) {
               <RuneBadge key={`${item}-${String(index)}`} runeName={item} isLod={isLod} />
             )
           )}
-          {jewelInfo && <Badge variant="outline">{jewelInfo}</Badge>}
+          {jewelInfo && <Badge variant="outline">{translateGameText(jewelInfo)}</Badge>}
         </div>
 
         {/* Tier point totals - check with 'in' for backwards compatibility with old cached data */}
@@ -77,15 +80,15 @@ export function RunewordCard({ runeword }: RunewordCardProps) {
 
         {/* Allowed items */}
         <div>
-          <p className="font-medium text-muted-foreground mb-1">Items:</p>
-          <p className="text-sm">{allowedItems.join(', ')}</p>
-          {excludedItems.length > 0 && <p className="text-sm text-muted-foreground mt-1">Excluded: {excludedItems.join(', ')}</p>}
+          <p className="font-medium text-muted-foreground mb-1">适用物品:</p>
+          <p className="text-sm">{translatedAllowedItems}</p>
+          {excludedItems.length > 0 && <p className="text-sm text-muted-foreground mt-1">排除: {translatedExcludedItems}</p>}
         </div>
 
         {/* Runeword Affixes */}
         {affixes.length > 0 && (
           <div className="text-center">
-            <p className="font-medium text-muted-foreground mb-1">Bonuses:</p>
+            <p className="font-medium text-muted-foreground mb-1">符文之语属性:</p>
             {hasColumnDifferences && columnAffixes ? (
               <div className="grid grid-cols-2 gap-3 text-sm">
                 {relevantCategories.map((category) => {
@@ -93,10 +96,12 @@ export function RunewordCard({ runeword }: RunewordCardProps) {
                   if (colAffixes.length === 0) return null;
                   return (
                     <div key={category}>
-                      <p className="font-medium text-muted-foreground text-xs mb-1">{getCategoryLabel(allowedItems, category)}:</p>
+                      <p className="font-medium text-muted-foreground text-xs mb-1">
+                        {translateGameText(getCategoryLabel(allowedItems, category))}:
+                      </p>
                       <ul className="space-y-0.5 text-[#8080E6] text-xs">
                         {colAffixes.map((affix, index) => (
-                          <li key={`${String(index)}-${affix.rawText}`}>{affix.rawText}</li>
+                          <li key={`${String(index)}-${affix.rawText}`}>{translateGameText(affix.rawText)}</li>
                         ))}
                       </ul>
                     </div>
@@ -106,7 +111,7 @@ export function RunewordCard({ runeword }: RunewordCardProps) {
             ) : (
               <ul className="space-y-0.5 text-[#8080E6]">
                 {affixes.map((affix, index) => (
-                  <li key={`${String(index)}-${affix.rawText}`}>{affix.rawText}</li>
+                  <li key={`${String(index)}-${affix.rawText}`}>{translateGameText(affix.rawText)}</li>
                 ))}
               </ul>
             )}
@@ -116,12 +121,12 @@ export function RunewordCard({ runeword }: RunewordCardProps) {
         {/* Rune Bonuses */}
         {hasRuneBonuses && (
           <div className="border-t pt-3">
-            <p className="font-medium text-muted-foreground mb-2 text-center">Socketable Bonuses:</p>
+            <p className="font-medium text-muted-foreground mb-2 text-center">镶嵌物加成:</p>
             {relevantCategories.length === 1 ? (
               // Single category - centered list
               <ul className="space-y-0.5 text-[#8080E6] text-center">
                 {getBonusesForCategory(relevantCategories[0]).map((bonus, index) => (
-                  <li key={`${String(index)}-${bonus}`}>{bonus}</li>
+                  <li key={`${String(index)}-${bonus}`}>{translateGameText(bonus)}</li>
                 ))}
               </ul>
             ) : (
@@ -132,10 +137,12 @@ export function RunewordCard({ runeword }: RunewordCardProps) {
                   if (bonuses.length === 0) return null;
                   return (
                     <div key={category}>
-                      <p className="font-medium text-muted-foreground text-xs mb-1">{getCategoryLabel(allowedItems, category)}:</p>
+                      <p className="font-medium text-muted-foreground text-xs mb-1">
+                        {translateGameText(getCategoryLabel(allowedItems, category))}:
+                      </p>
                       <ul className="space-y-0.5 text-[#8080E6] text-xs">
                         {bonuses.map((bonus, index) => (
-                          <li key={`${String(index)}-${bonus}`}>{bonus}</li>
+                          <li key={`${String(index)}-${bonus}`}>{translateGameText(bonus)}</li>
                         ))}
                       </ul>
                     </div>

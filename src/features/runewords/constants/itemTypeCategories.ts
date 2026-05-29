@@ -63,7 +63,7 @@ export function groupItemTypesByCategory(availableTypes: readonly string[]): Gro
 
   const uncategorized = availableTypes.filter((t) => !KNOWN_ITEM_TYPES.has(t));
   if (uncategorized.length > 0) {
-    groups.push({ label: 'New', itemTypes: uncategorized });
+    groups.push({ label: '新增', itemTypes: uncategorized });
   }
 
   return groups;

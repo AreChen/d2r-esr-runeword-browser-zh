@@ -93,18 +93,18 @@ export function HtmUniqueItemFilters() {
         <div className="flex-1 min-w-64 max-w-md space-y-1">
           <div className="flex items-center gap-1">
             <p className="text-xs text-muted-foreground">
-              Search by words or <code className="bg-muted px-1 rounded">"exact phrases"</code>
+              支持中文/英文关键词，也可用 <code className="bg-muted px-1 rounded">"精确短语"</code>
             </p>
             <SearchHelpButton />
           </div>
           <Label htmlFor="htm-unique-search" className="sr-only">
-            Search
+            搜索
           </Label>
           <InputGroup>
             <InputGroupInput
               id="htm-unique-search"
               type="text"
-              placeholder="Search name or properties..."
+              placeholder="搜索名称或属性..."
               value={localSearchText}
               onChange={handleSearchChange}
               autoComplete="off"
@@ -114,7 +114,7 @@ export function HtmUniqueItemFilters() {
             />
             {localSearchText && (
               <InputGroupAddon align="inline-end">
-                <InputGroupButton variant="ghost" size="icon-xs" onClick={handleClearSearch} aria-label="Clear search">
+                <InputGroupButton variant="ghost" size="icon-xs" onClick={handleClearSearch} aria-label="清空搜索">
                   <X className="size-4" />
                 </InputGroupButton>
               </InputGroupAddon>
@@ -124,9 +124,9 @@ export function HtmUniqueItemFilters() {
 
         {/* Max Required Level */}
         <div className="w-32 space-y-1">
-          <p className="text-xs text-muted-foreground">Max required level.</p>
+          <p className="text-xs text-muted-foreground">最高所需等级。</p>
           <Label htmlFor="htm-unique-maxReqLevel" className="sr-only">
-            Max Req Level
+            最高所需等级
           </Label>
           <InputGroup>
             <InputGroupInput
@@ -134,7 +134,7 @@ export function HtmUniqueItemFilters() {
               type="number"
               min={1}
               max={999}
-              placeholder="Max Req Lvl"
+              placeholder="最高等级"
               value={localMaxReqLevel ?? ''}
               onChange={handleMaxReqLevelChange}
               autoComplete="off"
@@ -142,7 +142,7 @@ export function HtmUniqueItemFilters() {
             />
             {localMaxReqLevel !== null && (
               <InputGroupAddon align="inline-end">
-                <InputGroupButton variant="ghost" size="icon-xs" onClick={handleClearMaxReqLevel} aria-label="Clear max req level">
+                <InputGroupButton variant="ghost" size="icon-xs" onClick={handleClearMaxReqLevel} aria-label="清空最高所需等级">
                   <X className="size-4" />
                 </InputGroupButton>
               </InputGroupAddon>

@@ -1,5 +1,6 @@
 import type { Runeword, EsrRune, LodRune, KanjiRune, Gem, SocketableBonuses } from '@/core/db/models';
 import { getRelevantCategories, getItemCategory } from './itemCategoryMapping';
+import { buildLocalizedSearchText } from '@/core/i18n';
 
 export type RuneBonusMap = Map<string, SocketableBonuses>;
 export type GemBonusMap = Map<string, SocketableBonuses>;
@@ -44,6 +45,10 @@ export function parseSearchTerms(searchText: string): string[] {
  * Build searchable text from rune bonuses for a runeword.
  */
 export function getRuneBonusesText(runeword: Runeword, runeBonusMap: RuneBonusMap): string {
+  return getRuneBonusTexts(runeword, runeBonusMap).join(' ');
+}
+
+function getRuneBonusTexts(runeword: Runeword, runeBonusMap: RuneBonusMap): string[] {
   const relevantCategories = getRelevantCategories(runeword.allowedItems);
   const bonusTexts: string[] = [];
 
@@ -58,15 +63,19 @@ export function getRuneBonusesText(runeword: Runeword, runeBonusMap: RuneBonusMa
     }
   }
 
-  return bonusTexts.join(' ');
+  return bonusTexts;
 }
 
 /**
  * Build searchable text from gem bonuses for a runeword.
  */
 export function getGemBonusesText(runeword: Runeword, gemBonusMap: GemBonusMap): string {
+  return getGemBonusTexts(runeword, gemBonusMap).join(' ');
+}
+
+function getGemBonusTexts(runeword: Runeword, gemBonusMap: GemBonusMap): string[] {
   const gems = 'gems' in runeword ? runeword.gems : [];
-  if (gems.length === 0) return '';
+  if (gems.length === 0) return [];
 
   const relevantCategories = getRelevantCategories(runeword.allowedItems);
   const bonusTexts: string[] = [];
@@ -82,7 +91,7 @@ export function getGemBonusesText(runeword: Runeword, gemBonusMap: GemBonusMap):
     }
   }
 
-  return bonusTexts.join(' ');
+  return bonusTexts;
 }
 
 /**
@@ -110,11 +119,10 @@ export function matchesSearch(
   // Search all column affixes to catch column-specific bonuses, fall back to legacy affixes if columns are empty
   const { weaponsGloves, helmsBoots, armorShieldsBelts } = runeword.columnAffixes;
   const allColumnAffixes = [...weaponsGloves, ...helmsBoots, ...armorShieldsBelts];
-  const affixText =
-    allColumnAffixes.length > 0 ? allColumnAffixes.map((a) => a.rawText).join(' ') : runeword.affixes.map((a) => a.rawText).join(' ');
-  const runeBonusText = getRuneBonusesText(runeword, runeBonusMap);
-  const gemBonusText = gemBonusMap ? getGemBonusesText(runeword, gemBonusMap) : '';
-  const searchableText = `${runeword.name} ${affixText} ${runeBonusText} ${gemBonusText}`.toLowerCase();
+  const affixTexts = allColumnAffixes.length > 0 ? allColumnAffixes.map((a) => a.rawText) : runeword.affixes.map((a) => a.rawText);
+  const runeBonusTexts = getRuneBonusTexts(runeword, runeBonusMap);
+  const gemBonusTexts = gemBonusMap ? getGemBonusTexts(runeword, gemBonusMap) : [];
+  const searchableText = buildLocalizedSearchText([runeword.name, ...affixTexts, ...runeBonusTexts, ...gemBonusTexts]);
 
   return searchTerms.every((term) => searchableText.includes(term));
 }

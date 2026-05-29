@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { db } from '@/core/db';
+import { translateGameText } from '@/core/i18n';
 import type { SocketableBonuses } from '@/core/db/models';
 
 interface RuneTooltipProps {
@@ -62,37 +63,37 @@ export function RuneTooltip({ runeName, children, isLod }: RuneTooltipProps) {
       <PopoverTrigger asChild>{children}</PopoverTrigger>
       <PopoverContent className="w-80">
         {/* Rune name */}
-        <div className="font-medium mb-2">{runeData.name}</div>
-        <p className="text-sm text-muted-foreground mb-3">Req Level: {runeData.reqLevel}</p>
+        <div className="font-medium mb-2">{translateGameText(runeData.name)}</div>
+        <p className="text-sm text-muted-foreground mb-3">所需等级: {runeData.reqLevel}</p>
 
         {/* Bonuses */}
         <div className="space-y-2 text-xs">
           {runeData.bonuses.weaponsGloves.length > 0 && (
             <div>
-              <p className="font-medium text-muted-foreground">Weapons/Gloves:</p>
+              <p className="font-medium text-muted-foreground">武器/手套:</p>
               <ul className="mt-0.5 space-y-0.5">
                 {runeData.bonuses.weaponsGloves.map((a) => (
-                  <li key={a.rawText}>{a.rawText}</li>
+                  <li key={a.rawText}>{translateGameText(a.rawText)}</li>
                 ))}
               </ul>
             </div>
           )}
           {runeData.bonuses.helmsBoots.length > 0 && (
             <div>
-              <p className="font-medium text-muted-foreground">Helms/Boots:</p>
+              <p className="font-medium text-muted-foreground">头盔/靴子:</p>
               <ul className="mt-0.5 space-y-0.5">
                 {runeData.bonuses.helmsBoots.map((a) => (
-                  <li key={a.rawText}>{a.rawText}</li>
+                  <li key={a.rawText}>{translateGameText(a.rawText)}</li>
                 ))}
               </ul>
             </div>
           )}
           {runeData.bonuses.armorShieldsBelts.length > 0 && (
             <div>
-              <p className="font-medium text-muted-foreground">Armor/Shields/Belts:</p>
+              <p className="font-medium text-muted-foreground">护甲/盾牌/腰带:</p>
               <ul className="mt-0.5 space-y-0.5">
                 {runeData.bonuses.armorShieldsBelts.map((a) => (
-                  <li key={a.rawText}>{a.rawText}</li>
+                  <li key={a.rawText}>{translateGameText(a.rawText)}</li>
                 ))}
               </ul>
             </div>

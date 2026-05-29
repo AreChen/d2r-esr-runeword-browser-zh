@@ -12,11 +12,11 @@ const CHANGELOG_URL = 'https://easternsunresurrected.com/changelogs.html';
 const GITHUB_URL = 'https://github.com/istvan-panczel/d2r-esr-runeword-browser';
 
 const NAV_ITEMS = [
-  { to: '/', label: 'Runewords', end: true },
-  { to: '/socketables', label: 'Socketables', end: false },
-  { to: '/uniques', label: 'Uniques', end: false },
-  { to: '/mythicals', label: 'Mythicals', end: false },
-  { to: '/ascendancies', label: 'Ascendancies', end: false },
+  { to: '/', label: '符文之语', end: true },
+  { to: '/socketables', label: '镶嵌物', end: false },
+  { to: '/uniques', label: '暗金物品', end: false },
+  { to: '/mythicals', label: '神话暗金', end: false },
+  { to: '/ascendancies', label: '升华', end: false },
 ] as const;
 
 /** GitHub icon (lucide Github is deprecated, using simple-icons SVG path) */
@@ -69,7 +69,7 @@ export function Header() {
             onClick={() => {
               setMobileMenuOpen(true);
             }}
-            aria-label="Open navigation menu"
+            aria-label="打开导航菜单"
           >
             <Menu className="size-5" />
           </Button>
@@ -86,7 +86,7 @@ export function Header() {
               rel="noopener noreferrer"
               className="px-3 py-2 text-sm font-medium rounded-md transition-colors text-muted-foreground hover:text-foreground inline-flex items-center gap-1"
             >
-              ESR Documentation
+              ESR 文档
               <ExternalLink className="size-3" />
             </a>
             <a
@@ -95,21 +95,21 @@ export function Header() {
               rel="noopener noreferrer"
               className="px-3 py-2 text-sm font-medium rounded-md transition-colors text-muted-foreground hover:text-foreground inline-flex items-center gap-1"
             >
-              Changelog
+              更新日志
               <ExternalLink className="size-3" />
             </a>
           </nav>
         </div>
         <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon" onClick={handleThemeToggle} aria-label="Toggle theme">
+          <Button variant="ghost" size="icon" onClick={handleThemeToggle} aria-label="切换主题">
             {theme === 'dark' ? <Sun className="size-5" /> : <Moon className="size-5" />}
           </Button>
-          <Button variant="ghost" size="icon" asChild aria-label="View source on GitHub">
+          <Button variant="ghost" size="icon" asChild aria-label="在 GitHub 查看源码">
             <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer">
               <GitHubIcon className="size-5" />
             </a>
           </Button>
-          <Button variant="ghost" size="icon" onClick={() => dispatch(openDrawer())} aria-label="Open settings">
+          <Button variant="ghost" size="icon" onClick={() => dispatch(openDrawer())} aria-label="打开设置">
             <Settings className="size-5" />
           </Button>
         </div>
@@ -119,7 +119,7 @@ export function Header() {
       <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
         <SheetContent side="left" className="w-72" aria-describedby={undefined}>
           <SheetHeader>
-            <SheetTitle>Navigation</SheetTitle>
+            <SheetTitle>导航</SheetTitle>
           </SheetHeader>
           <nav className="mt-0 px-4 pb-2 flex flex-col gap-1">
             {NAV_ITEMS.map((item) => (
@@ -142,7 +142,7 @@ export function Header() {
               className="block px-4 py-3 text-base font-medium rounded-md transition-colors text-muted-foreground hover:text-foreground"
             >
               <span className="inline-flex items-center gap-1">
-                ESR Documentation
+                ESR 文档
                 <ExternalLink className="size-3" />
               </span>
             </a>
@@ -153,7 +153,7 @@ export function Header() {
               className="block px-4 py-3 text-base font-medium rounded-md transition-colors text-muted-foreground hover:text-foreground"
             >
               <span className="inline-flex items-center gap-1">
-                Changelog
+                更新日志
                 <ExternalLink className="size-3" />
               </span>
             </a>

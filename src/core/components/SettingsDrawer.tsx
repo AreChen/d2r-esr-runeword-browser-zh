@@ -20,13 +20,13 @@ import {
 import { initDataLoad, selectIsLoading, selectNetworkWarning, selectIsUsingCachedData } from '@/core/store';
 import appVersion from '@/assets/version.json';
 
-const TEXT_SIZE_LABELS = ['Small', 'Normal', 'Large', 'Extra Large'] as const;
+const TEXT_SIZE_LABELS = ['小', '标准', '大', '特大'] as const;
 const TEXT_SIZE_VALUES: TextSize[] = ['small', 'normal', 'large', 'extralarge'];
 
 function formatLastUpdated(isoString: string | undefined): string {
-  if (!isoString) return 'Never';
+  if (!isoString) return '从未';
   const date = new Date(isoString);
-  if (Number.isNaN(date.getTime())) return 'Never';
+  if (Number.isNaN(date.getTime())) return '从未';
   return `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
 }
 
@@ -44,7 +44,7 @@ export function SettingsDrawer() {
   // Live query for metadata
   const version = useLiveQuery(async () => {
     const meta = await db.metadata.get('esrVersion');
-    return meta?.value ?? 'Unknown';
+    return meta?.value ?? '未知';
   });
 
   const lastUpdated = useLiveQuery(async () => {
@@ -69,7 +69,7 @@ export function SettingsDrawer() {
     >
       <SheetContent aria-describedby={undefined}>
         <SheetHeader>
-          <SheetTitle>Settings</SheetTitle>
+          <SheetTitle>设置</SheetTitle>
         </SheetHeader>
 
         <div className="mt-0 space-y-5 flex-1 overflow-y-auto px-4 pb-2">
@@ -82,7 +82,7 @@ export function SettingsDrawer() {
 
           {/* Theme Section */}
           <div className="space-y-3">
-            <Label className="text-sm font-medium">Theme</Label>
+            <Label className="text-sm font-medium">主题</Label>
             <div className="space-y-2">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
@@ -94,7 +94,7 @@ export function SettingsDrawer() {
                   }}
                   className="accent-primary"
                 />
-                <span>Dark (default)</span>
+                <span>深色（默认）</span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
@@ -106,14 +106,14 @@ export function SettingsDrawer() {
                   }}
                   className="accent-primary"
                 />
-                <span>Light</span>
+                <span>浅色</span>
               </label>
             </div>
           </div>
 
           {/* Font Section */}
           <div className="space-y-3">
-            <Label className="text-sm font-medium">Font</Label>
+            <Label className="text-sm font-medium">字体</Label>
             <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="checkbox"
@@ -123,33 +123,33 @@ export function SettingsDrawer() {
                 }}
                 className="accent-primary"
               />
-              <span>Use Diablo 2 style font</span>
+              <span>使用暗黑 2 风格字体</span>
             </label>
           </div>
 
           {/* Text Size Section */}
           <div className="space-y-3">
-            <Label className="text-sm font-medium">Text Size</Label>
+            <Label className="text-sm font-medium">文字大小</Label>
             <Slider value={[textSizeIndex]} onValueChange={handleTextSizeChange} min={0} max={3} step={1} className="w-full" />
             <p className="text-sm text-muted-foreground text-center">{TEXT_SIZE_LABELS[textSizeIndex]}</p>
           </div>
 
           {/* Data Section */}
           <div className="space-y-3">
-            <Label className="text-sm font-medium">Data</Label>
+            <Label className="text-sm font-medium">数据</Label>
             <Button onClick={() => dispatch(initDataLoad({ force: true }))} disabled={isLoading} className="w-full">
               {isLoading ? <Spinner className="mr-2" /> : null}
-              {isLoading ? 'Refreshing...' : 'Force Refresh Data'}
+              {isLoading ? '正在刷新...' : '强制刷新数据'}
             </Button>
-            <p className="text-xs text-muted-foreground">Re-downloads all data from ESR documentation.</p>
+            <p className="text-xs text-muted-foreground">从 ESR 文档重新下载全部数据。</p>
           </div>
 
           {/* Info Section */}
           <div className="space-y-2 text-sm text-muted-foreground">
-            <p>App Version: {appVersion.version}</p>
-            <p>ESR Version: {version}</p>
-            <p>Last updated: {lastUpdated}</p>
-            {isUsingCachedData ? <p className="text-yellow-500">Using cached data</p> : null}
+            <p>应用版本: {appVersion.version}</p>
+            <p>ESR 版本: {version}</p>
+            <p>上次更新: {lastUpdated}</p>
+            {isUsingCachedData ? <p className="text-yellow-500">正在使用缓存数据</p> : null}
           </div>
         </div>
       </SheetContent>

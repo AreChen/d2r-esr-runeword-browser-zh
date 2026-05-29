@@ -77,19 +77,19 @@ const dataSyncSlice = createSlice({
     // Error actions
     fetchHtmlError(state, action: PayloadAction<string>) {
       state.requestState = RequestState.ERROR;
-      state.error = `Failed to fetch data: ${action.payload}`;
+      state.error = `获取数据失败: ${action.payload}`;
     },
     parseDataError(state, action: PayloadAction<string>) {
       state.requestState = RequestState.ERROR;
-      state.error = `Failed to parse data: ${action.payload}`;
+      state.error = `解析数据失败: ${action.payload}`;
     },
     storeDataError(state, action: PayloadAction<string>) {
       state.requestState = RequestState.ERROR;
-      state.error = `Failed to store data: ${action.payload}`;
+      state.error = `保存数据失败: ${action.payload}`;
     },
     extractAffixesError(state, action: PayloadAction<string>) {
       state.requestState = RequestState.ERROR;
-      state.error = `Failed to extract affixes: ${action.payload}`;
+      state.error = `提取属性失败: ${action.payload}`;
     },
     fatalError(state, action: PayloadAction<string>) {
       state.requestState = RequestState.ERROR;

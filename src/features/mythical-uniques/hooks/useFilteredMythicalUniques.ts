@@ -4,6 +4,7 @@ import { db } from '@/core/db';
 import type { MythicalUnique } from '@/core/db';
 import { selectSearchText, selectSelectedCategories } from '../store';
 import { parseSearchTerms } from '@/features/runewords/utils/filteringHelpers';
+import { buildLocalizedSearchText } from '@/core/i18n';
 
 /**
  * Hook to get filtered and sorted mythical unique items.
@@ -41,10 +42,14 @@ function matchesCategory(category: string, selectedCategories: ReadonlySet<strin
 function matchesSearch(item: MythicalUnique, searchTerms: readonly string[]): boolean {
   if (searchTerms.length === 0) return true;
 
-  const propertyText = item.properties.join(' ');
-  const specialPropertyText = item.specialProperties.join(' ');
-  const notesText = item.notes.join(' ');
-  const searchableText = `${item.name} ${item.baseItem} ${item.category} ${propertyText} ${specialPropertyText} ${notesText}`.toLowerCase();
+  const searchableText = buildLocalizedSearchText([
+    item.name,
+    item.baseItem,
+    item.category,
+    ...item.properties,
+    ...item.specialProperties,
+    ...item.notes,
+  ]);
 
   return searchTerms.every((term) => searchableText.includes(term));
 }

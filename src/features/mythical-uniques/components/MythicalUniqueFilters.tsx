@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { CopyLinkButton } from '@/components/CopyLinkButton';
 import { SearchHelpButton } from '@/components/SearchHelpButton';
 import { db } from '@/core/db';
+import { translateGameText } from '@/core/i18n';
 import { useShareUrl } from '../hooks/useShareUrl';
 import {
   setSearchText,
@@ -87,18 +88,18 @@ export function MythicalUniqueFilters() {
         <div className="flex-1 min-w-64 max-w-md space-y-1">
           <div className="flex items-center gap-1">
             <p className="text-xs text-muted-foreground">
-              Search by words or <code className="bg-muted px-1 rounded">"exact phrases"</code>
+              支持中文/英文关键词，也可用 <code className="bg-muted px-1 rounded">"精确短语"</code>
             </p>
             <SearchHelpButton />
           </div>
           <Label htmlFor="mythical-search" className="sr-only">
-            Search
+            搜索
           </Label>
           <InputGroup>
             <InputGroupInput
               id="mythical-search"
               type="text"
-              placeholder="Search name or properties..."
+              placeholder="搜索名称或属性..."
               value={localSearchText}
               onChange={handleSearchChange}
               autoComplete="off"
@@ -108,7 +109,7 @@ export function MythicalUniqueFilters() {
             />
             {localSearchText && (
               <InputGroupAddon align="inline-end">
-                <InputGroupButton variant="ghost" size="icon-xs" onClick={handleClearSearch} aria-label="Clear search">
+                <InputGroupButton variant="ghost" size="icon-xs" onClick={handleClearSearch} aria-label="清空搜索">
                   <X className="size-4" />
                 </InputGroupButton>
               </InputGroupAddon>
@@ -124,7 +125,7 @@ export function MythicalUniqueFilters() {
       {availableCategories && availableCategories.length > 0 && (
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium">Categories</span>
+            <span className="text-sm font-medium">类别</span>
             <Button
               variant="outline"
               size="sm"
@@ -132,7 +133,7 @@ export function MythicalUniqueFilters() {
               disabled={isAllSelected}
               onClick={() => dispatch(selectAllCategories())}
             >
-              All
+              全选
             </Button>
             <Button
               variant="outline"
@@ -141,7 +142,7 @@ export function MythicalUniqueFilters() {
               disabled={isNoneSelected}
               onClick={() => dispatch(deselectAllCategories())}
             >
-              None
+              全不选
             </Button>
           </div>
           <div className="flex flex-wrap gap-x-4 gap-y-2">
@@ -153,7 +154,7 @@ export function MythicalUniqueFilters() {
                     handleToggleCategory(category);
                   }}
                 />
-                {category}
+                {translateGameText(category)}
               </label>
             ))}
           </div>

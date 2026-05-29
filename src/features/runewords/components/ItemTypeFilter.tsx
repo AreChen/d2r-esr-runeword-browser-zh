@@ -10,6 +10,7 @@ import {
   selectSelectedItemTypes,
 } from '../store/runewordsSlice';
 import { groupItemTypesByCategory, type GroupedItemTypes } from '../constants/itemTypeCategories';
+import { translateGameText } from '@/core/i18n';
 
 type GroupState = 'all' | 'some' | 'none';
 
@@ -43,7 +44,7 @@ function ItemGroupSection({ group }: ItemGroupSectionProps) {
           checked={groupState === 'all' ? true : groupState === 'some' ? 'indeterminate' : false}
           onCheckedChange={handleGroupToggle}
         />
-        <span className="font-bold text-sm text-muted-foreground">{group.label}:</span>
+        <span className="font-bold text-sm text-muted-foreground">{translateGameText(group.label)}:</span>
       </label>
 
       {/* Individual item type checkboxes */}
@@ -55,7 +56,7 @@ function ItemGroupSection({ group }: ItemGroupSectionProps) {
               dispatch(toggleItemType(itemType));
             }}
           />
-          <span className="text-sm">{itemType}</span>
+          <span className="text-sm">{translateGameText(itemType)}</span>
         </label>
       ))}
     </div>
@@ -76,12 +77,12 @@ export function ItemTypeFilter() {
   return (
     <div className="space-y-2">
       <div className="flex items-center gap-2">
-        <span className="font-medium text-sm">Item Types:</span>
+        <span className="font-medium text-sm">物品类型:</span>
         <Button variant="outline" size="sm" onClick={() => dispatch(selectAllItemTypes())} disabled={allSelected}>
-          All
+          全选
         </Button>
         <Button variant="outline" size="sm" onClick={() => dispatch(deselectAllItemTypes())} disabled={noneSelected}>
-          None
+          全不选
         </Button>
       </div>
       <div className="space-y-1.5">

@@ -9,7 +9,7 @@ interface CategoryBadgeProps {
 const CATEGORY_CONFIG: Record<SocketableCategory, { label: string; className: string }> = {
   // Gems: Amethyst purple
   gems: {
-    label: 'Gem',
+    label: '宝石',
     className: 'bg-purple-200 text-purple-800 hover:bg-purple-200 dark:bg-purple-900 dark:text-purple-200 dark:hover:bg-purple-900',
   },
   // ESR Runes: Tier 2 red
@@ -24,12 +24,12 @@ const CATEGORY_CONFIG: Record<SocketableCategory, { label: string; className: st
   },
   // Kanji Runes: Blue
   kanjiRunes: {
-    label: 'Kanji',
+    label: '汉字',
     className: 'bg-blue-200 text-blue-800 hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-200 dark:hover:bg-blue-900',
   },
   // Crystals: Peridot green
   crystals: {
-    label: 'Crystal',
+    label: '水晶',
     className: 'bg-green-200 text-green-800 hover:bg-green-200 dark:bg-green-900 dark:text-green-200 dark:hover:bg-green-900',
   },
 };

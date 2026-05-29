@@ -3,6 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { db } from '@/core/db';
 import { RuneTooltip } from './RuneTooltip';
+import { translateGameText } from '@/core/i18n';
 
 // Background colors for ESR tiers — same hue as tier text colors, dimmed to 70%
 const ESR_TIER_BG_COLORS: Record<number, string> = {
@@ -29,7 +30,7 @@ interface RuneBadgeProps {
 
 export function RuneBadge({ runeName, isLod }: RuneBadgeProps) {
   // Strip " Rune" suffix for display
-  const displayName = runeName.replace(' Rune', '');
+  const displayName = translateGameText(runeName).replace(/\s*(Rune|符文)$/u, '');
 
   // Look up rune data to get tier and category.
   // For LoD runewords, check LoD first to resolve shared runes (e.g. Ko) correctly.

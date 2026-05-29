@@ -148,18 +148,18 @@ export function RunewordFilters() {
         <div className="flex-1 min-w-64 max-w-md space-y-1">
           <div className="flex items-center gap-1">
             <p className="text-xs text-muted-foreground">
-              Search by words or <code className="bg-muted px-1 rounded">"exact phrases"</code>
+              支持中文/英文关键词，也可用 <code className="bg-muted px-1 rounded">"精确短语"</code>
             </p>
             <SearchHelpButton />
           </div>
           <Label htmlFor="search" className="sr-only">
-            Search
+            搜索
           </Label>
           <InputGroup>
             <InputGroupInput
               id="search"
               type="text"
-              placeholder="Search name or affixes..."
+              placeholder="搜索名称或属性..."
               value={localSearchText}
               onChange={handleSearchChange}
               autoComplete="off"
@@ -169,7 +169,7 @@ export function RunewordFilters() {
             />
             {localSearchText && (
               <InputGroupAddon align="inline-end">
-                <InputGroupButton variant="ghost" size="icon-xs" onClick={handleClearSearch} aria-label="Clear search">
+                <InputGroupButton variant="ghost" size="icon-xs" onClick={handleClearSearch} aria-label="清空搜索">
                   <X className="size-4" />
                 </InputGroupButton>
               </InputGroupAddon>
@@ -179,9 +179,9 @@ export function RunewordFilters() {
 
         {/* Socket count */}
         <div className="w-32 space-y-1">
-          <p className="text-xs text-muted-foreground">Filter by # of sockets.</p>
+          <p className="text-xs text-muted-foreground">按孔数筛选。</p>
           <Label htmlFor="sockets" className="sr-only">
-            Sockets
+            孔数
           </Label>
           <InputGroup>
             <InputGroupInput
@@ -189,14 +189,14 @@ export function RunewordFilters() {
               type="number"
               min={1}
               max={6}
-              placeholder="Sockets"
+              placeholder="孔数"
               value={localSocketCount ?? ''}
               onChange={handleSocketChange}
               className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
             />
             {localSocketCount !== null && (
               <InputGroupAddon align="inline-end">
-                <InputGroupButton variant="ghost" size="icon-xs" onClick={handleClearSockets} aria-label="Clear sockets">
+                <InputGroupButton variant="ghost" size="icon-xs" onClick={handleClearSockets} aria-label="清空孔数">
                   <X className="size-4" />
                 </InputGroupButton>
               </InputGroupAddon>
@@ -206,9 +206,9 @@ export function RunewordFilters() {
 
         {/* Max Required Level */}
         <div className="w-32 space-y-1">
-          <p className="text-xs text-muted-foreground">Max required level.</p>
+          <p className="text-xs text-muted-foreground">最高所需等级。</p>
           <Label htmlFor="maxReqLevel" className="sr-only">
-            Max Req Level
+            最高所需等级
           </Label>
           <InputGroup>
             <InputGroupInput
@@ -216,7 +216,7 @@ export function RunewordFilters() {
               type="number"
               min={1}
               max={999}
-              placeholder="Max Req Lvl"
+              placeholder="最高等级"
               value={localMaxReqLevel ?? ''}
               onChange={handleMaxReqLevelChange}
               autoComplete="off"
@@ -224,7 +224,7 @@ export function RunewordFilters() {
             />
             {localMaxReqLevel !== null && (
               <InputGroupAddon align="inline-end">
-                <InputGroupButton variant="ghost" size="icon-xs" onClick={handleClearMaxReqLevel} aria-label="Clear max req level">
+                <InputGroupButton variant="ghost" size="icon-xs" onClick={handleClearMaxReqLevel} aria-label="清空最高所需等级">
                   <X className="size-4" />
                 </InputGroupButton>
               </InputGroupAddon>
@@ -235,7 +235,7 @@ export function RunewordFilters() {
         {/* Copy Link button */}
         <div className="space-y-1">
           <div className="flex items-center gap-1">
-            <p className="text-xs text-muted-foreground">Share your current filters.</p>
+            <p className="text-xs text-muted-foreground">分享当前筛选条件。</p>
             <CopyLinkHelpButton />
           </div>
           <CopyLinkButton getShareUrl={getShareUrl} />
@@ -251,12 +251,12 @@ export function RunewordFilters() {
       {/* Rune Filter with All/None toggles */}
       <div className="space-y-2">
         <div className="flex items-center gap-2">
-          <span className="font-medium text-sm">Runes:</span>
+          <span className="font-medium text-sm">符文:</span>
           <Button variant="outline" size="sm" onClick={() => dispatch(selectAllRunes())} disabled={allRunesSelected}>
-            All
+            全选
           </Button>
           <Button variant="outline" size="sm" onClick={() => dispatch(deselectAllRunes())} disabled={noRunesSelected}>
-            None
+            全不选
           </Button>
         </div>
         <RuneCheckboxGroup />

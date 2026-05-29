@@ -1,6 +1,7 @@
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import type { Ascendancy } from '@/core/db';
 import { ESR_BASE_URL } from '@/core/api';
+import { translateGameText } from '@/core/i18n';
 
 interface AscendancyCardProps {
   readonly item: Ascendancy;
@@ -17,21 +18,26 @@ export function AscendancyCard({ item }: AscendancyCardProps) {
         {/* Image */}
         {item.imageUrl && (
           <div className="flex justify-center mb-2">
-            <img src={resolveImageUrl(item.imageUrl)} alt={item.name} className="max-h-32 object-contain" loading="lazy" />
+            <img
+              src={resolveImageUrl(item.imageUrl)}
+              alt={translateGameText(item.name)}
+              className="max-h-32 object-contain"
+              loading="lazy"
+            />
           </div>
         )}
 
-        <CardTitle className="text-lg text-amber-700 dark:text-amber-400 text-center">{item.name} Ascendancy</CardTitle>
+        <CardTitle className="text-lg text-amber-700 dark:text-amber-400 text-center">{translateGameText(item.name)} 升华</CardTitle>
       </CardHeader>
 
       <CardContent className="space-y-3">
         {/* Tiers */}
         {item.tiers.map((tier) => (
           <div key={tier.tier} className="text-center">
-            <p className="text-sm font-semibold text-amber-600 dark:text-amber-500">Tier {tier.tier}</p>
+            <p className="text-sm font-semibold text-amber-600 dark:text-amber-500">第 {tier.tier} 阶</p>
             <ul className="space-y-0.5 text-[#8080E6]">
               {tier.bonuses.map((bonus, idx) => (
-                <li key={`${String(tier.tier)}-${String(idx)}`}>{bonus}</li>
+                <li key={`${String(tier.tier)}-${String(idx)}`}>{translateGameText(bonus)}</li>
               ))}
             </ul>
           </div>
@@ -42,7 +48,7 @@ export function AscendancyCard({ item }: AscendancyCardProps) {
           <div className="border-t pt-2">
             <ul className="space-y-1 text-sm text-muted-foreground">
               {item.footnotes.map((fn, idx) => (
-                <li key={`fn-${String(idx)}`}>{fn}</li>
+                <li key={`fn-${String(idx)}`}>{translateGameText(fn)}</li>
               ))}
             </ul>
           </div>

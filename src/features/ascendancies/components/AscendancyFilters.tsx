@@ -11,9 +11,9 @@ import { setSearchText, selectSearchText } from '../store';
 const SEARCH_DEBOUNCE_MS = 300;
 
 const SEARCH_EXAMPLES = [
-  { query: 'spell damage', description: 'ascendancies with "spell damage"' },
-  { query: '"class skill"', description: 'exact phrase match' },
-  { query: 'resist strength', description: 'both "resist" and "strength"' },
+  { query: '法术伤害', description: '包含“法术伤害”的升华' },
+  { query: '"职业技能"', description: '精确短语匹配' },
+  { query: '抗性 力量', description: '同时包含“抗性”和“力量”' },
 ];
 
 export function AscendancyFilters() {
@@ -59,18 +59,18 @@ export function AscendancyFilters() {
         <div className="flex-1 min-w-64 max-w-md space-y-1">
           <div className="flex items-center gap-1">
             <p className="text-xs text-muted-foreground">
-              Search by words or <code className="bg-muted px-1 rounded">"exact phrases"</code>
+              支持中文/英文关键词，也可用 <code className="bg-muted px-1 rounded">"精确短语"</code>
             </p>
             <SearchHelpButton examples={SEARCH_EXAMPLES} />
           </div>
           <Label htmlFor="ascendancy-search" className="sr-only">
-            Search
+            搜索
           </Label>
           <InputGroup>
             <InputGroupInput
               id="ascendancy-search"
               type="text"
-              placeholder="Search name or bonuses..."
+              placeholder="搜索名称或加成..."
               value={localSearchText}
               onChange={handleSearchChange}
               autoComplete="off"
@@ -80,7 +80,7 @@ export function AscendancyFilters() {
             />
             {localSearchText && (
               <InputGroupAddon align="inline-end">
-                <InputGroupButton variant="ghost" size="icon-xs" onClick={handleClearSearch} aria-label="Clear search">
+                <InputGroupButton variant="ghost" size="icon-xs" onClick={handleClearSearch} aria-label="清空搜索">
                   <X className="size-4" />
                 </InputGroupButton>
               </InputGroupAddon>

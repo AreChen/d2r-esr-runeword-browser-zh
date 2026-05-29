@@ -13,14 +13,14 @@ export async function fetchLatestVersion(): Promise<ChangelogVersion> {
   const response = await fetch(REMOTE_URLS.changelog);
 
   if (!response.ok) {
-    throw new Error(`Failed to fetch changelog: ${String(response.status)} ${response.statusText}`);
+    throw new Error(`获取更新日志失败: ${String(response.status)} ${response.statusText}`);
   }
 
   const html = await response.text();
   const match = VERSION_PATTERN.exec(html);
 
   if (!match) {
-    throw new Error('Could not parse version from changelog');
+    throw new Error('无法从更新日志解析版本号');
   }
 
   return {

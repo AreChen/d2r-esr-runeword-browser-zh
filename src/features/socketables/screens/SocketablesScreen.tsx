@@ -20,11 +20,11 @@ export function SocketablesScreen() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-4">Socketables</h1>
+      <h1 className="text-2xl font-bold mb-4">镶嵌物</h1>
       <SocketableFilters />
 
       {socketables.length === 0 ? (
-        <p className="text-muted-foreground py-8 text-center">No socketables found. Try adjusting your filters or load data first.</p>
+        <p className="text-muted-foreground py-8 text-center">没有找到镶嵌物。请调整筛选条件或先加载数据。</p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {socketables.map((socketable) => (

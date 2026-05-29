@@ -20,10 +20,10 @@ export function AppLayout() {
     return (
       <div className="min-h-svh flex flex-col items-center justify-center p-4">
         <div className="text-center max-w-md">
-          <h1 className="text-xl font-bold text-destructive mb-4">Unable to Load</h1>
+          <h1 className="text-xl font-bold text-destructive mb-4">无法加载</h1>
           <p className="text-muted-foreground mb-4">{error}</p>
           <Button onClick={handleRetry} variant="outline">
-            Try Again
+            重试
           </Button>
         </div>
       </div>
@@ -35,7 +35,7 @@ export function AppLayout() {
     return (
       <div className="min-h-svh flex flex-col items-center justify-center">
         <Spinner className="size-12 mb-4" />
-        <p className="text-muted-foreground">Loading data...</p>
+        <p className="text-muted-foreground">正在加载数据...</p>
       </div>
     );
   }

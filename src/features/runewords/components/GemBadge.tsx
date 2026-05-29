@@ -3,6 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { db } from '@/core/db';
 import { GemTooltip } from './GemTooltip';
+import { translateGameText } from '@/core/i18n';
 
 const GEM_BG_COLORS: Record<string, string> = {
   RED: 'bg-red-600/30 dark:bg-red-600/30',
@@ -27,7 +28,7 @@ export function GemBadge({ gemName }: GemBadgeProps) {
   return (
     <GemTooltip gemName={gemName}>
       <Badge variant="outline" className={cn('cursor-pointer opacity-100 hover:opacity-75', bgColorClass)}>
-        {gemName}
+        {translateGameText(gemName)}
       </Badge>
     </GemTooltip>
   );

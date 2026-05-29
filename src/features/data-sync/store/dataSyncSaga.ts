@@ -81,7 +81,7 @@ function* handleFetchHtml(action: PayloadAction<{ force?: boolean } | undefined>
     if (count > 0 && !action.payload?.force) {
       // Not a force refresh and we have cached data - use it
       console.log('[HTML] Using cached data (fetch failed, have', count, 'runewords cached)');
-      yield put(setNetworkWarning('Unable to fetch latest data. Using cached version.'));
+      yield put(setNetworkWarning('无法获取最新数据，正在使用缓存版本。'));
       yield put(startupUseCached());
     } else {
       // Force refresh or no cached data - report error
@@ -89,7 +89,7 @@ function* handleFetchHtml(action: PayloadAction<{ force?: boolean } | undefined>
       yield put(fetchHtmlError(error instanceof Error ? error.message : 'Network error'));
 
       if (count === 0) {
-        yield put(fatalError('Unable to load data. Please check your internet connection and try again.'));
+        yield put(fatalError('无法加载数据。请检查网络连接后重试。'));
       }
     }
   }

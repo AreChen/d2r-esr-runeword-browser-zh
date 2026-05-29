@@ -23,6 +23,7 @@
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage",
     "test:fixtures": "node scripts/fetch-test-fixtures.js",
+    "translations:generate": "node scripts/generate-zh-translations.js",
     "socketables:names": "node scripts/extract-socketable-names.js",
     "version:extract": "node scripts/extract-version.js"
   },

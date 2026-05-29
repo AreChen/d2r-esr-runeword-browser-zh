@@ -20,13 +20,13 @@ export function MythicalUniquesScreen() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-4">Mythical Uniques ({items.length})</h1>
+      <h1 className="text-2xl font-bold mb-4">神话暗金 ({items.length})</h1>
       <MythicalUniqueFilters />
 
-      <p className="text-sm text-muted-foreground mb-4">Showing {items.length} mythical uniques</p>
+      <p className="text-sm text-muted-foreground mb-4">当前显示 {items.length} 件神话暗金</p>
 
       {items.length === 0 ? (
-        <p className="text-muted-foreground py-8 text-center">No mythical uniques found. Try adjusting your filters.</p>
+        <p className="text-muted-foreground py-8 text-center">没有找到神话暗金。请调整筛选条件。</p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {items.map((item) => (

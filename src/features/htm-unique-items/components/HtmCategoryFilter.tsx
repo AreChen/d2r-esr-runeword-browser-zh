@@ -11,6 +11,7 @@ import {
   setIncludeCouponItems,
 } from '../store';
 import { useCategoryFilters, getAllCategoriesFromGroups } from '../hooks';
+import { translateGameText } from '@/core/i18n';
 import type { HtmFilterGroup } from '../types';
 
 type GroupState = 'all' | 'some' | 'none';
@@ -74,7 +75,7 @@ function CategoryGroupSection({ group, allCategories }: CategoryGroupSectionProp
           checked={groupState === 'all' ? true : groupState === 'some' ? 'indeterminate' : false}
           onCheckedChange={handleGroupToggle}
         />
-        <span className="font-bold text-sm text-muted-foreground">{group.label}:</span>
+        <span className="font-bold text-sm text-muted-foreground">{translateGameText(group.label)}:</span>
       </label>
 
       {group.categories.map((category) => (
@@ -85,7 +86,7 @@ function CategoryGroupSection({ group, allCategories }: CategoryGroupSectionProp
               handleCategoryToggle(category);
             }}
           />
-          <span className="text-sm">{category}</span>
+          <span className="text-sm">{translateGameText(category)}</span>
         </label>
       ))}
     </div>
@@ -100,7 +101,7 @@ export function HtmCategoryFilter() {
   const includeCouponItems = useSelector(selectIncludeCouponItems);
 
   if (!filterGroups) {
-    return <div className="text-sm text-muted-foreground">Loading filters...</div>;
+    return <div className="text-sm text-muted-foreground">正在加载筛选器...</div>;
   }
 
   const allCategories = getAllCategoriesFromGroups(filterGroups);
@@ -109,12 +110,12 @@ export function HtmCategoryFilter() {
   return (
     <div className="space-y-2">
       <div className="flex items-center gap-2">
-        <span className="font-medium text-sm">Categories:</span>
+        <span className="font-medium text-sm">类别:</span>
         <Button variant="outline" size="sm" onClick={() => dispatch(selectAllCategories())} disabled={isAllSelected}>
-          All
+          全选
         </Button>
         <Button variant="outline" size="sm" onClick={() => dispatch(deselectAllCategories())} disabled={noneSelected}>
-          None
+          全不选
         </Button>
         <label className="flex items-center gap-1.5 cursor-pointer ml-2">
           <Checkbox
@@ -123,7 +124,7 @@ export function HtmCategoryFilter() {
               dispatch(setIncludeCouponItems(checked === true));
             }}
           />
-          <span className="text-sm text-purple-600 dark:text-purple-400">Include Coupon Items</span>
+          <span className="text-sm text-purple-600 dark:text-purple-400">包含兑换券物品</span>
         </label>
       </div>
       <div className="space-y-4">

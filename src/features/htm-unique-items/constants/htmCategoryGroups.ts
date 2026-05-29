@@ -15,12 +15,12 @@ const HTM_CATEGORY_GROUPS: readonly HtmCategoryDefinition[] = [
   // ── Weapons page ──────────────────────────────────────────────────────────
   {
     id: 'missile-weapons',
-    label: 'Missile Weapons',
+    label: '远程武器',
     categories: ['Bow', 'Bow Quiver2', 'Crossbow', 'Crossbow Quiver2', 'Javelin', 'Shuriken', 'Throwing Axe', 'Throwing Knife'],
   },
   {
     id: 'class-weapons',
-    label: 'Class Specific',
+    label: '职业专属',
     categories: [
       'Amazon Bow',
       'Amazon Javelin',
@@ -37,7 +37,7 @@ const HTM_CATEGORY_GROUPS: readonly HtmCategoryDefinition[] = [
   },
   {
     id: 'weapons',
-    label: 'Weapons',
+    label: '武器',
     categories: [
       'Axe',
       'Club',
@@ -59,24 +59,24 @@ const HTM_CATEGORY_GROUPS: readonly HtmCategoryDefinition[] = [
   // ── Armors page ───────────────────────────────────────────────────────────
   {
     id: 'armors',
-    label: 'Armors',
+    label: '护甲',
     categories: ['Belt', 'Body Armor', 'Boots', 'Circlet', 'Cloak', 'Gloves', 'Helm', 'Robe', 'Shield'],
   },
   {
     id: 'class-armors',
-    label: 'Class Specific',
+    label: '职业专属',
     categories: ['Auric Shields', 'Pelt', 'Primal Helm', 'Spirit Crown', 'Voodoo Heads'],
   },
 
   // ── Other page ────────────────────────────────────────────────────────────
   {
     id: 'rings',
-    label: 'Rings',
+    label: '戒指',
     categories: ['Ring', 'Ama Ring', 'Ass Ring', 'Bar Ring', 'Coupon Rings', 'Dru Ring', 'Nec Ring', 'Pal Ring', 'Sor Ring'],
   },
   {
     id: 'amulets',
-    label: 'Amulets',
+    label: '项链',
     categories: [
       'Amulet',
       'Ama Amulet',
@@ -91,12 +91,12 @@ const HTM_CATEGORY_GROUPS: readonly HtmCategoryDefinition[] = [
   },
   {
     id: 'charms',
-    label: 'Charms',
+    label: '护身符',
     categories: ['Grand Charm', 'Large Charm', 'Odd Charm', 'Small Charm'],
   },
   {
     id: 'jewels',
-    label: 'Jewels',
+    label: '珠宝',
     categories: ['Jewel'],
   },
 ];
@@ -121,7 +121,7 @@ export function groupHtmCategories(availableCategories: readonly string[]): HtmF
 
   const uncategorized = availableCategories.filter((c) => !KNOWN_CATEGORIES.has(c));
   if (uncategorized.length > 0) {
-    groups.push({ id: 'new', label: 'New', categories: uncategorized });
+    groups.push({ id: 'new', label: '新增', categories: uncategorized });
   }
 
   return groups;

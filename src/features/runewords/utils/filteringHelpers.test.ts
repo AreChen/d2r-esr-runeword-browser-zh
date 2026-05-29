@@ -451,12 +451,25 @@ describe('matchesSearch', () => {
     expect(matchesSearch(runeword, ['spirit'], emptyBonusMap)).toBe(true);
   });
 
+  it('should match translated runeword names', () => {
+    const runeword = createRuneword({ name: 'Call to Arms' });
+    expect(matchesSearch(runeword, parseSearchTerms('号召'), emptyBonusMap)).toBe(true);
+  });
+
   it('should match affix text', () => {
     const runeword = createRuneword({
       name: 'Test',
       affixes: [createAffix('+2 To All Skills')],
     });
     expect(matchesSearch(runeword, ['skills'], emptyBonusMap)).toBe(true);
+  });
+
+  it('should match translated affix text', () => {
+    const runeword = createRuneword({
+      name: 'Test',
+      affixes: [createAffix('+3 to Strength')],
+    });
+    expect(matchesSearch(runeword, parseSearchTerms('力量'), emptyBonusMap)).toBe(true);
   });
 
   it('should require all terms to match (AND logic)', () => {

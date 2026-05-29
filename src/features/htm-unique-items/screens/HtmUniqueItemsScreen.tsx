@@ -20,13 +20,13 @@ export function HtmUniqueItemsScreen() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-4">Unique Items ({items.length})</h1>
+      <h1 className="text-2xl font-bold mb-4">暗金物品 ({items.length})</h1>
       <HtmUniqueItemFilters />
 
-      <p className="text-sm text-muted-foreground mb-4">Showing {items.length} unique items</p>
+      <p className="text-sm text-muted-foreground mb-4">当前显示 {items.length} 件暗金物品</p>
 
       {items.length === 0 ? (
-        <p className="text-muted-foreground py-8 text-center">No unique items found. Try adjusting your filters.</p>
+        <p className="text-muted-foreground py-8 text-center">没有找到暗金物品。请调整筛选条件。</p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {items.map((item) => (

@@ -2,6 +2,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { CategoryBadge } from './CategoryBadge';
 import { getSocketableColorClass } from '../utils/socketableColors';
+import { translateGameText } from '@/core/i18n';
 import type { UnifiedSocketable } from '../types';
 
 interface SocketableCardProps {
@@ -19,21 +20,21 @@ export function SocketableCard({ socketable }: SocketableCardProps) {
       <CardHeader className="pb-0">
         <div className="flex items-start justify-between gap-2">
           <CardTitle className={cn('text-base', colorClass)}>
-            {name}
-            {points !== undefined && <span className="text-muted-foreground font-normal"> ({points} pts)</span>}
+            {translateGameText(name)}
+            {points !== undefined && <span className="text-muted-foreground font-normal"> ({points} 点)</span>}
           </CardTitle>
           <CategoryBadge category={category} />
         </div>
-        <p className="text-sm text-muted-foreground">Req Level: {reqLevel}</p>
+        <p className="text-sm text-muted-foreground">所需等级: {reqLevel}</p>
       </CardHeader>
       <CardContent className="space-y-3 text-sm">
         {/* Weapons/Gloves bonuses */}
         {bonuses.weaponsGloves.length > 0 && (
           <div>
-            <p className="font-medium text-muted-foreground mb-1">Weapons/Gloves:</p>
+            <p className="font-medium text-muted-foreground mb-1">武器/手套:</p>
             <ul className="space-y-0.5 text-[#8080E6]">
               {bonuses.weaponsGloves.map((affix) => (
-                <li key={affix.rawText}>{affix.rawText}</li>
+                <li key={affix.rawText}>{translateGameText(affix.rawText)}</li>
               ))}
             </ul>
           </div>
@@ -42,10 +43,10 @@ export function SocketableCard({ socketable }: SocketableCardProps) {
         {/* Helms/Boots bonuses */}
         {bonuses.helmsBoots.length > 0 && (
           <div>
-            <p className="font-medium text-muted-foreground mb-1">Helms/Boots:</p>
+            <p className="font-medium text-muted-foreground mb-1">头盔/靴子:</p>
             <ul className="space-y-0.5 text-[#8080E6]">
               {bonuses.helmsBoots.map((affix) => (
-                <li key={affix.rawText}>{affix.rawText}</li>
+                <li key={affix.rawText}>{translateGameText(affix.rawText)}</li>
               ))}
             </ul>
           </div>
@@ -54,10 +55,10 @@ export function SocketableCard({ socketable }: SocketableCardProps) {
         {/* Armor/Shields/Belts bonuses */}
         {bonuses.armorShieldsBelts.length > 0 && (
           <div>
-            <p className="font-medium text-muted-foreground mb-1">Armor/Shields/Belts:</p>
+            <p className="font-medium text-muted-foreground mb-1">护甲/盾牌/腰带:</p>
             <ul className="space-y-0.5 text-[#8080E6]">
               {bonuses.armorShieldsBelts.map((affix) => (
-                <li key={affix.rawText}>{affix.rawText}</li>
+                <li key={affix.rawText}>{translateGameText(affix.rawText)}</li>
               ))}
             </ul>
           </div>
