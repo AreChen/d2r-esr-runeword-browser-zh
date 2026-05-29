@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://istvan-panczel.github.io/d2r-esr-runeword-browser/sitemap.xml
+Sitemap: https://arechen.github.io/d2r-esr-runeword-browser-zh/sitemap.xml
