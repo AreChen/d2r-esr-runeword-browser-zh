@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Search, X } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -7,13 +6,22 @@ import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import { ScrollToTopButton } from '@/components/ScrollToTopButton';
+import { usePersistentState } from '@/core/hooks/usePersistentState';
 import { buildLocalizedSearchText } from '@/core/i18n';
 import { translateGuideText } from '@/core/i18n/guideTranslation';
 import type { GuidePage, GuidePageGroup } from '@/core/db';
 import { parseSearchTerms } from '@/features/runewords/utils/filteringHelpers';
 import { GuidePageContent } from '../components/GuidePageContent';
+import { GuideTableFilterControls } from '../components/GuideTableFilterControls';
 import { useGuidePages } from '../hooks/useGuidePages';
 import { getGuidePageBlockSummary } from '../utils/guidePageSummary';
+import {
+  DEFAULT_GUIDE_TABLE_FILTERS,
+  filterGuidePageTables,
+  getGuideTableSections,
+  isGuideTableFilterState,
+  type GuideTableFilterState,
+} from '../utils/guideTableFilters';
 
 type GroupFilter = 'all' | GuidePageGroup;
 
@@ -22,6 +30,33 @@ const GROUP_FILTERS: readonly { readonly value: GroupFilter; readonly label: str
   { value: 'base', label: '基础资料' },
   { value: 'features', label: '机制说明' },
 ];
+
+interface DatabaseBrowserState {
+  readonly groupFilter: GroupFilter;
+  readonly searchText: string;
+  readonly selectedPageId: string | null;
+}
+
+const DEFAULT_DATABASE_BROWSER_STATE: DatabaseBrowserState = {
+  groupFilter: 'all',
+  searchText: '',
+  selectedPageId: null,
+};
+
+function isGroupFilter(value: unknown): value is GroupFilter {
+  return value === 'all' || value === 'base' || value === 'features';
+}
+
+function isDatabaseBrowserState(value: unknown): value is DatabaseBrowserState {
+  if (typeof value !== 'object' || value === null) return false;
+  const candidate = value as Partial<DatabaseBrowserState>;
+
+  return (
+    isGroupFilter(candidate.groupFilter) &&
+    typeof candidate.searchText === 'string' &&
+    (candidate.selectedPageId === null || typeof candidate.selectedPageId === 'string')
+  );
+}
 
 function pageMatchesSearch(page: GuidePage, terms: readonly string[]): boolean {
   if (terms.length === 0) return true;
@@ -40,9 +75,11 @@ function getGroupName(group: GuidePageGroup): string {
 
 export function DatabaseScreen() {
   const pages = useGuidePages();
-  const [groupFilter, setGroupFilter] = useState<GroupFilter>('all');
-  const [searchText, setSearchText] = useState('');
-  const [selectedPageId, setSelectedPageId] = useState<string | null>(null);
+  const [browserState, setBrowserState] = usePersistentState(
+    'd2r-esr.database.browser.v1',
+    DEFAULT_DATABASE_BROWSER_STATE,
+    isDatabaseBrowserState
+  );
 
   if (pages === undefined) {
     return (
@@ -52,8 +89,9 @@ export function DatabaseScreen() {
     );
   }
 
-  const filteredPages = filterPages(pages, groupFilter, searchText);
-  const selectedPage = pages.find((page) => page.id === selectedPageId) ?? (filteredPages.length > 0 ? filteredPages[0] : null);
+  const filteredPages = filterPages(pages, browserState.groupFilter, browserState.searchText);
+  const selectedPage =
+    filteredPages.find((page) => page.id === browserState.selectedPageId) ?? (filteredPages.length > 0 ? filteredPages[0] : null);
 
   return (
     <div className="space-y-5">
@@ -66,11 +104,10 @@ export function DatabaseScreen() {
           {GROUP_FILTERS.map((filter) => (
             <Button
               key={filter.value}
-              variant={groupFilter === filter.value ? 'default' : 'outline'}
+              variant={browserState.groupFilter === filter.value ? 'default' : 'outline'}
               size="sm"
               onClick={() => {
-                setGroupFilter(filter.value);
-                setSelectedPageId(null);
+                setBrowserState((current) => ({ ...current, groupFilter: filter.value, selectedPageId: null }));
               }}
             >
               {filter.label}
@@ -89,25 +126,23 @@ export function DatabaseScreen() {
           </InputGroupAddon>
           <InputGroupInput
             id="database-search"
-            value={searchText}
+            value={browserState.searchText}
             placeholder="搜索资料、机制或词缀..."
             onChange={(event) => {
-              setSearchText(event.target.value);
-              setSelectedPageId(null);
+              setBrowserState((current) => ({ ...current, searchText: event.target.value, selectedPageId: null }));
             }}
             autoComplete="off"
             autoCapitalize="off"
             autoCorrect="off"
             spellCheck={false}
           />
-          {searchText && (
+          {browserState.searchText && (
             <InputGroupAddon align="inline-end">
               <InputGroupButton
                 variant="ghost"
                 size="icon-xs"
                 onClick={() => {
-                  setSearchText('');
-                  setSelectedPageId(null);
+                  setBrowserState((current) => ({ ...current, searchText: '', selectedPageId: null }));
                 }}
                 aria-label="清空搜索"
               >
@@ -133,7 +168,7 @@ export function DatabaseScreen() {
                   page={page}
                   isSelected={selectedPage !== null && selectedPage.id === page.id}
                   onSelect={() => {
-                    setSelectedPageId(page.id);
+                    setBrowserState((current) => ({ ...current, selectedPageId: page.id }));
                   }}
                 />
               ))}
@@ -142,7 +177,7 @@ export function DatabaseScreen() {
 
           <main className="min-w-0 rounded-md border bg-card p-4 md:p-6">
             {selectedPage !== null ? (
-              <GuidePageContent page={selectedPage} />
+              <GuidePagePanel key={selectedPage.id} page={selectedPage} />
             ) : (
               <p className="py-10 text-center text-muted-foreground">没有找到资料页。请调整搜索条件。</p>
             )}
@@ -151,6 +186,29 @@ export function DatabaseScreen() {
       )}
 
       <ScrollToTopButton />
+    </div>
+  );
+}
+
+function GuidePagePanel({ page }: { readonly page: GuidePage }) {
+  const [filters, setFilters] = usePersistentState<GuideTableFilterState>(
+    `d2r-esr.database.tableFilters.${page.id}.v1`,
+    DEFAULT_GUIDE_TABLE_FILTERS,
+    isGuideTableFilterState
+  );
+  const sections = getGuideTableSections(page);
+  const filteredPage = filterGuidePageTables(page, filters);
+
+  return (
+    <div className="space-y-4">
+      <GuideTableFilterControls
+        sections={sections}
+        filters={filters}
+        visibleRowCount={filteredPage.visibleRowCount}
+        totalRowCount={filteredPage.totalRowCount}
+        onFiltersChange={setFilters}
+      />
+      <GuidePageContent page={filteredPage.page} />
     </div>
   );
 }

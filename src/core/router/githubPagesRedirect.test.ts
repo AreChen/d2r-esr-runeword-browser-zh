@@ -29,9 +29,10 @@ describe('GitHub Pages routing metadata', () => {
     }
   });
 
-  it('lists the gemword browser route in the sitemap', () => {
+  it('lists the main browser routes in the sitemap', () => {
     const sitemap = readProjectFile('public/sitemap.xml');
 
     expect(sitemap).toContain(`${CHINESE_FORK_PUBLIC_URL}gemwords`);
+    expect(sitemap).toContain(`${CHINESE_FORK_PUBLIC_URL}vessel-of-souls`);
   });
 });

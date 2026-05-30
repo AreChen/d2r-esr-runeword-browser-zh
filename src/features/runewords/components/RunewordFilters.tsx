@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { X } from 'lucide-react';
+import { writePersistentJson } from '@/core/hooks/usePersistentState';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '@/components/ui/input-group';
@@ -11,6 +12,7 @@ import { RuneCheckboxGroup } from './RuneCheckboxGroup';
 import { ItemTypeFilter } from './ItemTypeFilter';
 import { TierPointsFilter } from './TierPointsFilter';
 import { useShareUrl } from '../hooks/useShareUrl';
+import { RUNEWORD_FILTER_STORAGE_KEY } from '../hooks/useUrlInitialize';
 import {
   setSearchText,
   setSocketCount,
@@ -21,6 +23,8 @@ import {
   selectAllRunes,
   deselectAllRunes,
   selectSelectedRunes,
+  selectSelectedItemTypes,
+  selectMaxTierPoints,
 } from '../store/runewordsSlice';
 
 const SEARCH_DEBOUNCE_MS = 300;
@@ -32,6 +36,8 @@ export function RunewordFilters() {
   const socketCount = useSelector(selectSocketCount);
   const maxReqLevel = useSelector(selectMaxReqLevel);
   const selectedRunes = useSelector(selectSelectedRunes);
+  const selectedItemTypes = useSelector(selectSelectedItemTypes);
+  const maxTierPoints = useSelector(selectMaxTierPoints);
   const getShareUrl = useShareUrl();
 
   const [localSearchText, setLocalSearchText] = useState(searchText);
@@ -93,6 +99,19 @@ export function RunewordFilters() {
       clearTimeout(timer);
     };
   }, [localMaxReqLevel, maxReqLevel, dispatch]);
+
+  useEffect(() => {
+    if (Object.keys(selectedItemTypes).length === 0 || Object.keys(selectedRunes).length === 0) return;
+
+    writePersistentJson(typeof window === 'undefined' ? null : window.localStorage, RUNEWORD_FILTER_STORAGE_KEY, {
+      searchText,
+      socketCount,
+      maxReqLevel,
+      selectedItemTypes,
+      selectedRunes,
+      maxTierPoints,
+    });
+  }, [maxReqLevel, maxTierPoints, searchText, selectedItemTypes, selectedRunes, socketCount]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setLocalSearchText(e.target.value);

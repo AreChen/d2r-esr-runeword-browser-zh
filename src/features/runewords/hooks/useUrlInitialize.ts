@@ -1,9 +1,12 @@
 import { useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
+import { readPersistentJson } from '@/core/hooks/usePersistentState';
 import { useRuneGroups } from './useRuneGroups';
 import { useAvailableItemTypes } from './useAvailableItemTypes';
 import { setSearchText, setSocketCount, setMaxReqLevel, setAllRunes, setAllItemTypes, setMaxTierPoints } from '../store/runewordsSlice';
+
+export const RUNEWORD_FILTER_STORAGE_KEY = 'd2r-esr.runewords.filters.v1';
 
 const URL_PARAM_KEYS = {
   SEARCH: 'search',
@@ -13,6 +16,59 @@ const URL_PARAM_KEYS = {
   RUNES: 'runes',
   TIERPTS: 'tierpts',
 } as const;
+
+interface PersistedRunewordFilters {
+  readonly searchText: string;
+  readonly socketCount: number | null;
+  readonly maxReqLevel: number | null;
+  readonly selectedItemTypes: Record<string, boolean>;
+  readonly selectedRunes: Record<string, boolean>;
+  readonly maxTierPoints: Record<string, number | null>;
+}
+
+const DEFAULT_PERSISTED_FILTERS: PersistedRunewordFilters = {
+  searchText: '',
+  socketCount: null,
+  maxReqLevel: null,
+  selectedItemTypes: {},
+  selectedRunes: {},
+  maxTierPoints: {},
+};
+
+function isBooleanRecord(value: unknown): value is Record<string, boolean> {
+  return typeof value === 'object' && value !== null && Object.values(value).every((entry) => typeof entry === 'boolean');
+}
+
+function isNumberOrNullRecord(value: unknown): value is Record<string, number | null> {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    Object.values(value).every((entry) => entry === null || (typeof entry === 'number' && Number.isFinite(entry)))
+  );
+}
+
+function isPersistedRunewordFilters(value: unknown): value is PersistedRunewordFilters {
+  if (typeof value !== 'object' || value === null) return false;
+  const candidate = value as Partial<PersistedRunewordFilters>;
+
+  return (
+    typeof candidate.searchText === 'string' &&
+    (candidate.socketCount === null || typeof candidate.socketCount === 'number') &&
+    (candidate.maxReqLevel === null || typeof candidate.maxReqLevel === 'number') &&
+    isBooleanRecord(candidate.selectedItemTypes) &&
+    isBooleanRecord(candidate.selectedRunes) &&
+    isNumberOrNullRecord(candidate.maxTierPoints)
+  );
+}
+
+function readStoredRunewordFilters(): PersistedRunewordFilters {
+  return readPersistentJson(
+    typeof window === 'undefined' ? null : window.localStorage,
+    RUNEWORD_FILTER_STORAGE_KEY,
+    DEFAULT_PERSISTED_FILTERS,
+    isPersistedRunewordFilters
+  );
+}
 
 /**
  * Initializes runeword filter state from URL query parameters (one-time on mount).
@@ -111,18 +167,27 @@ export function useUrlInitialize(): void {
       // Clean the URL after initialization
       window.history.replaceState({}, '', window.location.pathname);
     } else {
-      // No URL params - initialize with defaults (all selected)
+      const storedFilters = readStoredRunewordFilters();
+
+      dispatch(setSearchText(storedFilters.searchText));
+      dispatch(setSocketCount(storedFilters.socketCount));
+      dispatch(setMaxReqLevel(storedFilters.maxReqLevel));
+
       const allItemTypes: Record<string, boolean> = {};
       for (const type of itemTypes) {
-        allItemTypes[type] = true;
+        allItemTypes[type] = storedFilters.selectedItemTypes[type] ?? true;
       }
       dispatch(setAllItemTypes(allItemTypes));
 
       const allRunes: Record<string, boolean> = {};
       for (const key of allRuneKeys) {
-        allRunes[key] = true;
+        allRunes[key] = storedFilters.selectedRunes[key] ?? true;
       }
       dispatch(setAllRunes(allRunes));
+
+      for (const [tierKey, value] of Object.entries(storedFilters.maxTierPoints)) {
+        dispatch(setMaxTierPoints({ tierKey, value }));
+      }
     }
   }, [runeGroups, itemTypes, searchParams, dispatch]);
 }

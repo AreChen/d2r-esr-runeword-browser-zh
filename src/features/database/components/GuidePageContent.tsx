@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { ExternalLink } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -5,6 +6,9 @@ import { ESR_BASE_URL } from '@/core/api';
 import type { GuideContentBlock, GuidePage, GuideTableBlock } from '@/core/db';
 import { translateGuideText } from '@/core/i18n/guideTranslation';
 import { getGuidePageBlockSummary, getGuidePageHeadings } from '../utils/guidePageSummary';
+
+const INITIAL_GUIDE_TABLE_RENDER_COUNT = 80;
+const GUIDE_TABLE_RENDER_INCREMENT = 160;
 
 interface GuidePageContentProps {
   readonly page: GuidePage;
@@ -35,6 +39,10 @@ function renderMultilineCell(text: string): React.ReactNode {
 }
 
 function GuideTable({ block }: { readonly block: GuideTableBlock }) {
+  const [visibleRows, setVisibleRows] = useState(INITIAL_GUIDE_TABLE_RENDER_COUNT);
+  const renderedRows = block.rows.slice(0, visibleRows);
+  const hasMoreRows = renderedRows.length < block.rows.length;
+
   return (
     <section id={block.id} className="scroll-mt-20 space-y-2">
       {block.caption && <h3 className="text-base font-semibold text-amber-700 dark:text-amber-400">{translated(block.caption)}</h3>}
@@ -52,7 +60,7 @@ function GuideTable({ block }: { readonly block: GuideTableBlock }) {
             </thead>
           )}
           <tbody>
-            {block.rows.map((row, rowIndex) => (
+            {renderedRows.map((row, rowIndex) => (
               <tr key={`row-${String(rowIndex)}`} className="odd:bg-card even:bg-muted/30">
                 {row.map((cell, cellIndex) => (
                   <td key={`${String(rowIndex)}-${String(cellIndex)}`} className="border-b px-3 py-2 align-top">
@@ -64,6 +72,23 @@ function GuideTable({ block }: { readonly block: GuideTableBlock }) {
           </tbody>
         </table>
       </div>
+      {hasMoreRows && (
+        <div className="flex items-center justify-between gap-3 text-xs text-muted-foreground">
+          <span>
+            已显示 {renderedRows.length} / {block.rows.length} 行
+          </span>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              setVisibleRows((current) => current + GUIDE_TABLE_RENDER_INCREMENT);
+            }}
+          >
+            显示更多
+          </Button>
+        </div>
+      )}
     </section>
   );
 }

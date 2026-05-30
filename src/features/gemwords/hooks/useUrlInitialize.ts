@@ -1,9 +1,12 @@
 import { useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
+import { readPersistentJson } from '@/core/hooks/usePersistentState';
 import { useAvailableItemTypes } from './useAvailableItemTypes';
 import { useGemGroups } from './useGemGroups';
 import { setSearchText, setSocketCount, setMaxReqLevel, setAllItemTypes, setAllGems } from '../store/gemwordsSlice';
+
+export const GEMWORD_FILTER_STORAGE_KEY = 'd2r-esr.gemwords.filters.v1';
 
 const URL_PARAM_KEYS = {
   SEARCH: 'search',
@@ -12,6 +15,48 @@ const URL_PARAM_KEYS = {
   ITEMS: 'items',
   GEMS: 'gems',
 } as const;
+
+interface PersistedGemwordFilters {
+  readonly searchText: string;
+  readonly socketCount: number | null;
+  readonly maxReqLevel: number | null;
+  readonly selectedItemTypes: Record<string, boolean>;
+  readonly selectedGems: Record<string, boolean>;
+}
+
+const DEFAULT_PERSISTED_FILTERS: PersistedGemwordFilters = {
+  searchText: '',
+  socketCount: null,
+  maxReqLevel: null,
+  selectedItemTypes: {},
+  selectedGems: {},
+};
+
+function isBooleanRecord(value: unknown): value is Record<string, boolean> {
+  return typeof value === 'object' && value !== null && Object.values(value).every((entry) => typeof entry === 'boolean');
+}
+
+function isPersistedGemwordFilters(value: unknown): value is PersistedGemwordFilters {
+  if (typeof value !== 'object' || value === null) return false;
+  const candidate = value as Partial<PersistedGemwordFilters>;
+
+  return (
+    typeof candidate.searchText === 'string' &&
+    (candidate.socketCount === null || typeof candidate.socketCount === 'number') &&
+    (candidate.maxReqLevel === null || typeof candidate.maxReqLevel === 'number') &&
+    isBooleanRecord(candidate.selectedItemTypes) &&
+    isBooleanRecord(candidate.selectedGems)
+  );
+}
+
+function readStoredGemwordFilters(): PersistedGemwordFilters {
+  return readPersistentJson(
+    typeof window === 'undefined' ? null : window.localStorage,
+    GEMWORD_FILTER_STORAGE_KEY,
+    DEFAULT_PERSISTED_FILTERS,
+    isPersistedGemwordFilters
+  );
+}
 
 export function useUrlInitialize(): void {
   const dispatch = useDispatch();
@@ -70,15 +115,21 @@ export function useUrlInitialize(): void {
 
       window.history.replaceState({}, '', window.location.pathname);
     } else {
+      const storedFilters = readStoredGemwordFilters();
+
+      dispatch(setSearchText(storedFilters.searchText));
+      dispatch(setSocketCount(storedFilters.socketCount));
+      dispatch(setMaxReqLevel(storedFilters.maxReqLevel));
+
       const allItemTypes: Record<string, boolean> = {};
       for (const type of itemTypes) {
-        allItemTypes[type] = true;
+        allItemTypes[type] = storedFilters.selectedItemTypes[type] ?? true;
       }
       dispatch(setAllItemTypes(allItemTypes));
 
       const allGems: Record<string, boolean> = {};
       for (const gem of allGemNames) {
-        allGems[gem] = true;
+        allGems[gem] = storedFilters.selectedGems[gem] ?? true;
       }
       dispatch(setAllGems(allGems));
     }

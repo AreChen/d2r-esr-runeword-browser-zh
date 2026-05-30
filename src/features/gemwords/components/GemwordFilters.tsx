@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { X } from 'lucide-react';
+import { writePersistentJson } from '@/core/hooks/usePersistentState';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '@/components/ui/input-group';
@@ -10,6 +11,7 @@ import { SearchHelpButton } from '@/components/SearchHelpButton';
 import { ItemTypeFilter } from './ItemTypeFilter';
 import { GemCheckboxGroup } from './GemCheckboxGroup';
 import { useShareUrl } from '../hooks/useShareUrl';
+import { GEMWORD_FILTER_STORAGE_KEY } from '../hooks/useUrlInitialize';
 import {
   setSearchText,
   setSocketCount,
@@ -20,6 +22,7 @@ import {
   selectAllGems,
   deselectAllGems,
   selectSelectedGems,
+  selectSelectedItemTypes,
 } from '../store/gemwordsSlice';
 
 const SEARCH_DEBOUNCE_MS = 300;
@@ -31,6 +34,7 @@ export function GemwordFilters() {
   const socketCount = useSelector(selectSocketCount);
   const maxReqLevel = useSelector(selectMaxReqLevel);
   const selectedGems = useSelector(selectSelectedGems);
+  const selectedItemTypes = useSelector(selectSelectedItemTypes);
   const getShareUrl = useShareUrl();
 
   const [localSearchText, setLocalSearchText] = useState(searchText);
@@ -90,6 +94,18 @@ export function GemwordFilters() {
       clearTimeout(timer);
     };
   }, [localMaxReqLevel, maxReqLevel, dispatch]);
+
+  useEffect(() => {
+    if (Object.keys(selectedItemTypes).length === 0 || Object.keys(selectedGems).length === 0) return;
+
+    writePersistentJson(typeof window === 'undefined' ? null : window.localStorage, GEMWORD_FILTER_STORAGE_KEY, {
+      searchText,
+      socketCount,
+      maxReqLevel,
+      selectedItemTypes,
+      selectedGems,
+    });
+  }, [maxReqLevel, searchText, selectedGems, selectedItemTypes, socketCount]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setLocalSearchText(e.target.value);
