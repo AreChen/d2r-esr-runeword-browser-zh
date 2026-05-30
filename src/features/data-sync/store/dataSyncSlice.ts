@@ -1,5 +1,6 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { RequestState } from '@/core/types';
+import type { FetchedGuidePageHtml } from '@/core/api';
 import type { ParsedData } from '../interfaces';
 
 export interface FetchedHtmlData {
@@ -10,6 +11,7 @@ export interface FetchedHtmlData {
   readonly uniqueOthersHtml: string;
   readonly mythicalsHtml: string;
   readonly ascendanciesHtml: string;
+  readonly guidePageHtmls: readonly FetchedGuidePageHtml[];
 }
 
 interface DataSyncState {

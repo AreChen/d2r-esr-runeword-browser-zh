@@ -20,5 +20,12 @@ export type {
   MythicalUnique,
   Ascendancy,
   AscendancyTier,
+  GuidePageGroup,
+  GuideHeadingBlock,
+  GuideParagraphBlock,
+  GuideTableBlock,
+  GuideImageBlock,
+  GuideContentBlock,
+  GuidePage,
   Metadata,
 } from './models';

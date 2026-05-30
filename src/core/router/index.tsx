@@ -5,6 +5,7 @@ import { RunewordsScreen } from '@/features/runewords';
 import { HtmUniqueItemsScreen } from '@/features/htm-unique-items';
 import { MythicalUniquesScreen } from '@/features/mythical-uniques';
 import { AscendanciesScreen } from '@/features/ascendancies';
+import { DatabaseScreen } from '@/features/database';
 
 export const router = createBrowserRouter(
   [
@@ -17,6 +18,7 @@ export const router = createBrowserRouter(
         { path: 'uniques', element: <HtmUniqueItemsScreen /> },
         { path: 'mythicals', element: <MythicalUniquesScreen /> },
         { path: 'ascendancies', element: <AscendanciesScreen /> },
+        { path: 'database', element: <DatabaseScreen /> },
       ],
     },
   ],

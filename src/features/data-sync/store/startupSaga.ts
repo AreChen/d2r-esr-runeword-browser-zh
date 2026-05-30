@@ -98,6 +98,16 @@ export function* handleStartupCheck() {
         return;
       }
 
+      // Check if guidePages table is empty (new table migration)
+      const guidePagesCount: number = (yield call(() => db.guidePages.count())) as number;
+
+      if (guidePagesCount === 0) {
+        console.log('[HTML] Migration needed: guidePages table empty, refetching...');
+        yield put(startupNeedsFetch());
+        yield put(initDataLoad({ force: false }));
+        return;
+      }
+
       // Check if app version changed (catches data model changes and logic fixes)
       const storedAppVersion = (yield call(() => db.metadata.get('appVersion'))) as Metadata | undefined;
       const currentVersion = appVersion.version;

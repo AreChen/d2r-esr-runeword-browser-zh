@@ -8,8 +8,11 @@ import {
   fetchUniqueOthersHtml,
   fetchUniqueMythicalsHtml,
   fetchAscendanciesHtml,
+  fetchAdditionalGuidePageHtmls,
   fetchLatestVersion,
+  getGuidePageEntry,
   type ChangelogVersion,
+  type FetchedGuidePageHtml,
 } from '@/core/api';
 import { db } from '@/core/db';
 import appVersion from '@/assets/version.json';
@@ -23,6 +26,7 @@ import {
   parseHtmUniqueItems,
   parseMythicalUniques,
   parseAscendancies,
+  parseGuidePages,
   type RunePointsLookup,
   type RuneReqLevelLookup,
   type RunePriorityLookup,
@@ -52,7 +56,16 @@ import type { ParsedData } from '../interfaces';
 function* handleFetchHtml(action: PayloadAction<{ force?: boolean } | undefined>) {
   try {
     console.log('[HTML] Fetching HTML files...', { force: action.payload?.force ?? false });
-    const [gemsHtml, runewordsHtml, uniqueWeaponsHtml, uniqueArmorsHtml, uniqueOthersHtml, mythicalsHtml, ascendanciesHtml] = (yield all([
+    const [
+      gemsHtml,
+      runewordsHtml,
+      uniqueWeaponsHtml,
+      uniqueArmorsHtml,
+      uniqueOthersHtml,
+      mythicalsHtml,
+      ascendanciesHtml,
+      additionalGuidePageHtmls,
+    ] = (yield all([
       call(fetchGemsHtml),
       call(fetchRunewordsHtml),
       call(fetchUniqueWeaponsHtml),
@@ -60,7 +73,20 @@ function* handleFetchHtml(action: PayloadAction<{ force?: boolean } | undefined>
       call(fetchUniqueOthersHtml),
       call(fetchUniqueMythicalsHtml),
       call(fetchAscendanciesHtml),
-    ])) as [string, string, string, string, string, string, string];
+      call(fetchAdditionalGuidePageHtmls),
+    ])) as [string, string, string, string, string, string, string, FetchedGuidePageHtml[]];
+
+    const guidePageHtmls: readonly FetchedGuidePageHtml[] = [
+      { entry: getGuidePageEntry('gems'), html: gemsHtml },
+      { entry: getGuidePageEntry('runewords'), html: runewordsHtml },
+      { entry: getGuidePageEntry('uniqueWeapons'), html: uniqueWeaponsHtml },
+      { entry: getGuidePageEntry('uniqueArmors'), html: uniqueArmorsHtml },
+      { entry: getGuidePageEntry('uniqueOthers'), html: uniqueOthersHtml },
+      { entry: getGuidePageEntry('uniqueMythicals'), html: mythicalsHtml },
+      { entry: getGuidePageEntry('ascendancies'), html: ascendanciesHtml },
+      ...additionalGuidePageHtmls,
+    ].sort((a, b) => a.entry.order - b.entry.order);
+
     console.log('[HTML] Fetched HTML files', {
       gemsHtmlLength: gemsHtml.length,
       runewordsHtmlLength: runewordsHtml.length,
@@ -69,9 +95,19 @@ function* handleFetchHtml(action: PayloadAction<{ force?: boolean } | undefined>
       uniqueOthersHtmlLength: uniqueOthersHtml.length,
       mythicalsHtmlLength: mythicalsHtml.length,
       ascendanciesHtmlLength: ascendanciesHtml.length,
+      guidePageHtmls: guidePageHtmls.length,
     });
     yield put(
-      fetchHtmlSuccess({ gemsHtml, runewordsHtml, uniqueWeaponsHtml, uniqueArmorsHtml, uniqueOthersHtml, mythicalsHtml, ascendanciesHtml })
+      fetchHtmlSuccess({
+        gemsHtml,
+        runewordsHtml,
+        uniqueWeaponsHtml,
+        uniqueArmorsHtml,
+        uniqueOthersHtml,
+        mythicalsHtml,
+        ascendanciesHtml,
+        guidePageHtmls,
+      })
     );
   } catch (error) {
     console.error('[HTML] Fetch error:', error);
@@ -98,8 +134,16 @@ function* handleFetchHtml(action: PayloadAction<{ force?: boolean } | undefined>
 function* handleParseData(action: PayloadAction<FetchedHtmlData>) {
   try {
     console.log('[HTML] Parsing HTML data...');
-    const { gemsHtml, runewordsHtml, uniqueWeaponsHtml, uniqueArmorsHtml, uniqueOthersHtml, mythicalsHtml, ascendanciesHtml } =
-      action.payload;
+    const {
+      gemsHtml,
+      runewordsHtml,
+      uniqueWeaponsHtml,
+      uniqueArmorsHtml,
+      uniqueOthersHtml,
+      mythicalsHtml,
+      ascendanciesHtml,
+      guidePageHtmls,
+    } = action.payload;
     const gems = parseGemsHtml(gemsHtml);
     console.log('[HTML] Parsed gems:', gems.length);
     const esrRunes = parseEsrRunesHtml(gemsHtml);
@@ -206,8 +250,22 @@ function* handleParseData(action: PayloadAction<FetchedHtmlData>) {
     const ascendancies = parseAscendancies(ascendanciesHtml);
     console.log('[HTML] Parsed ascendancies:', ascendancies.length);
 
+    const guidePages = parseGuidePages(guidePageHtmls);
+    console.log('[HTML] Parsed guide pages:', guidePages.length);
+
     yield put(
-      parseDataSuccess({ gems, esrRunes, lodRunes, kanjiRunes, crystals, runewords, htmUniqueItems, mythicalUniques, ascendancies })
+      parseDataSuccess({
+        gems,
+        esrRunes,
+        lodRunes,
+        kanjiRunes,
+        crystals,
+        runewords,
+        htmUniqueItems,
+        mythicalUniques,
+        ascendancies,
+        guidePages,
+      })
     );
   } catch (error) {
     console.error('[HTML] Parse error:', error);
@@ -217,7 +275,8 @@ function* handleParseData(action: PayloadAction<FetchedHtmlData>) {
 
 function* handleStoreData(action: PayloadAction<ParsedData>) {
   try {
-    const { gems, esrRunes, lodRunes, kanjiRunes, crystals, runewords, htmUniqueItems, mythicalUniques, ascendancies } = action.payload;
+    const { gems, esrRunes, lodRunes, kanjiRunes, crystals, runewords, htmUniqueItems, mythicalUniques, ascendancies, guidePages } =
+      action.payload;
 
     console.log('[HTML] Storing data to IndexedDB...');
 
@@ -236,6 +295,7 @@ function* handleStoreData(action: PayloadAction<ParsedData>) {
       call(() => db.htmUniqueItems.bulkPut(htmUniqueItems)),
       call(() => db.mythicalUniques.bulkPut(mythicalUniques)),
       call(() => db.ascendancies.bulkPut(ascendancies)),
+      call(() => db.guidePages.bulkPut(guidePages)),
     ]);
     console.log('[HTML] Stored all data tables');
 
@@ -263,6 +323,7 @@ function* handleStoreData(action: PayloadAction<ParsedData>) {
       htmUniqueItems: htmUniqueItems.length,
       mythicalUniques: mythicalUniques.length,
       ascendancies: ascendancies.length,
+      guidePages: guidePages.length,
     });
 
     yield put(storeDataSuccess());

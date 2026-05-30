@@ -15,3 +15,4 @@ export {
 export { parseHtmUniqueItems } from './htmUniqueItemsParser';
 export { parseMythicalUniques } from './mythicalUniquesParser';
 export { parseAscendancies } from './ascendanciesParser';
+export { parseGuidePage, parseGuidePages, type GuidePageHtmlSource } from './guidePagesParser';

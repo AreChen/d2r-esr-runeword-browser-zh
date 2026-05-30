@@ -22,6 +22,7 @@ Project overview, design decisions, and general project information.
 - [Runewords](./features/RUNEWORDS.md) - Browse and filter runewords (primary feature, home page)
 - [Socketables](./features/SOCKETABLES.md) - Unified view of all socketables (gems, runes, crystals) with filters
 - [Unique Items](./features/UNIQUE-ITEMS.md) - Browse and filter unique items parsed from HTM pages
+- Guide Database - Browse official Base Information and Features pages in the app-owned Chinese interface
 
 ### Technical Documentation
 - [Tech Stack](./technical/TECH-STACK.md) - Libraries, frameworks, and tools
@@ -48,6 +49,9 @@ The app uses a single HTM-based data system. All data is fetched from the ESR do
 | Unique Weapons | `unique_weapons.htm` |
 | Unique Armors | `unique_armors.htm` |
 | Unique Others | `unique_others.htm` |
+| Mythical Uniques | `unique_mythicals.htm` |
+| Ascendancies | `ascendancies.htm` |
+| Guide Database | 23 official Base Information / Features pages from `changelogs.html` navigation |
 | Version info | `changelogs.html` |
 
 ### Features
@@ -57,6 +61,9 @@ The app uses a single HTM-based data system. All data is fetched from the ESR do
 | Runewords | `/` | ~386 runewords with filters for runes, sockets, item types, tier points, req level |
 | Socketables | `/socketables` | ~177 socketable items across 5 categories |
 | Unique Items | `/uniques` | Unique weapons, armors, and other items with category filters |
+| Mythical Uniques | `/mythicals` | Mythical unique items with special properties and notes |
+| Ascendancies | `/ascendancies` | Ascendancy tiers, bonuses, and footnotes |
+| Guide Database | `/database` | Official Base Information and Features pages rendered in a Chinese app UI |
 
 ---
 

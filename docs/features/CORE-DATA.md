@@ -16,8 +16,11 @@ Data is fetched from the ESR documentation site:
 | Unique Weapons | `https://easternsunresurrected.com/unique_weapons.htm` |
 | Unique Armors | `https://easternsunresurrected.com/unique_armors.htm` |
 | Unique Others | `https://easternsunresurrected.com/unique_others.htm` |
+| Mythical Uniques | `https://easternsunresurrected.com/unique_mythicals.htm` |
+| Ascendancies | `https://easternsunresurrected.com/ascendancies.htm` |
+| Guide Pages | 23 Base Information / Features links from `changelogs.html` |
 
-Remote URLs are configured in `src/core/api/remoteConfig.ts`.
+Remote URLs are configured in `src/core/api/remoteConfig.ts`; guide page catalog entries live in `src/core/api/guidePageCatalog.ts`.
 
 **Version Checking:** The version is extracted from the changelog page using the pattern: `Eastern Sun Resurrected X.Y.ZZ - DD/MM/YYYY`
 
@@ -96,7 +99,7 @@ When fresh data is needed, the pipeline proceeds through these stages:
 startupCheck
   → startupNeedsFetch / startupUseCached
     → initDataLoad
-      → fetchHtmlSuccess (5 HTML files fetched in parallel)
+      → fetchHtmlSuccess (core HTML files and guide pages fetched in parallel)
         → parseDataSuccess (all parsers run)
           → storeDataSuccess (IndexedDB bulk writes)
             → extractAffixesSuccess (affix patterns extracted)
@@ -125,6 +128,9 @@ When a full parse is triggered:
    - unique_weapons.htm
    - unique_armors.htm
    - unique_others.htm
+   - unique_mythicals.htm
+   - ascendancies.htm
+   - Guide database pages from the official Base Information / Features navigation
 2. Parse gems.htm:
    a. Extract Gems (8 types x 6 tiers = 48 items)
    b. Extract ESR Runes (~50 items)
@@ -133,17 +139,18 @@ When a full parse is triggered:
    e. Extract Crystals (12 types x 3 tiers = 36 items)
 3. Parse runewords.htm (multi-variant, per-column bonuses, gems)
 4. Parse unique item pages (weapons, armors, others)
-5. Normalize all affixes and extract patterns
-6. Store everything in IndexedDB (separate tables per category)
-7. Store version string and timestamp in metadata
-8. Signal app ready (extractAffixesSuccess)
+5. Parse mythical uniques, ascendancies, and guide pages
+6. Normalize all affixes and extract patterns
+7. Store everything in IndexedDB (separate tables per category)
+8. Store version string and timestamp in metadata
+9. Signal app ready (extractAffixesSuccess)
 ```
 
 ## Database
 
-Single IndexedDB database: **`d2r-esr-runeword-browser`** (version 10)
+Single IndexedDB database: **`d2r-esr-runeword-browser`** (version 13)
 
-Tables: `gems`, `esrRunes`, `lodRunes`, `kanjiRunes`, `crystals`, `runewords`, `affixes`, `htmUniqueItems`, `metadata`
+Tables: `gems`, `esrRunes`, `lodRunes`, `kanjiRunes`, `crystals`, `runewords`, `affixes`, `htmUniqueItems`, `mythicalUniques`, `ascendancies`, `guidePages`, `metadata`
 
 See [DATA-MODELS.md](../technical/DATA-MODELS.md) for the full schema.
 

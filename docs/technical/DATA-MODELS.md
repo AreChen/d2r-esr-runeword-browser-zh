@@ -17,12 +17,15 @@ class AppDatabase extends Dexie {
   runewords!: Table<Runeword, [string, number]>;  // Compound key: [name, variant]
   affixes!: EntityTable<AffixPattern, 'pattern'>;
   htmUniqueItems!: EntityTable<HtmUniqueItem, 'id'>;
+  mythicalUniques!: EntityTable<MythicalUnique, 'id'>;
+  ascendancies!: EntityTable<Ascendancy, 'name'>;
+  guidePages!: EntityTable<GuidePage, 'id'>;
   metadata!: EntityTable<Metadata, 'key'>;
 
   constructor() {
     super('d2r-esr-runeword-browser');
 
-    this.version(10).stores({
+    this.version(13).stores({
       gems: 'name, type, quality, color',
       esrRunes: 'name, order, tier, color',
       lodRunes: 'name, order',
@@ -31,6 +34,9 @@ class AppDatabase extends Dexie {
       runewords: '[name+variant], name, sockets, reqLevel, sortKey',
       affixes: 'pattern',
       htmUniqueItems: '++id, name, page, category, reqLevel',
+      mythicalUniques: '++id, name, category, reqLevel',
+      ascendancies: 'name',
+      guidePages: 'id, group, order, title',
       metadata: 'key',
     });
   }
@@ -165,6 +171,22 @@ Key-value store for app metadata.
 **Used Keys:**
 - `esrVersion` - Current parsed version (e.g., "3.9.07 - 18/12/2025")
 - `lastParsed` - Timestamp of last parse
+
+### guidePages
+
+Stores app-owned renderable versions of the official Base Information and Features pages.
+
+| Column | Type | Index | Description |
+|--------|------|-------|-------------|
+| id | string | Primary | Stable catalog id, e.g. `corruptions` |
+| group | `'base' \| 'features'` | Yes | Official navigation group |
+| label | string | No | Original English navigation label |
+| title | string | Yes | Chinese page title |
+| sourcePath | string | No | Official source path |
+| sourceUrl | string | No | Full official source URL |
+| order | number | Yes | Sort order from the catalog |
+| blocks | GuideContentBlock[] | No | Parsed headings, paragraphs, tables, and images |
+| textIndex | string | No | Search text assembled from all blocks |
 
 ## TypeScript Interfaces
 

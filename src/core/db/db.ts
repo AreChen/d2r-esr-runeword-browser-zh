@@ -10,6 +10,7 @@ import type {
   HtmUniqueItem,
   MythicalUnique,
   Ascendancy,
+  GuidePage,
   Metadata,
 } from './models';
 
@@ -24,12 +25,13 @@ class AppDatabase extends Dexie {
   htmUniqueItems!: EntityTable<HtmUniqueItem, 'id'>;
   mythicalUniques!: EntityTable<MythicalUnique, 'id'>;
   ascendancies!: EntityTable<Ascendancy, 'name'>;
+  guidePages!: EntityTable<GuidePage, 'id'>;
   metadata!: EntityTable<Metadata, 'key'>;
 
   constructor() {
     super('d2r-esr-runeword-browser');
 
-    this.version(12).stores({
+    this.version(13).stores({
       gems: 'name, type, quality, color',
       esrRunes: 'name, order, tier, color',
       lodRunes: 'name, order',
@@ -40,6 +42,7 @@ class AppDatabase extends Dexie {
       htmUniqueItems: '++id, name, page, category, reqLevel',
       mythicalUniques: '++id, name, category, reqLevel',
       ascendancies: 'name',
+      guidePages: 'id, group, order, title',
       metadata: 'key',
     });
   }

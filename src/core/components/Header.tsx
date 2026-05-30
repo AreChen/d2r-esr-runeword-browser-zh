@@ -17,6 +17,7 @@ const NAV_ITEMS = [
   { to: '/uniques', label: '暗金物品', end: false },
   { to: '/mythicals', label: '神话暗金', end: false },
   { to: '/ascendancies', label: '升华', end: false },
+  { to: '/database', label: '资料库', end: false },
 ] as const;
 
 /** GitHub icon (lucide Github is deprecated, using simple-icons SVG path) */

@@ -165,6 +165,52 @@ export interface Ascendancy {
   readonly footnotes: readonly string[];
 }
 
+// Guide pages
+
+export type GuidePageGroup = 'base' | 'features';
+
+export interface GuideHeadingBlock {
+  readonly id: string;
+  readonly kind: 'heading';
+  readonly level: 2 | 3;
+  readonly text: string;
+}
+
+export interface GuideParagraphBlock {
+  readonly id: string;
+  readonly kind: 'paragraph';
+  readonly text: string;
+}
+
+export interface GuideTableBlock {
+  readonly id: string;
+  readonly kind: 'table';
+  readonly caption: string;
+  readonly headers: readonly string[];
+  readonly rows: readonly (readonly string[])[];
+}
+
+export interface GuideImageBlock {
+  readonly id: string;
+  readonly kind: 'image';
+  readonly src: string;
+  readonly alt: string;
+}
+
+export type GuideContentBlock = GuideHeadingBlock | GuideParagraphBlock | GuideTableBlock | GuideImageBlock;
+
+export interface GuidePage {
+  readonly id: string;
+  readonly group: GuidePageGroup;
+  readonly label: string;
+  readonly title: string;
+  readonly sourcePath: string;
+  readonly sourceUrl: string;
+  readonly order: number;
+  readonly blocks: readonly GuideContentBlock[];
+  readonly textIndex: string;
+}
+
 // Metadata
 
 export interface Metadata {
