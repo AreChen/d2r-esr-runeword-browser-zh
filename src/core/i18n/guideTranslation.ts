@@ -34,7 +34,9 @@ const guideExactTranslations: Readonly<Record<string, string>> = {
   Rarity: '稀有度',
   Group: '组别',
   Stats: '属性',
+  Properties: '属性',
   'Item Type': '物品类型',
+  'Item Level': '物品等级',
   Blank: '空白',
   'Excluding:': '排除:',
   'Mag Lvl': '魔法等级',
@@ -53,6 +55,8 @@ const guideExactTranslations: Readonly<Record<string, string>> = {
   Recipe: '公式',
   Recipes: '公式',
   Notes: '备注',
+  'Rune Word': '符文之语',
+  'Excluded:': '排除:',
   'Gem Word': '宝石之语',
   Gems: '宝石',
   'Allowed Items': '允许物品',
@@ -64,6 +68,8 @@ const guideExactTranslations: Readonly<Record<string, string>> = {
   'General Recipe': '通用公式',
   Specialization: '专精',
   'Same Item': '同一物品',
+  'Cannot be Gambled': '无法赌博获得',
+  'Gamble Item:': '赌博物品:',
   Corrupted: '已腐化',
   'Worldstone Shard': '世界石碎片',
   'Weapon Mastery Token': '武器精通代币',
@@ -76,10 +82,14 @@ const guideExactTranslations: Readonly<Record<string, string>> = {
   'Class specific Dragon Stone form': '对应职业的龙石形态',
   'Any Class Weapon': '任意职业武器',
   'Staves And Rods': '法杖与权杖',
+  Staves: '法杖',
+  Orbs: '法球',
+  Wands: '魔杖',
   'Thrown Weapon': '投掷武器',
   Item: '物品',
   Items: '物品',
   Weapon: '武器',
+  Torso: '身体护甲',
   'Throwing Weapon': '投掷武器',
   'Throwing Weapons': '投掷武器',
   Ring: '戒指',
@@ -152,6 +162,7 @@ const guideExactTranslations: Readonly<Record<string, string>> = {
   'Kanji Runes': '汉字符文',
   'Ancient Coupon': '古代券',
   'Ancient Coupons': '古代券',
+  'Ancient Coupon Unique': '古代券暗金',
   'Same Ancient Coupons': '相同古代券',
   'Ancient Decipherer': '古代解读器',
   'Ancient Decipherers': '古代解读器',
@@ -173,6 +184,7 @@ const guideExactTranslations: Readonly<Record<string, string>> = {
   'Dragon Stones': '龙石',
   'Dragon Stone': '龙石',
   'Maple Leaf': '枫叶',
+  'Maple Leaves': '枫叶',
   'Medium Charm': '中型护身符',
   'Unique/Set/Crafted/Rare Weapon': '暗金/套装/手工/稀有武器',
   'Unique/Set/Crafted/Rare Armor': '暗金/套装/手工/稀有护甲',
@@ -231,6 +243,23 @@ const guideExactTranslations: Readonly<Record<string, string>> = {
   'Endgame Maps': '终局地图',
   'Vessel of Souls': '灵魂之器',
   Ascendancies: '升华',
+  'Ascendancy Stone': '升华之石',
+  'Ascendancy Stones': '升华之石',
+  'Battlemage Ascendancy': '战斗法师升华',
+  'Blademaster Ascendancy': '剑术大师升华',
+  'Arcanist Ascendancy': '奥术师升华',
+  'Bloodmage Ascendancy': '血法师升华',
+  'Awakened Ascendancy': '觉醒升华',
+  'Ironbolt Ascendancy': '铁弩手升华',
+  'Starborn Ascendancy': '星裔升华',
+  'Lifebreaker Ascendancy': '破命者升华',
+  'Worldshaper Ascendancy': '塑界者升华',
+  'Soul Warden Ascendancy': '灵魂守卫升华',
+  'Stance Dancer Ascendancy': '姿态舞者升华',
+  'Nomad Ascendancy': '游牧者升华',
+  'Sharpshooter Ascendancy': '神射手升华',
+  'Mana Warden Ascendancy': '法力守卫升华',
+  'Berserker Ascendancy': '狂战士升华',
   'Kill Ledger': '击杀账本',
   'Mercenary and Oskill Information': '佣兵与 Oskill 信息',
   'Weapon Mastery': '武器精通',
@@ -326,6 +355,7 @@ const guideExactTranslations: Readonly<Record<string, string>> = {
   'The Sewer': '下水道',
   'South Entrance': '南入口',
   'Maggot Lair': '蛆虫巢穴',
+  'Staff of Kings': '国王之杖',
   'Temple Passage': '神殿通道',
   'Unholy Alter': '邪秽祭坛',
   'Way Point': '传送小站',
@@ -351,6 +381,7 @@ const guideExactTranslations: Readonly<Record<string, string>> = {
   Nihlathak: '尼拉塞克',
   'Kill Bonuses': '击杀加成',
   'Boss Bonuses': '首领加成',
+  Boss: '首领',
   'Weapon Anointment Bonus': '武器涂油加成',
   Mercenaries: '佣兵',
   Hireling: '雇佣兵',
@@ -384,6 +415,9 @@ const guideExactTranslations: Readonly<Record<string, string>> = {
   'Precision Bow Variant': '精准弓变体',
   'Maiden Spear Variant': '少女之矛变体',
   Completion: '完成',
+  'Fire Variant': '火焰变体',
+  'Cold Variant': '冰冷变体',
+  'Lightning Variant': '闪电变体',
   'Only works once': '仅生效一次',
   'Unique/Set/Crafted/Rare Equipment': '暗金/套装/手工/稀有装备',
   'Endgame Map': '终局地图',
@@ -434,6 +468,7 @@ const guideExactTranslations: Readonly<Record<string, string>> = {
   'Lightning Skills': '闪电技能',
   'Amazon Skill Levels': '亚马逊技能等级',
   'Assassin Skills': '刺客技能',
+  'Assassin Skill Levels': '刺客技能等级',
   'Druid Skills': '德鲁伊技能',
   'Necromancer Skills': '死灵法师技能',
   'Paladin Skills': '圣骑士技能',
@@ -475,6 +510,7 @@ const guideExactTranslations: Readonly<Record<string, string>> = {
   'Lightning Absorb': '闪电吸收',
   'Replenish Life': '生命恢复',
   'Bonus to Attack Rating': '攻击准确率加成',
+  'Bonus to Strength': '力量加成',
   'Poison Length Reduced By': '毒素持续时间缩短',
   'Heal after Each Kill': '击杀后生命恢复',
   'Slow Target': '减慢目标',
@@ -484,6 +520,7 @@ const guideExactTranslations: Readonly<Record<string, string>> = {
   'Increase Max Life': '生命上限提高',
   'Increase Max Mana': '法力上限提高',
   'Experience Gained': '获得经验',
+  'Dodge Chance': '闪避几率',
   'Slain Monsters Rest In Peace': '击杀怪物安息',
   Knockback: '击退',
   'Merc Only Conversion': '佣兵专用转换',
@@ -549,6 +586,9 @@ const guideExactTranslations: Readonly<Record<string, string>> = {
   'Empty Socket(s)': '空镶孔',
   'All Socketable(s)': '所有镶嵌物',
   'Frozen Orb': '冰封球',
+  'Chain Lightning': '连锁闪电',
+  Immolation: '焚烧',
+  'Thrown Axe': '投掷斧',
   'of the Colossus': '之巨像',
   "Mechanist's": '机械师之',
   "Acrobat's": '杂技师之',
@@ -688,6 +728,15 @@ const guideExactTranslations: Readonly<Record<string, string>> = {
   'Poison Dagger': '毒匕首',
   'Killer Scythe': '杀手镰刀',
   'All Applied Bonuses': '全部已应用加成',
+  'Raise Skeletal Mage Level Bonus': '召唤骷髅法师等级加成',
+  'Aura Bearing Soldier': '持光环士兵',
+  '1H Swing Weapon': '单手挥击武器',
+  'Shared Savagery': '共享狂野',
+  'SP only': '仅 SP',
+  'LAN only': '仅 LAN',
+  'Enemy Fire Resistance': '敌人火焰抗性',
+  'Enemy Cold Resistance': '敌人冰冷抗性',
+  'Enemy Lightning Resistance': '敌人闪电抗性',
   'Crystal Sword': '水晶剑',
   'Crystal Boots': '水晶靴',
   'Crystal Sword/Crystal Boots family excluded': '不包括水晶剑/水晶靴家族',
@@ -700,6 +749,22 @@ const guideExactTranslations: Readonly<Record<string, string>> = {
   'Petrified Staff': '石化法杖',
   'Arctic Horn': '北极之角',
   'Hunter Bow': '猎人的弓',
+  Lifebane: '生命灾祸',
+  "Trang'Oul's Claw": '塔格奥之爪',
+  "Tal Rasha's Walking Stick": '塔拉夏的手杖',
+  "Qoto's Bow of Fortuitous Battle": '科托的幸运战弓',
+  "Yoyo's Sanity": '悠悠的理智',
+  "Requier's Skill": '雷奎尔的技艺',
+  'Wrath of Asmodeus': '阿斯摩蒂斯之怒',
+  "Que-Hegan's Wisdom": '奎-黑刚的智慧',
+  "Vindalay's Sole": '温达莱的鞋底',
+  'Con Dar Warpaint': '康达尔战纹',
+  Ravenlore: '乌鸦之语',
+  'Hellfire Torch Old': '旧版地狱火炬',
+  "Dfuzzz's Fingerguard": '迪法兹的护指',
+  'Undead Stygian Doll': '亡灵冥河娃娃',
+  "Rathma's Acolyte": '拉斯玛的侍僧',
+  Horror: '恐魔',
   'Battering Arm': '撞击臂',
   'Repeating Crosbow': '连射弩',
   'Repeating Crossbow': '连射弩',
@@ -835,7 +900,7 @@ const guideExactTranslations: Readonly<Record<string, string>> = {
   'Enable transmute key in D2Launcher for a much faster transmuting experience': '在 D2Launcher 中启用合成快捷键可以显著加快合成操作。',
   "*The feather works on ethereal items as well due to an engine bug, so be careful not to waste it. It doesn't work on missile weapons.":
     '*由于引擎缺陷，羽毛也会对无形物品生效，所以请小心不要浪费。它对投射武器无效。',
-  'Torso means Body Armor. Armor means all kinds of armor.': 'Torso 表示身体护甲。Armor 表示所有类型的护甲。',
+  'Torso means Body Armor. Armor means all kinds of armor.': '身体部位表示身体护甲。护甲表示所有类型的护甲。',
   "Base upgraded uniques can't be rerolled. Please reroll before upgrade.": '底材已升级的暗金物品不能重置。请在升级前重置。',
   'Items that had sockets added before reroll will lose their sockets upon rerolling.':
     '重置前额外添加过镶孔的物品，在重置时会失去这些镶孔。',
@@ -985,10 +1050,79 @@ const guideExactTranslations: Readonly<Record<string, string>> = {
   'Weapon mastery can be achieved by transmuting a Weapon Mastery Token that can drop from Corrupted Zakarum and endgame map bosses (25% chance, not scaled by /players).':
     '武器精通可以通过合成武器精通代币获得；该代币可由腐化的扎卡鲁姆和终局地图首领掉落（25% 几率，不受玩家数缩放影响）。',
   'Weapon mastery can be removed, but the token is lost on removal.': '武器精通可以移除，但移除时会消耗代币。',
+  'Also check out the runeword tool developed by @mefi_ke here for a more seamless experience.':
+    '也可以查看 @mefi_ke 开发的符文之语工具，以获得更顺畅的体验。',
+  '+25% chance for finishing moves to not consume charges (SP only)': '+25% 几率使终结技不消耗充能（仅 SP）',
+  '+40% chance for finishing moves to not consume charges (SP only)': '+40% 几率使终结技不消耗充能（仅 SP）',
+  '+80% Increased Attack Speed (LAN only)': '+80% 攻击速度提高（仅 LAN）',
+  '+10% Dodge Chance (LAN only)': '+10% 闪避几率（仅 LAN）',
+  'Fists of Fire, Claws of Thunder and Blades of Ice have a 25% (50% chance on LAN) chance':
+    '火焰之拳、雷霆之爪和冰之刃有 25% 几率（LAN 中为 50%）',
+  'to release twice on discharge.': '在释放时触发两次。',
+  'Periodically, you have a chance to gain 5% (10% on LAN) Fire, Cold or Lightning Spell Damage':
+    '你会周期性地有几率获得 5%（LAN 中为 10%）火焰、冰冷或闪电法术伤害',
+  'per each level of Fists of Fire, Blades of Ice or Claws of Thunder, respectively': '数值分别按火焰之拳、冰之刃或雷霆之爪的每个等级计算',
+  "Feral Rage and Maul each inherit 50% of the other's effects.": '野性愤怒和重击会各自继承对方 50% 的效果。',
+  'You have a small to restore 50% of total health instantly if struck while below 500 health':
+    '生命低于 500 时若被击中，有小概率立即恢复总生命值的 50%',
+  'equal to 25% of the cold damage and stuns for 0.6 seconds': '等同于冰冷伤害 25% 的伤害，并击晕 0.6 秒',
+  'Your holy auras now have 5% chance to pulse with 5 times more damage': '你的神圣光环现在有 5% 几率以 5 倍伤害脉冲',
+  'Grants Holy Freeze a 10% chance to deal damage equal': '使神圣冰冻有 10% 几率造成等同于',
+  "to 50% of enemies' current life, but halves its total damage (SP only)": '敌人当前生命值 50% 的伤害，但总伤害减半（仅 SP）',
+  'grant twice the amount of cold damage to attacks (LAN only)': '使攻击获得双倍冰冷伤害加成（仅 LAN）',
   'The Kill Ledger can also be used to capture the souls of endgame map bosses. Killing map bosses allows you to transmute the ledger for special bonuses.':
     '击杀账本也可以用于捕获终局地图首领的灵魂。击杀地图首领后，可以合成账本来获得特殊加成。',
   'The vessel spawns with 2000 souls and every recipe consumes a number of souls. There are four tier of stats, each tier has specific properties, as listed below.':
     '灵魂之器生成时带有 2000 个灵魂，每个公式都会消耗一定数量的灵魂。属性共有 4 个阶级，每个阶级都有如下特定属性。',
+  'Mythical unique items are items that have a different base from all other items, which means they cannot be gambled.':
+    '神话暗金物品使用与其他所有物品不同的底材，因此无法赌博获得。',
+  'Mythical unique items can only drop in endgame map areas because they have a drop level of 100+.':
+    '神话暗金物品只能在终局地图区域掉落，因为它们的掉落等级为 100+。',
+  'Most mythical uniques have special effects or procs that enable unique playstyles or enhance existing ones.':
+    '大多数神话暗金都有特殊效果或触发效果，可启用独特玩法或强化现有玩法。',
+  'Some mythical uniques have specific drop sources (e.g. the lich king ones). All mythical base items have slightly improved stats. Physical attack weapons generally have 10% more base damage. Spellcaster weapons generally have lower requirements or other small bonuses.':
+    '部分神话暗金有特定掉落来源（例如巫妖王相关物品）。所有神话底材都有略微提升的属性。物理攻击武器通常基础伤害提高 10%。施法武器通常需求更低，或带有其他小幅加成。',
+  "All mythical base items have slightly increased level requirements (usually it's +3 on top of the base item they're designed after; e.g. Titan's Maul for Mythical Titan's Maul).":
+    '所有神话底材的等级需求都会略微提高（通常是在参考底材基础上 +3；例如神话泰坦之槌对应泰坦之槌）。',
+  'Mythical uniques cannot be rerolled. What drops is what you get.': '神话暗金不能重置。掉出来是什么就是什么。',
+  'This item was designed by TiltedPrimate over the ESR Discord as a winner of the Mythical Unique Contest.':
+    '此物品由 TiltedPrimate 在 ESR Discord 的神话暗金竞赛中设计，是获胜作品之一。',
+  "Can be upgraded by killing Rathma and Kor'nac, The Hollow Apostle within one minute of each other on /players 8 and transmuting the charm with itself. The charm gains +(10 to 20) to Raise Kor'nac, The Hollow Apostle.":
+    "可在 /players 8 下于一分钟内击杀拉斯玛和空洞使徒 Kor'nac，并将护身符与自身合成来升级。该护身符获得 +(10 to 20) 复活空洞使徒 Kor'nac。",
+  'Ascendancies are powerful specializations that shape how you play, granting unique skills and bonuses.':
+    '升华是强力专精，会塑造你的玩法，并提供独特技能和加成。',
+  'Ascendancies are granted through a special charm called the Ascendancy Stone that can only be obtained after completing several special encounters.':
+    '升华由一种名为升华之石的特殊护身符提供，只有完成数个特殊遭遇后才能获得。',
+  'Ascendancy stones can be further upgraded (meaning you can further ascend) by completing specific challenges, some of which are tied to very hard endgame content.':
+    '升华之石可以通过完成特定挑战进一步升级（也就是进一步升华），其中部分挑战与高难度终局内容相关。',
+  'There are 5 ascendancy tiers you can attain, each challenge being harder than the previous one, but the bonuses being stronger as well.':
+    '升华共有 5 个可达阶级，每个挑战都比前一个更难，但加成也更强。',
+  'Ascendancy Stones cannot be shared to other characters. You can only have one ascendancy stone equipped at any time.':
+    '升华之石不能与其他角色共享。你在任意时刻只能装备一块升华之石。',
+  'Needless to say, each tier can only be achieved once. However, you can achieve them in any order.':
+    '不用说，每个阶级只能达成一次。不过你可以按任意顺序完成它们。',
+  "Due to an engine limitation, the special effect from tier 4 will not apply if you haven't ascended to tier 3 first. Once you ascend to tier 3, tier 4 will automatically take effect.":
+    '由于引擎限制，如果你尚未先升到 3 阶，4 阶的特殊效果不会生效。一旦升到 3 阶，4 阶效果会自动生效。',
+  'Ascendancy stones cannot be modified by regular means (they cannot be corrupted, anointed, broken down for maple leaves etc.).':
+    '升华之石不能通过常规方式改造（不能腐化、涂油、分解为枫叶等）。',
+  'After you die, you need to reequip the Ascendancy Stone in order to regain the bonuses, due to an engine limitation.':
+    '由于引擎限制，死亡后需要重新装备升华之石才能重新获得加成。',
+  'In order to get an Ascendancy Stone, you need to kill 5 special superuniques on hell difficulty scattered around Sanctuary':
+    '要获得升华之石，你需要在地狱难度击杀分散在庇护之地各处的 5 个特殊超级暗金怪',
+  'and transmute the elemental orbs each of them drop to obtain the Orb of Creation.': '并将它们各自掉落的元素宝珠合成为创造之球。',
+  'The orb can then be transmuted with specific colored gems to unlock the ascendancy of your choice. Clue: Act 1, 2, 3 each have a superunique. Act 5 has 2, while act 4 has none.':
+    '随后可将该宝珠与特定颜色宝石合成，解锁你选择的升华。提示：第 1、2、3 幕各有一个超级暗金怪；第 5 幕有 2 个，第 4 幕没有。',
+  'The second tier is achieved by killing Nihalthak in his domain on hell difficulty and transmuting the ascendancy stone with itself.':
+    '第 2 阶需要在地狱难度尼拉塞克领域击杀尼拉塞克，并将升华之石与自身合成。',
+  'You need to transmute it while you have the swirls active on your character.': '需要在角色身上仍有旋光效果时进行合成。',
+  'The third tier is achieved by killing all of Uber Tristram bosses within one minute of each other without dying and transmuting the ascendancy stone with a Maple Leaf.':
+    '第 3 阶需要在不死亡的情况下，于一分钟内击杀所有超级崔斯特瑞姆首领，并将升华之石与枫叶合成。',
+  'Even if you have the swirls active on your character after you killed the last boss, it will not work if it passed more than 1 minute since you killed the first one.':
+    '即使击杀最后一个首领后角色身上仍有旋光效果，如果距离击杀第一个首领已经超过 1 分钟，也不会生效。',
+  'The fourth tier is achieved by collecting 10 Primordial Soulstones that drop from any endgame map boss. You can only transmute one Primordial Stone at a time with the Ascendancy Stone. Once you have captured 10 Primordial Soulstones in the Ascendancy Stone, you will be able to transmute it with 2 Maple Leaves to ascend to tier 4.':
+    '第 4 阶需要收集任意终局地图首领掉落的 10 个原始灵魂石。每次只能将 1 个原始灵魂石与升华之石合成。升华之石捕获 10 个原始灵魂石后，即可与 2 片枫叶合成并升到 4 阶。',
+  'The fifth tier is achieved by killing any tier 5 map boss and transmuting the ascendancy stone with 3 Maple Leaves.':
+    '第 5 阶需要击杀任意 5 阶地图首领，并将升华之石与 3 片枫叶合成。',
   'Corruptions are unique bonuses obtained through transmuting a Worldstone Shard with any item.':
     '腐化是通过将世界石碎片与任意物品合成获得的独特加成。',
   'On SP build, Worldstone Shards can drop from any terrorized champion or unique.':
@@ -1218,7 +1352,7 @@ const guideExactTranslations: Readonly<Record<string, string>> = {
   'Any Arrow/Bolt/Javelin/Thowing Weapon': '任意箭矢/弩矢/标枪/投掷武器',
   "Perfect Gem of Chipped Gem's Color": '与碎裂宝石同色的完美宝石',
   'lvl 92+ Unique Jewelry and Quivers': '92 级以上暗金首饰和箭袋',
-  'up to O rune': '最高到 O rune',
+  'up to O rune': '最高到 O Rune',
   'P-Gem determines the color': '完美宝石决定颜色',
   '(25% chance to apply a small bonus)': '（25% 几率获得小型加成）',
   '2 Same Organs (except Hearts and Souls)': '2 个相同器官（心脏和灵魂除外）',
@@ -1885,6 +2019,9 @@ function translateGuideSpecialFormat(normalized: string): string | null {
     if (translatedBase !== footnoteMatch[1]) return `${translatedBase}${footnoteMatch[2]}`;
   }
 
+  const itemLevelMatch = /^Item Level:\s*(\d+)$/iu.exec(normalized);
+  if (itemLevelMatch) return `物品等级: ${itemLevelMatch[1]}`;
+
   const gambleMatch = /^Gamble Item:\s*(.+)$/u.exec(normalized);
   if (gambleMatch) return `赌博物品: ${translateGuideCompositeText(gambleMatch[1])}`;
 
@@ -1936,11 +2073,18 @@ function translateGuideSpecialFormat(normalized: string): string | null {
   const tierMatch = /^Tier\s+(\d+)$/iu.exec(normalized);
   if (tierMatch) return `${tierMatch[1]} 阶`;
 
+  const tierChallengeMatch = /^Tier\s+(\d+)\s+Challenge$/iu.exec(normalized);
+  if (tierChallengeMatch) return `${tierChallengeMatch[1]} 阶挑战`;
+
   const tierRecipeMatch = /^Each tier\s+(\d+)\s+recipe consumes\s+(\d+)\s+souls per use\.$/iu.exec(normalized);
   if (tierRecipeMatch) return `每次使用 ${tierRecipeMatch[1]} 阶公式会消耗 ${tierRecipeMatch[2]} 个灵魂。`;
 
   const itemsMatch = /^\((\d+)\s+items?\)$/iu.exec(normalized);
   if (itemsMatch) return `（${itemsMatch[1]} 件）`;
+
+  const parentheticalCountItemMatch = /^\((\d+-\d+)\)\s+(.+)$/iu.exec(normalized);
+  if (parentheticalCountItemMatch)
+    return `(${parentheticalCountItemMatch[1]}) ${translateGuideCompositeText(parentheticalCountItemMatch[2])}`;
 
   const socketMatch = /^\((\d+)\s+Sockets?\)$/iu.exec(normalized);
   if (socketMatch) return `（${socketMatch[1]} 孔）`;
@@ -1977,7 +2121,15 @@ function translateGuideSpecialFormat(normalized: string): string | null {
   if (exampleParentheticalMatch) return `（例如 ${translateGuideCompositeText(exampleParentheticalMatch[1])}）`;
 
   const upToRuneMatch = /^\(up to\s+(.+?)\)$/iu.exec(normalized);
-  if (upToRuneMatch) return `（最高到 ${upToRuneMatch[1]}）`;
+  if (upToRuneMatch) return `（最高到 ${upToRuneMatch[1].replace(/\brune\b/giu, 'Rune')}）`;
+
+  const bareUpToMatch = /^up to\s+(.+?)$/iu.exec(normalized);
+  if (bareUpToMatch) {
+    const target = /\brune\b/iu.test(bareUpToMatch[1])
+      ? bareUpToMatch[1].replace(/\brune\b/giu, 'Rune')
+      : translateGuideCompositeText(bareUpToMatch[1]);
+    return `最高到 ${target}`;
+  }
 
   const conversionPathMatch = /^\((.+?)\)$/u.exec(normalized);
   if (conversionPathMatch && /(?:<->|->)/u.test(conversionPathMatch[1])) {
@@ -2148,6 +2300,16 @@ function translateGuideSpecialFormat(normalized: string): string | null {
   const convertsPointsMatch = /^Converts\s+(\d+)\s+(.+)$/iu.exec(normalized);
   if (convertsPointsMatch) return `转换 ${convertsPointsMatch[1]} 点${translateGuideCompositeText(convertsPointsMatch[2])}`;
 
+  const addsAttackTimedDamageMatch =
+    /^Adds\s+((?:\d+|%d)(?:-(?:\d+|%d))?)\s+(Physical|Magic|Fire|Cold|Lightning|Poison)\s+Damage to Attacks over\s+(\d+(?:\.\d+)?|%d)(?:\s+Seconds?)?$/iu.exec(
+      normalized
+    );
+  if (addsAttackTimedDamageMatch) {
+    return `攻击附加 ${addsAttackTimedDamageMatch[1]} ${translateGuideCompositeText(`${addsAttackTimedDamageMatch[2]} Damage`)}，持续 ${
+      addsAttackTimedDamageMatch[3]
+    } 秒`;
+  }
+
   const addsPointsMatch = /^Adds\s+(\d+(?:-\d+)?)\s+(.+)$/iu.exec(normalized);
   if (addsPointsMatch) return `增加 ${addsPointsMatch[1]} 点${translateGuideCompositeText(addsPointsMatch[2])}`;
 
@@ -2243,6 +2405,9 @@ function translateGuideSpecialFormat(normalized: string): string | null {
   const allResistMatch = /^([+-]?(?:\(\d+\s+to\s+\d+\)|\d+(?:\.\d+)?)%?)\s+to\s+All Resistances$/iu.exec(normalized);
   if (allResistMatch) return `${allResistMatch[1]} 所有抗性`;
 
+  const reanimateAsMatch = /^([+-]?(?:\(\d+\s+to\s+\d+\)|\d+(?:\.\d+)?)%?)\s+Reanimate as:\s+(.+)$/iu.exec(normalized);
+  if (reanimateAsMatch) return `${reanimateAsMatch[1]} 复生为: ${translateGuideCompositeText(reanimateAsMatch[2])}`;
+
   const leadingPercentStatMatch = /^([+-]?\(?\d+(?:-\d+|\s+to\s+\d+)?\)?%)\s+(.+)$/iu.exec(normalized);
   if (leadingPercentStatMatch) {
     const shouldDeferPercentStat = /^(?:to\s+(?:Deadly Strike|Crushing Blow)|Better Chance of Getting Magic Items?)$/iu.test(
@@ -2269,6 +2434,11 @@ function translateGuideSpecialFormat(normalized: string): string | null {
   const classSkillMatch = /^([+-]?(?:\(\d+\s+to\s+\d+\)|\d+(?:-\d+)?(?:\.\d+)?))\s+to\s+(.+ Skills)\s+\((.+?)\s+Only\)$/iu.exec(normalized);
   if (classSkillMatch) {
     return `${classSkillMatch[1]} ${translateGuideCompositeText(classSkillMatch[2])}（仅${translateGuideCompositeText(classSkillMatch[3])}）`;
+  }
+
+  const lanAlternateToStatMatch = /^([+-]?\d+%?)\s+\(([+-]?\d+%?)\s+on\s+LAN\)\s+to\s+(.+)$/iu.exec(normalized);
+  if (lanAlternateToStatMatch) {
+    return `${lanAlternateToStatMatch[1]}（LAN ${lanAlternateToStatMatch[2]}）${translateGuideCompositeText(lanAlternateToStatMatch[3])}`;
   }
 
   const genericToSkillMatch =
@@ -2427,6 +2597,12 @@ function translateGuideCompositeText(normalized: string): string {
 }
 
 export function translateGuideText(text: string): string {
+  const lines = text
+    .split(/\r?\n+/u)
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0);
+  if (lines.length > 1) return lines.map((line) => translateGuideText(line)).join(' ');
+
   const normalized = normalizeGuideTranslationKey(text);
   if (!normalized) return normalized;
 

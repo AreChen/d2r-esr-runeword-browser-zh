@@ -103,11 +103,16 @@ describe('guide text translation', () => {
 
   it('translates base information table names, data headers, and parameter notes', () => {
     expect(translateGuideText('Code')).toBe('代码');
+    expect(translateGuideText('Properties')).toBe('属性');
     expect(translateGuideText('Dur')).toBe('耐久');
     expect(translateGuideText('Req Lvl')).toBe('需求等级');
     expect(translateGuideText('Req Str')).toBe('需求力量');
     expect(translateGuideText('Gem Type')).toBe('宝石类型');
     expect(translateGuideText('Str/Dex Bonus')).toBe('力量/敏捷加成');
+    expect(translateGuideText('Item Level: 45')).toBe('物品等级: 45');
+    expect(translateGuideText('Gamble Item:')).toBe('赌博物品:');
+    expect(translateGuideText('(Cannot be Gambled)')).toBe('（无法赌博获得）');
+    expect(translateGuideText('Ancient Coupon Unique')).toBe('古代券暗金');
     expect(translateGuideText('Quilted Armor (qui)')).toBe('绗缝铠甲 (qui)');
     expect(translateGuideText('Gamble Item: Quilted Armor (qui)')).toBe('赌博物品: 绗缝铠甲 (qui)');
     expect(translateGuideText('Lvl 5 / Req Lvl 3')).toBe('等级 5 / 需求等级 3');
@@ -125,6 +130,8 @@ describe('guide text translation', () => {
     );
     expect(translateGuideText('arrm, boqm')).toBe('弓箭袋(arrm)、弩矢袋(boqm)');
     expect(translateGuideText('glov, miss, thro')).toBe('手套(glov)、远程武器(miss)、投掷武器(thro)');
+    expect(translateGuideText('Magic Torso')).toBe('魔法身体护甲');
+    expect(translateGuideText('Any Torso/Helm/Shield')).toBe('任意身体护甲/头盔/盾牌');
     expect(translateGuideText('16.0 Avg')).toBe('16.0 平均');
   });
 
@@ -157,6 +164,11 @@ describe('guide text translation', () => {
       '+3% 几率在击中时施放等级 60 闪电冲击'
     );
     expect(translateGuideText('1% Chance to Cast Level 15 Frozen Orb on Striking')).toBe('1% 几率在击中时施放等级 15 冰封球');
+    expect(translateGuideText('25% Chance to Cast Level 20 Immolation when you Kill an Enemy')).toBe(
+      '25% 几率在击杀敌人时施放等级 20 焚烧'
+    );
+    expect(translateGuideText('Adds 1000-1500 Cold Damage to Attacks over 10 Seconds')).toBe('攻击附加 1000-1500 冰冷伤害，持续 10 秒');
+    expect(translateGuideText("(15 to 30)% Reanimate as: Rathma's Acolyte")).toBe('(15 to 30)% 复生为: 拉斯玛的侍僧');
     expect(translateGuideText('of the Colossus')).toBe('之巨像');
     expect(translateGuideText("Mechanist's")).toBe('机械师之');
     expect(translateGuideText("Nature's")).toBe('自然之');
@@ -173,7 +185,7 @@ describe('guide text translation', () => {
       '多数会重置投入物的公式在投入物带有锻造时不会生效，但并非全部如此。'
     );
     expect(translateGuideText('Torso means Body Armor. Armor means all kinds of armor.')).toBe(
-      'Torso 表示身体护甲。Armor 表示所有类型的护甲。'
+      '身体部位表示身体护甲。护甲表示所有类型的护甲。'
     );
     expect(translateGuideText('Special')).toBe('特殊');
     expect(translateGuideText("Wirt's leg or Any Club Class Weapon")).toBe('维特之脚或任意木棒职业武器');
@@ -218,6 +230,7 @@ describe('guide text translation', () => {
     expect(translateGuideText('Adds 54 Gem points of selected color')).toBe('增加 54 点所选颜色宝石点数');
     expect(translateGuideText('2 Runes/Decals of the Same Grade')).toBe('2 个相同等级的符文/贴花');
     expect(translateGuideText('Rune/Decal of One Higher Grade (up to Wo or Zod)')).toBe('高一级符文/贴花（最高到 Wo 或 Zod）');
+    expect(translateGuideText('2 Same Runes (up to O rune)')).toBe('2 相同符文（最高到 O Rune）');
     expect(translateGuideText('8 Ancient Coupons (Normal)')).toBe('8 张古代券（普通）');
     expect(translateGuideText('Converts 5 normal coupon points')).toBe('转换 5 点普通券点数');
     expect(translateGuideText('to 1 exceptional coupon point')).toBe('为 1 点扩展券点数');
@@ -303,6 +316,12 @@ describe('guide text translation', () => {
     expect(translateGuideText('Vessel of Souls cannot be corrupted while it has unconsumed souls.')).toBe(
       '灵魂之器仍有未消耗的灵魂时不能被腐化。'
     );
+    expect(
+      translateGuideText(
+        'Mythical unique items are items that have a different base from all other items, which means they cannot be gambled.'
+      )
+    ).toBe('神话暗金物品使用与其他所有物品不同的底材，因此无法赌博获得。');
+    expect(translateGuideText('( Fire Variant)')).toBe('（火焰变体）');
     expect(translateGuideText("Lucion's Whisper - Cellar of Pain")).toBe('卢西恩的低语 - 痛苦地窖');
     expect(translateGuideText('Lucion Whisper just killed')).toBe('卢西恩的低语刚被击杀');
     expect(translateGuideText('Fire/Cold/Lightning/Poison/Magic/Wind Surge')).toBe('火焰/冰冷/闪电/毒素/魔法/风暴涌动');
@@ -323,6 +342,36 @@ describe('guide text translation', () => {
     );
     expect(translateGuideText('Rewards (for each boss)')).toBe('奖励（每个首领）');
     expect(translateGuideText('Glacial Behemoth - Frozen Wastes (Northern Descent)')).toBe('冰川巨兽 - 冰冻荒原（北部下坡）');
+  });
+
+  it('translates official guide multiline table headers and captions line by line', () => {
+    expect(translateGuideText('Tier 1\nEach tier 1 recipe consumes 350 souls per use.')).toBe('1 阶 每次使用 1 阶公式会消耗 350 个灵魂。');
+    expect(translateGuideText('Vessel of Souls\n2x Heart\nBrain\nTail\nQuill')).toBe('灵魂之器 2x 心脏 脑 尾巴 刺');
+    expect(translateGuideText('Same Item\n+5% Chance to Cast Level 15 Thrown Axe on Striking')).toBe(
+      '同一物品 +5% 几率在击中时施放等级 15 投掷斧'
+    );
+    expect(translateGuideText('Any Class Weapon\nWeapon Mastery Token')).toBe('任意职业武器 武器精通代币');
+    expect(
+      translateGuideText(
+        'Poison, Immolation, Freezing, Lightning Arrow\nMakes those skills fire their special effect every 5 attacks\ninstead of 3, but increases their total damage by 20%'
+      )
+    ).toBe('毒箭、焚烧箭、冰冻箭、闪电箭 使这些技能每 5 次攻击触发一次特殊效果 而不是每 3 次触发一次，但总伤害提高 20%');
+    expect(translateGuideText('Lut Gohlein\nThe Sewer\nSouth Entrance')).toBe('鲁高因 下水道 南入口');
+  });
+
+  it('translates ascendancy challenge prose and ascendancy names', () => {
+    expect(
+      translateGuideText('Ascendancies are powerful specializations that shape how you play, granting unique skills and bonuses.')
+    ).toBe('升华是强力专精，会塑造你的玩法，并提供独特技能和加成。');
+    expect(translateGuideText('Tier 1 Challenge')).toBe('1 阶挑战');
+    expect(
+      translateGuideText(
+        'The second tier is achieved by killing Nihalthak in his domain on hell difficulty and transmuting the ascendancy stone with itself.'
+      )
+    ).toBe('第 2 阶需要在地狱难度尼拉塞克领域击杀尼拉塞克，并将升华之石与自身合成。');
+    expect(translateGuideText('2 Maple Leaves')).toBe('2 枫叶');
+    expect(translateGuideText('Battlemage Ascendancy')).toBe('战斗法师升华');
+    expect(translateGuideText('Mana Warden Ascendancy')).toBe('法力守卫升华');
   });
 
   it('translates every official guide navigation label for visible database UI', () => {
