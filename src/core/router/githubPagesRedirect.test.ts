@@ -28,4 +28,10 @@ describe('GitHub Pages routing metadata', () => {
       expect(content, file).not.toContain(UPSTREAM_PUBLIC_URL);
     }
   });
+
+  it('lists the gemword browser route in the sitemap', () => {
+    const sitemap = readProjectFile('public/sitemap.xml');
+
+    expect(sitemap).toContain(`${CHINESE_FORK_PUBLIC_URL}gemwords`);
+  });
 });
