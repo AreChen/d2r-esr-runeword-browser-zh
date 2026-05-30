@@ -54,7 +54,7 @@ export const GUIDE_PAGE_CATALOG = [
     id: 'vesselOfSouls',
     group: 'features',
     label: 'Vessel of Souls',
-    title: '灵魂容器',
+    title: '灵魂之器',
     sourcePath: 'vessel_of_souls.htm',
     order: 103,
   },

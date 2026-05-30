@@ -275,8 +275,8 @@ const manualExactTranslations = {
   'The ring can come in one out of 7 variants. Each variant has some baseline stats (elemental damage, resist, spell damage) and some special stats (e.g. Maximum Life, Cooldown Reduction etc.). Wearing two different rings causes their modifiers to double in magnitude.':
     '此戒指会出现 7 种变体之一。每种变体都有一些基础属性（元素伤害、抗性、法术伤害）和特殊属性（例如最大生命、冷却缩减等）。佩戴两个不同戒指会使它们的词缀数值翻倍。',
   'Vessel of Souls is a special mythical unique that can consume organs to gain various bonuses.':
-    '灵魂容器是一件特殊神话暗金，可以消耗器官获得各种加成。',
-  'Check the Vessel of Souls page for a complete list of bonuses.': '完整加成列表请查看灵魂容器页面。',
+    '灵魂之器是一件特殊神话暗金，可以消耗器官获得各种加成。',
+  'Check the Vessel of Souls page for a complete list of bonuses.': '完整加成列表请查看灵魂之器页面。',
   'Can be obtained on killing all eternal ancients in The Edge of Eternity and transmuting the dropped hourglass pieces':
     '击杀永恒边缘中的所有永恒先祖并合成掉落的沙漏碎片即可获得',
   'Can be obtained on killing The Lich King': '击杀巫妖王即可获得',

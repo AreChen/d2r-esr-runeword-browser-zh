@@ -1860,7 +1860,7 @@ export const exactTranslations = {
   'Chat Message Background': '聊天信息背景',
   'chat messages to improve readability': '背景颜色设为深色以便阅读',
   Cheating: '作弊',
-  'Check the Vessel of Souls page for a complete list of bonuses.': '完整加成列表请查看灵魂容器页面。',
+  'Check the Vessel of Souls page for a complete list of bonuses.': '完整加成列表请查看灵魂之器页面。',
   'Checking...': '检查中…',
   Cheerleader: '拉拉队员',
   'Cherry Blossom': '樱花',
@@ -7609,7 +7609,7 @@ export const exactTranslations = {
   'Very Slow Attack Speed': '非常慢的攻击速度',
   'Vessel of Souls': '灵魂之器',
   'Vessel of Souls is a special mythical unique that can consume organs to gain various bonuses.':
-    '灵魂容器是一件特殊神话暗金，可以消耗器官获得各种加成。',
+    '灵魂之器是一件特殊神话暗金，可以消耗器官获得各种加成。',
   'Veteran Part-Timer': '老练的兼职者',
   "Veteran's": '老兵的',
   "Veteran's Odd Charm": '老兵的奇异护符',
