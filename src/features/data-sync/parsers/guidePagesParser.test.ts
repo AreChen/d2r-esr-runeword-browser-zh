@@ -76,6 +76,36 @@ describe('guide page parser', () => {
     });
   });
 
+  it('keeps source-wrapped table text together while preserving real line breaks', () => {
+    const page = parseGuidePage(
+      `
+        <html>
+          <body>
+            <table>
+              <tr><th>Reward</th><th>Notes</th></tr>
+              <tr>
+                <td>
+                  Tier 2 Map (25%
+                  chance on average)<br>
+                  Random Pandemonium Key (100%
+                  chance each on average)
+                </td>
+                <td>Map rewards</td>
+              </tr>
+            </table>
+          </body>
+        </html>
+      `,
+      sampleEntry
+    );
+
+    const table = page.blocks.find((block) => block.kind === 'table');
+
+    expect(table).toBeDefined();
+    if (!table || table.kind !== 'table') return;
+    expect(table.rows[0]?.[0]).toBe('Tier 2 Map (25% chance on average)\nRandom Pandemonium Key (100% chance each on average)');
+  });
+
   it('parses the real changelog fixture as a guide page without keeping the nav menu as content', () => {
     const [page] = parseGuidePages([
       {

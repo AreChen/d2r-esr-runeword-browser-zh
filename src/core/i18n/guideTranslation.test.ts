@@ -93,7 +93,10 @@ describe('guide text translation', () => {
 
   it('translates recurring endgame map reward labels', () => {
     expect(translateGuideText('Description/Rewards')).toBe('描述/奖励');
+    expect(translateGuideText('Orb of Anointment (5% chance on average)')).toBe('涂抹之球（平均 5% 几率）');
+    expect(translateGuideText('Orb of Anointment (16.67% chance on average each)')).toBe('涂抹之球（平均每个 16.67% 几率）');
     expect(translateGuideText('Tier 2 Map (25% chance on average)')).toBe('2 阶地图（平均 25% 几率）');
+    expect(translateGuideText('Tier 5 Map (17% chance on average each)')).toBe('5 阶地图（平均每个 17% 几率）');
     expect(translateGuideText('Random Pandemonium Key (100% chance each on average)')).toBe('随机混沌钥匙（平均每个 100% 几率）');
     expect(translateGuideText('Other Generic Items/Materials')).toBe('其他通用物品/材料');
   });

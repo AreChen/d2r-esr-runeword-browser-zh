@@ -43,11 +43,13 @@ function cleanText(text: string): string {
 }
 
 function cleanHtmlLines(html: string): string[] {
+  const lineBreak = '[[GUIDE_LINE_BREAK]]';
   return html
-    .replace(/<br\s*\/?>/gi, '\n')
-    .replace(/<\/(?:p|div|li)>/gi, '\n')
+    .replace(/<br\s*\/?>/gi, lineBreak)
+    .replace(/<\/(?:p|div|li)>/gi, lineBreak)
     .replace(/<[^>]*>/g, ' ')
-    .split(/\n+/)
+    .replace(/\s+/g, ' ')
+    .split(lineBreak)
     .map(cleanText)
     .filter((line) => line.length > 0);
 }
