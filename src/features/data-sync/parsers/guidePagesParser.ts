@@ -85,12 +85,8 @@ function parseTable(table: Element, id: string): GuideTableBlock | null {
 
   const rowElements = Array.from(table.querySelectorAll('tr'));
   const parsedRows = rowElements
-    .map((row) =>
-      Array.from(row.querySelectorAll('th,td'))
-        .map(parseTableCell)
-        .filter((cell) => cell.length > 0)
-    )
-    .filter((row) => row.length > 0);
+    .map((row) => Array.from(row.querySelectorAll('th,td')).map(parseTableCell))
+    .filter((row) => row.some((cell) => cell.length > 0));
 
   if (parsedRows.length < 2) return null;
   if (parsedRows.every((row) => row.length <= 1)) return null;

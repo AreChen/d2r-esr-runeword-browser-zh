@@ -106,6 +106,28 @@ describe('guide page parser', () => {
     expect(table.rows[0]?.[0]).toBe('Tier 2 Map (25% chance on average)\nRandom Pandemonium Key (100% chance each on average)');
   });
 
+  it('preserves empty table cells so later columns stay aligned with headers', () => {
+    const page = parseGuidePage(
+      `
+        <html>
+          <body>
+            <table>
+              <tr><th>Name</th><th>Gem Type</th><th>Automod</th><th>Staffmod</th></tr>
+              <tr><td>Precision Bow</td><td></td><td></td><td>+1 Bow Skills</td></tr>
+            </table>
+          </body>
+        </html>
+      `,
+      sampleEntry
+    );
+
+    const table = page.blocks.find((block) => block.kind === 'table');
+
+    expect(table).toBeDefined();
+    if (!table || table.kind !== 'table') return;
+    expect(table.rows[0]).toEqual(['Precision Bow', '', '', '+1 Bow Skills']);
+  });
+
   it('parses the real changelog fixture as a guide page without keeping the nav menu as content', () => {
     const [page] = parseGuidePages([
       {
