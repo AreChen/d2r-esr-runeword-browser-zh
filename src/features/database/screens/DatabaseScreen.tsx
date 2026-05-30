@@ -12,6 +12,7 @@ import type { GuidePage, GuidePageGroup } from '@/core/db';
 import { parseSearchTerms } from '@/features/runewords/utils/filteringHelpers';
 import { GuidePageContent } from '../components/GuidePageContent';
 import { useGuidePages } from '../hooks/useGuidePages';
+import { getGuidePageBlockSummary } from '../utils/guidePageSummary';
 
 type GroupFilter = 'all' | GuidePageGroup;
 
@@ -126,26 +127,14 @@ export function DatabaseScreen() {
             <p className="text-sm text-muted-foreground">当前显示 {filteredPages.length} 个资料页</p>
             <div className="max-h-[calc(100vh-14rem)] space-y-2 overflow-y-auto pr-1">
               {filteredPages.map((page) => (
-                <button
+                <GuidePageListButton
                   key={page.id}
-                  type="button"
-                  onClick={() => {
+                  page={page}
+                  isSelected={selectedPage !== null && selectedPage.id === page.id}
+                  onSelect={() => {
                     setSelectedPageId(page.id);
                   }}
-                  className={`w-full rounded-md border px-3 py-2 text-left transition-colors ${
-                    selectedPage !== null && selectedPage.id === page.id
-                      ? 'border-primary bg-accent text-accent-foreground'
-                      : 'bg-card hover:bg-muted'
-                  }`}
-                >
-                  <span className="block font-medium">{page.title}</span>
-                  <span className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
-                    <Badge variant="outline" className="px-1 py-0 text-[11px]">
-                      {getGroupName(page.group)}
-                    </Badge>
-                    {page.label}
-                  </span>
-                </button>
+                />
               ))}
             </div>
           </aside>
@@ -162,5 +151,38 @@ export function DatabaseScreen() {
 
       <ScrollToTopButton />
     </div>
+  );
+}
+
+function GuidePageListButton({
+  page,
+  isSelected,
+  onSelect,
+}: {
+  readonly page: GuidePage;
+  readonly isSelected: boolean;
+  readonly onSelect: () => void;
+}) {
+  const summary = getGuidePageBlockSummary(page);
+
+  return (
+    <button
+      type="button"
+      onClick={onSelect}
+      className={`w-full rounded-md border px-3 py-2 text-left transition-colors ${
+        isSelected ? 'border-primary bg-accent text-accent-foreground' : 'bg-card hover:bg-muted'
+      }`}
+    >
+      <span className="block font-medium">{page.title}</span>
+      <span className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+        <Badge variant="outline" className="px-1 py-0 text-[11px]">
+          {getGroupName(page.group)}
+        </Badge>
+        {page.label}
+      </span>
+      <span className="mt-2 block text-xs text-muted-foreground">
+        {summary.headingCount} 章 / {summary.tableCount} 表 / {summary.tableRowCount} 行
+      </span>
+    </button>
   );
 }

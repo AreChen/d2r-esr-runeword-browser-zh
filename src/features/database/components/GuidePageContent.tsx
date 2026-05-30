@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { ESR_BASE_URL } from '@/core/api';
 import type { GuideContentBlock, GuidePage, GuideTableBlock } from '@/core/db';
 import { translateGuideText } from '@/core/i18n/guideTranslation';
+import { getGuidePageBlockSummary, getGuidePageHeadings } from '../utils/guidePageSummary';
 
 interface GuidePageContentProps {
   readonly page: GuidePage;
@@ -35,7 +36,7 @@ function renderMultilineCell(text: string): React.ReactNode {
 
 function GuideTable({ block }: { readonly block: GuideTableBlock }) {
   return (
-    <section className="space-y-2">
+    <section id={block.id} className="scroll-mt-20 space-y-2">
       {block.caption && <h3 className="text-base font-semibold text-amber-700 dark:text-amber-400">{translated(block.caption)}</h3>}
       <div className="overflow-x-auto rounded-md border">
         <table className="w-full min-w-max border-collapse text-sm">
@@ -70,9 +71,13 @@ function GuideTable({ block }: { readonly block: GuideTableBlock }) {
 function GuideBlock({ block }: { readonly block: GuideContentBlock }) {
   if (block.kind === 'heading') {
     return block.level === 2 ? (
-      <h2 className="text-xl font-semibold text-foreground">{translated(block.text)}</h2>
+      <h2 id={block.id} className="scroll-mt-20 text-xl font-semibold text-foreground">
+        {translated(block.text)}
+      </h2>
     ) : (
-      <h3 className="text-lg font-semibold text-foreground">{translated(block.text)}</h3>
+      <h3 id={block.id} className="scroll-mt-20 text-lg font-semibold text-foreground">
+        {translated(block.text)}
+      </h3>
     );
   }
 
@@ -93,6 +98,8 @@ function GuideBlock({ block }: { readonly block: GuideContentBlock }) {
 
 export function GuidePageContent({ page }: GuidePageContentProps) {
   const groupLabel = page.group === 'base' ? '基础资料' : '机制说明';
+  const headings = getGuidePageHeadings(page);
+  const summary = getGuidePageBlockSummary(page);
 
   return (
     <article className="space-y-5">
@@ -103,6 +110,12 @@ export function GuidePageContent({ page }: GuidePageContentProps) {
             <Badge variant="outline">{page.label}</Badge>
           </div>
           <h1 className="text-2xl font-bold">{page.title}</h1>
+          <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
+            <span>{summary.headingCount} 个章节</span>
+            <span>{summary.tableCount} 张表格</span>
+            <span>{summary.tableRowCount} 行表格数据</span>
+            {summary.imageCount > 0 && <span>{summary.imageCount} 张图片</span>}
+          </div>
         </div>
         <Button variant="outline" size="sm" asChild>
           <a href={page.sourceUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2">
@@ -112,10 +125,36 @@ export function GuidePageContent({ page }: GuidePageContentProps) {
         </Button>
       </header>
 
-      <div className="space-y-5">
-        {page.blocks.map((block) => (
-          <GuideBlock key={block.id} block={block} />
-        ))}
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_14rem]">
+        <div className="min-w-0 space-y-5">
+          {page.blocks.map((block) => (
+            <GuideBlock key={block.id} block={block} />
+          ))}
+        </div>
+
+        {headings.length > 0 && (
+          <aside className="hidden xl:block">
+            <div className="sticky top-20 space-y-2 border-l pl-4">
+              <p className="text-sm font-semibold">本页目录</p>
+              <nav className="space-y-1">
+                {headings.slice(0, 24).map((heading) => (
+                  <a
+                    key={heading.id}
+                    href={`#${heading.id}`}
+                    className={`block rounded-sm py-1 text-sm text-muted-foreground hover:text-foreground ${
+                      heading.level === 3 ? 'pl-3' : ''
+                    }`}
+                  >
+                    {translated(heading.text)}
+                  </a>
+                ))}
+              </nav>
+              {headings.length > 24 && (
+                <p className="text-xs text-muted-foreground">另有 {headings.length - 24} 个章节，可继续向下浏览。</p>
+              )}
+            </div>
+          </aside>
+        )}
       </div>
     </article>
   );
