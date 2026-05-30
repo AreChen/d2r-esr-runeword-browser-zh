@@ -5,6 +5,7 @@ import { parseGuidePage, parseGuidePages } from './guidePagesParser';
 import type { GuidePageCatalogEntry } from '@/features/database';
 
 const changelogHtml = readFileSync(resolve(__dirname, '../../../../test-fixtures/changelogs.html'), 'utf-8');
+const fixtureDir = resolve(__dirname, '../../../../test-fixtures');
 
 const sampleEntry: GuidePageCatalogEntry = {
   id: 'sample',
@@ -100,7 +101,7 @@ describe('guide page parser', () => {
   it('parses all official guide page fixtures into app-owned content blocks', () => {
     const sources = GUIDE_PAGE_CATALOG.map((entry) => ({
       entry,
-      html: readFileSync(resolve(__dirname, '../../../../test-fixtures', entry.sourcePath), 'utf-8'),
+      html: readFileSync(resolve(fixtureDir, entry.sourcePath), 'utf-8'),
     }));
 
     const pages = parseGuidePages(sources);
@@ -112,4 +113,21 @@ describe('guide page parser', () => {
       expect(page.textIndex, page.id).not.toContain('[Changelogs]');
     }
   }, 25000);
+
+  it('keeps equipment and affix base information pages as real tables', () => {
+    const tableHeavyPageIds = ['armors', 'weapons', 'prefixes', 'suffixes', 'sets', 'gemwords', 'cubeRecipes', 'maps'] as const;
+
+    for (const id of tableHeavyPageIds) {
+      const entry = GUIDE_PAGE_CATALOG.find((page) => page.id === id);
+      expect(entry, id).toBeDefined();
+      if (!entry) continue;
+
+      const page = parseGuidePage(readFileSync(resolve(fixtureDir, entry.sourcePath), 'utf-8'), entry);
+      const tables = page.blocks.filter((block) => block.kind === 'table');
+      const tableRows = tables.reduce((total, table) => total + table.rows.length, 0);
+
+      expect(tables.length, id).toBeGreaterThan(0);
+      expect(tableRows, id).toBeGreaterThan(10);
+    }
+  }, 20000);
 });
