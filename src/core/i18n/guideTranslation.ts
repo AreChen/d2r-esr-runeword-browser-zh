@@ -48,17 +48,24 @@ const guideExactTranslations: Readonly<Record<string, string>> = {
   Oskills: 'Oskills',
   'Corruptions are unique bonuses obtained through transmuting a Worldstone Shard with any item.':
     '腐化是通过将世界之石碎片与任意物品合成获得的独特加成。',
+  'All items have a 25% chance to be turned into a rare (brick) upon corrupting.': '所有物品在腐化时都有 25% 几率变成稀有物品（损坏）。',
   'Anointments are unique bonuses obtained through transmuting specific cube regents with certain items.':
     '涂油是通过将特定方块材料与指定物品合成获得的独特加成。',
+  'Unlike corruptions, anointing an item cannot brick it.': '不同于腐化，给物品涂油不会使其损坏。',
   'Warning: endgame map zones are much more difficult than all other content they require extremely well defined builds.':
     '警告：终局地图区域远难于其他内容，需要非常明确且成型的构筑。',
+  'Endgame map zones can be accessed by transmuting map items by themselves in act 5 hell.':
+    '在地狱第五幕单独合成地图物品即可进入终局地图区域。',
   'Vessel of Souls is a special mythical unique amulet that can consume 5 organs at a time to get various bonuses based on the organs consumed.':
     '灵魂容器是一件特殊的神话暗金项链，可以一次消耗 5 个器官，并根据消耗的器官获得不同加成。',
+  'Each tier 1 recipe consumes 350 souls per use.': '每次使用 1 阶公式会消耗 350 个灵魂。',
   'The Kill Ledger is a special book that keeps tracks of the amount of enemies you have killed.':
     '击杀账本是一本特殊书籍，会记录你击杀的敌人数量。',
+  'The boss bonuses can be completed in any order.': '首领加成可以按任意顺序完成。',
   'Here you can find information about mercenaries and various oskills.': '这里可以查看佣兵和各种 Oskill 的信息。',
   'Weapon mastery is an unique system that changes how class weapons interact with skills.':
     '武器精通是一个会改变职业武器与技能互动方式的独特系统。',
+  'You can only apply one weapon mastery per weapon.': '每把武器只能应用一种武器精通。',
 };
 
 const guidePhraseTranslations: readonly (readonly [RegExp, string])[] = [

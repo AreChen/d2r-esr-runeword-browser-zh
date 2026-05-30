@@ -47,5 +47,15 @@ describe('guide text translation', () => {
     expect(translateGuideText('Here you can find information about mercenaries and various oskills.')).toBe(
       '这里可以查看佣兵和各种 Oskill 的信息。'
     );
+    expect(translateGuideText('All items have a 25% chance to be turned into a rare (brick) upon corrupting.')).toBe(
+      '所有物品在腐化时都有 25% 几率变成稀有物品（损坏）。'
+    );
+    expect(translateGuideText('Unlike corruptions, anointing an item cannot brick it.')).toBe('不同于腐化，给物品涂油不会使其损坏。');
+    expect(translateGuideText('Endgame map zones can be accessed by transmuting map items by themselves in act 5 hell.')).toBe(
+      '在地狱第五幕单独合成地图物品即可进入终局地图区域。'
+    );
+    expect(translateGuideText('Each tier 1 recipe consumes 350 souls per use.')).toBe('每次使用 1 阶公式会消耗 350 个灵魂。');
+    expect(translateGuideText('The boss bonuses can be completed in any order.')).toBe('首领加成可以按任意顺序完成。');
+    expect(translateGuideText('You can only apply one weapon mastery per weapon.')).toBe('每把武器只能应用一种武器精通。');
   });
 });
