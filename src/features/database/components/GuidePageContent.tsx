@@ -150,7 +150,7 @@ export function GuidePageContent({ page }: GuidePageContentProps) {
         </Button>
       </header>
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_14rem]">
+      <div className={headings.length > 0 ? 'grid gap-6 xl:grid-cols-[minmax(0,1fr)_14rem]' : 'grid gap-6'}>
         <div className="min-w-0 space-y-5">
           {page.blocks.map((block) => (
             <GuideBlock key={block.id} block={block} />
