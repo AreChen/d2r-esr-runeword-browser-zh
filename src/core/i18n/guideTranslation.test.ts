@@ -224,11 +224,13 @@ describe('guide text translation', () => {
     expect(translateGuideText('3 Any Mana potions')).toBe('3 任意法力药剂');
     expect(translateGuideText('Any Ring/Amulet')).toBe('任意戒指/项链');
     expect(translateGuideText('or Unique/Rare Quiver')).toBe('或暗金/稀有箭袋');
-    expect(translateGuideText('Chipped Gem')).toBe('碎裂宝石');
+    expect(translateGuideText('Chipped Gem')).toBe('碎裂的宝石');
+    expect(translateGuideText('Flawless Topazes')).toBe('无瑕黄玉');
+    expect(translateGuideText('Blemished Amethist')).toBe('瑕疵紫水晶');
     expect(translateGuideText('3 Gems of the Same Color and Grade')).toBe('3 个相同颜色和等级的宝石');
     expect(translateGuideText('Gem of One Higher Grade (up to Perfect)')).toBe('高一级宝石（最高到完美）');
     expect(translateGuideText('2 Flawless Gems of the Same Color')).toBe('2 个相同颜色的无瑕宝石');
-    expect(translateGuideText('Can Opener (Chipped Gem Output)')).toBe('开罐器（输出碎裂宝石）');
+    expect(translateGuideText('Can Opener (Chipped Gem Output)')).toBe('开罐器（输出碎裂的宝石）');
     expect(translateGuideText('(-1 Crystal Point of selected color)')).toBe('（所选颜色水晶点数 -1）');
     expect(translateGuideText('Adds 54 Gem points of selected color')).toBe('增加 54 点所选颜色宝石点数');
     expect(translateGuideText('2 Runes/Decals of the Same Grade')).toBe('2 个相同等级的符文/贴花');
@@ -253,7 +255,7 @@ describe('guide text translation', () => {
     expect(translateGuideText("D-Stoning doesn't work if the property on the target item has reached the cap.")).toBe(
       '如果目标物品上的属性已经达到上限，D-Stoning 不会生效。'
     );
-    expect(translateGuideText("Adds Chipped Gem's Weapon Bonus")).toBe('增加碎裂宝石的武器加成');
+    expect(translateGuideText("Adds Chipped Gem's Weapon Bonus")).toBe('增加碎裂的宝石的武器加成');
     expect(translateGuideText('(Capped at 500%)')).toBe('（上限 500%）');
     expect(translateGuideText('Lvl 10 Blessed Aim Aura When Equipped')).toBe('装备时赋予等级 10 祝福瞄准光环');
     expect(translateGuideText('Normal/Superior Weapon/Armor (Elite)')).toBe('普通/超强武器/护甲（精英）');
@@ -286,7 +288,7 @@ describe('guide text translation', () => {
     expect(translateGuideText('(Only works once)')).toBe('（仅生效一次）');
     expect(translateGuideText('Kill Bonuses')).toBe('击杀加成');
     expect(translateGuideText('(At least 500 kills)')).toBe('（至少 500 次击杀）');
-    expect(translateGuideText('2x Flawed Enigmatic Cinnabar')).toBe('2x 缺陷的神秘朱砂');
+    expect(translateGuideText('2x Flawed Enigmatic Cinnabar')).toBe('2x 裂开的神秘朱砂');
     expect(translateGuideText('Mercenaries')).toBe('佣兵');
     expect(translateGuideText('Hireling')).toBe('雇佣兵');
     expect(translateGuideText('Comb - Nightmare')).toBe('战斗 - 噩梦');

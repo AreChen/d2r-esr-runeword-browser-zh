@@ -48,7 +48,7 @@ describe('gemword filtering helpers', () => {
 
     expect(matchesGemwordSearch(gemword, ['holy'])).toBe(true);
     expect(matchesGemwordSearch(gemword, ['冰冷抗性'])).toBe(true);
-    expect(matchesGemwordSearch(gemword, ['碎钻石'])).toBe(true);
+    expect(matchesGemwordSearch(gemword, ['碎裂的钻石'])).toBe(true);
     expect(matchesGemwordSearch(gemword, ['身体护甲'])).toBe(true);
     expect(matchesGemwordSearch(gemword, ['missing'])).toBe(false);
   });

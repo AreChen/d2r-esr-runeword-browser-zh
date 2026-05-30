@@ -11,6 +11,21 @@ describe('game text i18n facade', () => {
     expect(buildLocalizedSearchText(['El Rune'])).toBe('el rune');
   });
 
+  it('uses the corrected gem quality names in game text and search terms', () => {
+    expect(translateGameText('Chipped Diamond')).toBe('碎裂的钻石');
+    expect(translateGameText('Flawed Sapphire')).toBe('裂开的蓝宝石');
+    expect(translateGameText('Blemished Amethyst')).toBe('瑕疵紫水晶');
+    expect(translateGameText('Flawless Topaz')).toBe('无瑕黄玉');
+    expect(translateGameText('Perfect Ruby')).toBe('完美红宝石');
+
+    const searchText = buildLocalizedSearchText(['Flawed Sapphire', 'Flawless Topaz']);
+    expect(searchText).toContain('flawed sapphire');
+    expect(searchText).toContain('裂开的蓝宝石');
+    expect(searchText).toContain('无瑕黄玉');
+    expect(searchText).not.toContain('缺陷蓝宝石');
+    expect(searchText).not.toContain('完美黄玉');
+  });
+
   it('translates elemental attack damage with duration variants', () => {
     expect(translateGameText('Adds 30-40 Cold Damage to Attacks over 2 Seconds、')).toBe('攻击附加 30-40 冰冷伤害，持续 2 秒');
     expect(translateGameText('Adds 250 Poison Damage to Attacks over 10.24')).toBe('攻击附加 250 毒素伤害，持续 10.24 秒');

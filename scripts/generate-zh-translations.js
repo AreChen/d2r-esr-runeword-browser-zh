@@ -25,6 +25,40 @@ const TEMPLATE_MAX_LENGTH = 180;
 const PLACEHOLDER_REGEX = /%\+?[dius]/;
 const TEMPLATE_PLACEHOLDER_REGEX = /%\+?[dius]/g;
 
+const correctedGemQualityTranslations = {
+  Chipped: '碎裂的',
+  Flawed: '裂开的',
+  Blemished: '瑕疵',
+  Flawless: '无瑕',
+  Perfect: '完美',
+};
+
+const correctedGemBaseTranslations = {
+  Amethyst: '紫水晶',
+  Sapphire: '蓝宝石',
+  Emerald: '翡翠',
+  Ruby: '红宝石',
+  Diamond: '钻石',
+  Topaz: '黄玉',
+  Skull: '头骨',
+  Obsidian: '黑曜石',
+};
+
+const correctedCrystalBaseTranslations = {
+  'Bitter Peridot': '苦涩橄榄石',
+  'Bleeding Stone': '流血石',
+  'Burning Sulphur': '燃烧硫磺',
+  'Dark Azurite': '黑暗青金石',
+  'Enigmatic Cinnabar': '神秘朱砂',
+  'Frozen Soul': '冰冻灵魂',
+  'Pulsing Opal': '脉动蛋白石',
+  'Shadow Quartz': '影子石英',
+  'Solid Mercury': '固态水银',
+  'Storm Amber': '风暴琥珀',
+  'Tainted Tourmaline': '污秽电气石',
+  'Tomb Jade': '墓穴翡翠',
+};
+
 const manualExactTranslations = {
   'All Weapons': '所有武器',
   '2H Swing Weapon': '双手挥击武器',
@@ -51,6 +85,9 @@ const manualExactTranslations = {
   'Bow Quiver2': '弓箭袋',
   Boots: '靴子',
   Bow: '弓',
+  'Quilted Armor': '绗缝铠甲',
+  '(Quilted Armor)': '(绗缝盔甲)',
+  '(Quilted Armor) Ancient Coupon': '(绗缝盔甲) 古代优惠券',
   Charm: '护身符',
   Circlet: '头环',
   'Class-Specific': '职业专属',
@@ -328,6 +365,28 @@ const manualExactTranslations = {
   'Mythical Unique Jewelry': '神话暗金首饰',
   'Dedicated Drops Mythical Uniques': '专属掉落神话暗金',
 };
+
+for (const [quality, qualityTranslation] of Object.entries(correctedGemQualityTranslations)) {
+  manualExactTranslations[quality] = qualityTranslation;
+  manualExactTranslations[`${quality} Gem`] = `${qualityTranslation}宝石`;
+  manualExactTranslations[`${quality} Gems`] = `${qualityTranslation}宝石`;
+
+  for (const [base, baseTranslation] of Object.entries(correctedGemBaseTranslations)) {
+    manualExactTranslations[`${quality} ${base}`] = `${qualityTranslation}${baseTranslation}`;
+    manualExactTranslations[`${quality} ${base} (6 Pack)`] = `${qualityTranslation}${baseTranslation}（6个装）`;
+  }
+}
+
+manualExactTranslations['Chipped Crystal'] = `${correctedGemQualityTranslations.Chipped}水晶`;
+manualExactTranslations['Flawed Crystal'] = `${correctedGemQualityTranslations.Flawed}水晶`;
+manualExactTranslations['Chipped Crystals'] = `${correctedGemQualityTranslations.Chipped}水晶`;
+manualExactTranslations['Flawed Crystals'] = `${correctedGemQualityTranslations.Flawed}水晶`;
+
+for (const quality of ['Chipped', 'Flawed']) {
+  for (const [base, baseTranslation] of Object.entries(correctedCrystalBaseTranslations)) {
+    manualExactTranslations[`${quality} ${base}`] = `${correctedGemQualityTranslations[quality]}${baseTranslation}`;
+  }
+}
 
 const manualSuffixTranslations = {
   'of the Aether': '之虚空',
