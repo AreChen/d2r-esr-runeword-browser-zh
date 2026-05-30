@@ -42,10 +42,6 @@ function cleanText(text: string): string {
     .trim();
 }
 
-function cleanHtmlText(html: string): string {
-  return cleanText(html.replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]*>/g, ' '));
-}
-
 function cleanHtmlLines(html: string): string[] {
   return html
     .replace(/<br\s*\/?>/gi, '\n')
@@ -79,7 +75,7 @@ function getHeadingLevel(tagName: string): 2 | 3 {
 }
 
 function parseTableCell(cell: Element): string {
-  return cleanHtmlText(cell.innerHTML);
+  return cleanHtmlLines(cell.innerHTML).join('\n');
 }
 
 function parseTable(table: Element, id: string): GuideTableBlock | null {

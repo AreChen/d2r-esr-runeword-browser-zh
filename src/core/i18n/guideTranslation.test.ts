@@ -13,6 +13,15 @@ describe('guide text translation', () => {
     expect(translateGuideText('Worldstone Shard')).toBe('世界之石碎片');
     expect(translateGuideText('Weapon Mastery Token')).toBe('武器精通令牌');
     expect(translateGuideText('Awakened Weapon Mastery Token')).toBe('觉醒武器精通令牌');
+    expect(translateGuideText('Rare Weapon')).toBe('稀有武器');
+    expect(translateGuideText('Rare Equippable Gear')).toBe('稀有可装备物品');
+    expect(translateGuideText('Unique Charm')).toBe('暗金护身符');
+    expect(translateGuideText('Any Class Weapon')).toBe('任意职业武器');
+    expect(translateGuideText('Random highest tier suffix')).toBe('随机最高阶后缀');
+    expect(translateGuideText('*** Anointed **')).toBe('*** 已涂油 **');
+    expect(translateGuideText('Orb of Anointment')).toBe('涂抹之球');
+    expect(translateGuideText("Diablo's Demonic Horn")).toBe('迪亚布罗的恶魔之角');
+    expect(translateGuideText('Anvil Stone')).toBe('锻造石');
     expect(translateGuideText('Corruptions are unique bonuses obtained through transmuting a Worldstone Shard with any item.')).toBe(
       '腐化是通过将世界之石碎片与任意物品合成获得的独特加成。'
     );

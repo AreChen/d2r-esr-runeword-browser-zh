@@ -30,7 +30,7 @@ const sampleHtml = `
       <table>
         <tr><td colspan="3"><b>Weapon Outcomes</b></td></tr>
         <tr><th>Outcome</th><th>Chance</th><th>Notes</th></tr>
-        <tr><td>Extra sockets</td><td>10%</td><td>Cannot exceed maximum sockets</td></tr>
+        <tr><td>Same Item<br>+(150 to 200)% Enhanced Damage<br>Corrupted</td><td>10%</td><td>Cannot exceed maximum sockets</td></tr>
       </table>
       <img src="./images/features/corruption.png" alt="Corruption altar">
     </body>
@@ -65,7 +65,7 @@ describe('guide page parser', () => {
       kind: 'table',
       caption: 'Weapon Outcomes',
       headers: ['Outcome', 'Chance', 'Notes'],
-      rows: [['Extra sockets', '10%', 'Cannot exceed maximum sockets']],
+      rows: [['Same Item\n+(150 to 200)% Enhanced Damage\nCorrupted', '10%', 'Cannot exceed maximum sockets']],
     });
     expect(page.blocks).toContainEqual({
       id: 'sample-image-4',
