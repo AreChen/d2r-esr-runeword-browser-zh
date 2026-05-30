@@ -117,6 +117,14 @@ describe('guide text translation', () => {
     expect(translateGuideText('weap, circ')).toBe('武器(weap)、头环(circ)');
     expect(translateGuideText('staf, wand, orb')).toBe('法杖(staf)、魔杖(wand)、法球(orb)');
     expect(translateGuideText('amul, circ, glov, spea, scrn')).toBe('项链(amul)、头环(circ)、手套(glov)、长矛(spea)、死灵盾(scrn)');
+    expect(translateGuideText('amul, circ, claw, asnx, tkni, cloa')).toBe(
+      '项链(amul)、头环(circ)、爪(claw)、刺客武器(asnx)、投掷刀(tkni)、斗篷(cloa)'
+    );
+    expect(translateGuideText('staf, wand, mana, orb, dclb, npol, ndgr')).toBe(
+      '法杖(staf)、魔杖(wand)、法力物品(mana)、法球(orb)、德鲁伊木棒(dclb)、死灵法师长柄武器(npol)、死灵匕首(ndgr)'
+    );
+    expect(translateGuideText('arrm, boqm')).toBe('弓箭袋(arrm)、弩矢袋(boqm)');
+    expect(translateGuideText('glov, miss, thro')).toBe('手套(glov)、远程武器(miss)、投掷武器(thro)');
     expect(translateGuideText('16.0 Avg')).toBe('16.0 平均');
   });
 
@@ -151,6 +159,13 @@ describe('guide text translation', () => {
     expect(translateGuideText('1% Chance to Cast Level 15 Frozen Orb on Striking')).toBe('1% 几率在击中时施放等级 15 冰封球');
     expect(translateGuideText('of the Colossus')).toBe('之巨像');
     expect(translateGuideText("Mechanist's")).toBe('机械师之');
+    expect(translateGuideText("Nature's")).toBe('自然之');
+    expect(translateGuideText('of Cold Arrows')).toBe('之冰箭');
+    expect(translateGuideText('Grand Charms')).toBe('超大型护身符');
+    expect(translateGuideText('Arrow/Bolt Quivers')).toBe('箭/弩矢袋');
+    expect(translateGuideText('+(10 to 20)% chance for finishing moves to not consume charges')).toBe(
+      '+(10 to 20)% 几率使终结技不消耗充能'
+    );
   });
 
   it('translates cube recipe, map, and mechanism guide prose labels', () => {
@@ -166,6 +181,9 @@ describe('guide text translation', () => {
     expect(translateGuideText('Teleport Restrictions')).toBe('传送限制');
     expect(translateGuideText('Location: Act 1 The Secret Cow Level')).toBe('位置: 第 1 幕 秘密奶牛关');
     expect(translateGuideText('Location: Act 1 Tamoe Highland')).toBe('位置: 第 1 幕 塔莫高地');
+    expect(translateGuideText('Forgotten Tower Level 5')).toBe('遗忘之塔第 5 层');
+    expect(translateGuideText('Location: Act 5 Naraku Level 1&2')).toBe('位置: 第 5 幕 奈落第 1 和 2 层');
+    expect(translateGuideText('Way Point*')).toBe('传送小站*');
     expect(translateGuideText('Level 1 and Level 2')).toBe('第 1 层和第 2 层');
     expect(translateGuideText('General')).toBe('通用');
     expect(translateGuideText('Min iLvl')).toBe('最低物品等级');
@@ -191,6 +209,56 @@ describe('guide text translation', () => {
     expect(translateGuideText('3 Any Mana potions')).toBe('3 任意法力药剂');
     expect(translateGuideText('Any Ring/Amulet')).toBe('任意戒指/项链');
     expect(translateGuideText('or Unique/Rare Quiver')).toBe('或暗金/稀有箭袋');
+    expect(translateGuideText('Chipped Gem')).toBe('碎裂宝石');
+    expect(translateGuideText('3 Gems of the Same Color and Grade')).toBe('3 个相同颜色和等级的宝石');
+    expect(translateGuideText('Gem of One Higher Grade (up to Perfect)')).toBe('高一级宝石（最高到完美）');
+    expect(translateGuideText('2 Flawless Gems of the Same Color')).toBe('2 个相同颜色的无瑕宝石');
+    expect(translateGuideText('Can Opener (Chipped Gem Output)')).toBe('开罐器（输出碎裂宝石）');
+    expect(translateGuideText('(-1 Crystal Point of selected color)')).toBe('（所选颜色水晶点数 -1）');
+    expect(translateGuideText('Adds 54 Gem points of selected color')).toBe('增加 54 点所选颜色宝石点数');
+    expect(translateGuideText('2 Runes/Decals of the Same Grade')).toBe('2 个相同等级的符文/贴花');
+    expect(translateGuideText('Rune/Decal of One Higher Grade (up to Wo or Zod)')).toBe('高一级符文/贴花（最高到 Wo 或 Zod）');
+    expect(translateGuideText('8 Ancient Coupons (Normal)')).toBe('8 张古代券（普通）');
+    expect(translateGuideText('Converts 5 normal coupon points')).toBe('转换 5 点普通券点数');
+    expect(translateGuideText('to 1 exceptional coupon point')).toBe('为 1 点扩展券点数');
+    expect(translateGuideText('Full Rejuvenation Potion')).toBe('完全复苏药水');
+    expect(translateGuideText('Any Non-ethereal Weapon/Armor')).toBe('任意非无形武器/护甲');
+    expect(translateGuideText('Quantity Reset To 500 (Quivers)')).toBe('数量重置为 500（箭袋）');
+    expect(translateGuideText('Normal Weapon of the Same Type')).toBe('同类型普通武器');
+    expect(translateGuideText('Set/Unique Weapons/Armor (Elite)')).toBe('套装/暗金武器/护甲（精英）');
+    expect(translateGuideText('Adds 4 Ancient Decipherer points')).toBe('增加 4 点古代解读器点数');
+    expect(translateGuideText('into an Anvil Stone point')).toBe('转为铁砧石点数');
+    expect(translateGuideText('(25% chance of success)')).toBe('（25% 成功几率）');
+    expect(translateGuideText("Base upgraded uniques can't be rerolled. Please reroll before upgrade.")).toBe(
+      '底材已升级的暗金物品不能重置。请在升级前重置。'
+    );
+    expect(translateGuideText('Forging, D-Stoning and other ehnancements are inherited.')).toBe('锻造、D-Stoning 和其他强化会被继承。');
+    expect(translateGuideText('Level 92 unique jewels and quivers cannot be rerolled.')).toBe('92 级暗金珠宝和箭袋不能重置。');
+    expect(translateGuideText("D-Stoning doesn't work if the property on the target item has reached the cap.")).toBe(
+      '如果目标物品上的属性已经达到上限，D-Stoning 不会生效。'
+    );
+    expect(translateGuideText("Adds Chipped Gem's Weapon Bonus")).toBe('增加碎裂宝石的武器加成');
+    expect(translateGuideText('(Capped at 500%)')).toBe('（上限 500%）');
+    expect(translateGuideText('Lvl 10 Blessed Aim Aura When Equipped')).toBe('装备时赋予等级 10 祝福瞄准光环');
+    expect(translateGuideText('Normal/Superior Weapon/Armor (Elite)')).toBe('普通/超强武器/护甲（精英）');
+    expect(translateGuideText('Rare Gloves of the Same Mods')).toBe('相同词缀稀有手套');
+    expect(
+      translateGuideText('On LAN build, Worldstone Shards can drop from any champion or unique that has level 90+, regardless if they')
+    ).toBe('局域网版中，世界石碎片可由任意 90 级以上冠军怪或暗金怪掉落，无论它们');
+    expect(
+      translateGuideText('are terrorized or not (although terrorized zones help with this since they add levels to the affected monsters).')
+    ).toBe('是否恐怖化（恐怖化区域会提高受影响怪物的等级，因此会有帮助）。');
+    expect(
+      translateGuideText('For Unique Charms , anointments can be obtained through transmuting all Eye of the Storm boss body parts')
+    ).toBe('暗金护身符可以通过合成全部风暴之眼首领器官获得涂油');
+    expect(
+      translateGuideText(
+        'After you exhausted all souls, you can transform the amulet in 1 out of 8 mythical weapon bases. Doing this will allow you to wear the weapon without restrictions and any flavor text will be removed.'
+      )
+    ).toBe('耗尽所有灵魂后，你可以把项链转化为 8 种神话武器底材之一。这样可以让你无视限制装备该武器，并移除所有风味文本。');
+    expect(translateGuideText('A simple arrow that deals 100% weapon damage and that cannot pierce.')).toBe(
+      '一支简单箭矢，造成 100% 武器伤害，且不能穿透。'
+    );
   });
 
   it('translates feature mechanism table labels and formula fragments', () => {
@@ -216,7 +284,7 @@ describe('guide text translation', () => {
       translateGuideText(
         'Weapon mastery can be achieved by transmuting a Weapon Mastery Token that can drop from Corrupted Zakarum and endgame map bosses (25% chance, not scaled by /players).'
       )
-    ).toBe('武器精通可以通过合成武器精通代币获得；该代币可由腐化的扎卡鲁姆和终局地图首领掉落（25% 几率，不受 /players 缩放影响）。');
+    ).toBe('武器精通可以通过合成武器精通代币获得；该代币可由腐化的扎卡鲁姆和终局地图首领掉落（25% 几率，不受玩家数缩放影响）。');
     expect(translateGuideText('Weapon mastery can be removed , but the token is lost on removal.')).toBe(
       '武器精通可以移除，但移除时会消耗代币。'
     );
@@ -238,6 +306,23 @@ describe('guide text translation', () => {
     expect(translateGuideText("Lucion's Whisper - Cellar of Pain")).toBe('卢西恩的低语 - 痛苦地窖');
     expect(translateGuideText('Lucion Whisper just killed')).toBe('卢西恩的低语刚被击杀');
     expect(translateGuideText('Fire/Cold/Lightning/Poison/Magic/Wind Surge')).toBe('火焰/冰冷/闪电/毒素/魔法/风暴涌动');
+    expect(translateGuideText("Wrathamon's Omens")).toBe('拉萨蒙的预兆');
+    expect(translateGuideText('(with 5 souls remaining)')).toBe('（剩余 5 个灵魂）');
+    expect(translateGuideText('Rathma just killed')).toBe('拉斯玛刚被击杀');
+    expect(
+      translateGuideText(
+        "Weakening Curse - Lucion's Whisper has a chance to cast a curse on the ground. If you're caught within the area, you are petrified and your fire resistance is lowered by 150%."
+      )
+    ).toBe('削弱诅咒 - 卢西恩的低语有几率在地面施放诅咒。若你处于区域内，会被石化并降低 150% 火焰抗性。');
+    expect(
+      translateGuideText(
+        "Spell on Attack - Diablo's Hellhound has a chance to unlesh a deadly spell on attacking its prey. Possible spells include a regular Meteor, a devastating Frozen Orb whose ice bolts seek nearby players, a piercing Bone Spirit and a curse that slows the target and lowers their elemental resistances by 100% and magic resist by 50%."
+      )
+    ).toBe(
+      '攻击触发法术 - 迪亚布罗的地狱犬在攻击猎物时有几率释放致命法术。可能的法术包括普通陨石、毁灭性的冰封球（冰弹会追踪附近玩家）、可穿透的骨灵，以及一个会减速目标、降低 100% 元素抗性和 50% 魔法抗性的诅咒。'
+    );
+    expect(translateGuideText('Rewards (for each boss)')).toBe('奖励（每个首领）');
+    expect(translateGuideText('Glacial Behemoth - Frozen Wastes (Northern Descent)')).toBe('冰川巨兽 - 冰冻荒原（北部下坡）');
   });
 
   it('translates every official guide navigation label for visible database UI', () => {
