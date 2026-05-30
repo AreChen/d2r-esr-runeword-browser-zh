@@ -8,6 +8,7 @@ import { MythicalUniquesScreen } from '@/features/mythical-uniques';
 import { AscendanciesScreen } from '@/features/ascendancies';
 import { VesselOfSoulsScreen } from '@/features/vessel-of-souls';
 import { DatabaseScreen } from '@/features/database';
+import { LootFilterScreen } from '@/features/loot-filter';
 
 export const router = createBrowserRouter(
   [
@@ -22,6 +23,7 @@ export const router = createBrowserRouter(
         { path: 'mythicals', element: <MythicalUniquesScreen /> },
         { path: 'ascendancies', element: <AscendanciesScreen /> },
         { path: 'vessel-of-souls', element: <VesselOfSoulsScreen /> },
+        { path: 'loot-filter', element: <LootFilterScreen /> },
         { path: 'database', element: <DatabaseScreen /> },
       ],
     },

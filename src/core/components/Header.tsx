@@ -19,6 +19,7 @@ const NAV_ITEMS = [
   { to: '/mythicals', label: '神话暗金', end: false },
   { to: '/ascendancies', label: '升华', end: false },
   { to: '/vessel-of-souls', label: '灵魂之器', end: false },
+  { to: '/loot-filter', label: '过滤器', end: false },
   { to: '/database', label: '资料库', end: false },
 ] as const;
 

@@ -22,6 +22,7 @@ Project overview, design decisions, and general project information.
 - [Runewords](./features/RUNEWORDS.md) - Browse and filter runewords (primary feature, home page)
 - [Socketables](./features/SOCKETABLES.md) - Unified view of all socketables (gems, runes, crystals) with filters
 - [Unique Items](./features/UNIQUE-ITEMS.md) - Browse and filter unique items parsed from HTM pages
+- [Loot Filter Editor](./features/LOOT-FILTER.md) - Import, preview, adjust, and export D2RLAN Lua loot filter configs
 - Guide Database - Browse official Base Information and Features pages in the app-owned Chinese interface
 
 ### Technical Documentation
@@ -63,6 +64,7 @@ The app uses a single HTM-based data system. All data is fetched from the ESR do
 | Unique Items | `/uniques` | Unique weapons, armors, and other items with category filters |
 | Mythical Uniques | `/mythicals` | Mythical unique items with special properties and notes |
 | Ascendancies | `/ascendancies` | Ascendancy tiers, bonuses, and footnotes |
+| Loot Filter Editor | `/loot-filter` | Local Lua filter import, Chinese editing UI, style preview, audio filename editing, and Lua export |
 | Guide Database | `/database` | Official Base Information and Features pages rendered in a Chinese app UI |
 
 ---
