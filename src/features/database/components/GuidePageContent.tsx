@@ -107,7 +107,7 @@ export function GuidePageContent({ page }: GuidePageContentProps) {
         <div className="space-y-2">
           <div className="flex flex-wrap items-center gap-2">
             <Badge variant="secondary">{groupLabel}</Badge>
-            <Badge variant="outline">{page.label}</Badge>
+            <Badge variant="outline">{translated(page.label)}</Badge>
           </div>
           <h1 className="text-2xl font-bold">{page.title}</h1>
           <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">

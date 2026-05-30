@@ -2,6 +2,21 @@ import { translateGameText } from './index';
 import { normalizeTranslationKey } from './textTranslation';
 
 const guideExactTranslations: Readonly<Record<string, string>> = {
+  Changelogs: '更新日志',
+  Armor: '护甲',
+  Weapons: '武器',
+  Prefixes: '前缀',
+  Suffixes: '后缀',
+  'Uni Armor': '暗金护甲',
+  'Uni Weapons': '暗金武器',
+  'Uni Other': '暗金其他',
+  'Uni Mythicals': '神话暗金',
+  Sets: '套装',
+  'Gems/Runes': '宝石/符文',
+  Gemwords: '宝石之语',
+  Runewords: '符文之语',
+  'Cube Recipes': '方块公式',
+  Maps: '地图',
   'Input(s)': '投入物',
   'Possible Outcome(s)': '可能结果',
   Output: '产物',

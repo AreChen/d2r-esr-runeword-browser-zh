@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import { ScrollToTopButton } from '@/components/ScrollToTopButton';
 import { buildLocalizedSearchText } from '@/core/i18n';
+import { translateGuideText } from '@/core/i18n/guideTranslation';
 import type { GuidePage, GuidePageGroup } from '@/core/db';
 import { parseSearchTerms } from '@/features/runewords/utils/filteringHelpers';
 import { GuidePageContent } from '../components/GuidePageContent';
@@ -24,7 +25,7 @@ const GROUP_FILTERS: readonly { readonly value: GroupFilter; readonly label: str
 
 function pageMatchesSearch(page: GuidePage, terms: readonly string[]): boolean {
   if (terms.length === 0) return true;
-  const searchable = buildLocalizedSearchText([page.title, page.label, page.textIndex]);
+  const searchable = buildLocalizedSearchText([page.title, page.label, translateGuideText(page.label), page.textIndex]);
   return terms.every((term) => searchable.includes(term));
 }
 
@@ -59,7 +60,7 @@ export function DatabaseScreen() {
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold">资料库 ({pages.length})</h1>
-          <p className="mt-1 text-sm text-muted-foreground">官方 Base Information 与 Features 子页面的中文整理版。</p>
+          <p className="mt-1 text-sm text-muted-foreground">官方基础资料与特色机制子页面的中文整理版。</p>
         </div>
         <div className="flex flex-wrap gap-2">
           {GROUP_FILTERS.map((filter) => (
@@ -178,7 +179,7 @@ function GuidePageListButton({
         <Badge variant="outline" className="px-1 py-0 text-[11px]">
           {getGroupName(page.group)}
         </Badge>
-        {page.label}
+        {translateGuideText(page.label)}
       </span>
       <span className="mt-2 block text-xs text-muted-foreground">
         {summary.headingCount} 章 / {summary.tableCount} 表 / {summary.tableRowCount} 行

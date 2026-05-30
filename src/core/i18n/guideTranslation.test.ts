@@ -1,5 +1,5 @@
 import { translateGuideText } from './guideTranslation';
-import { getGuidePageEntry } from '../api/guidePageCatalog';
+import { GUIDE_PAGE_CATALOG, getGuidePageEntry } from '../api/guidePageCatalog';
 import { translateGameText } from './index';
 
 describe('guide text translation', () => {
@@ -96,5 +96,16 @@ describe('guide text translation', () => {
     expect(translateGuideText('Tier 2 Map (25% chance on average)')).toBe('2 阶地图（平均 25% 几率）');
     expect(translateGuideText('Random Pandemonium Key (100% chance each on average)')).toBe('随机混沌钥匙（平均每个 100% 几率）');
     expect(translateGuideText('Other Generic Items/Materials')).toBe('其他通用物品/材料');
+  });
+
+  it('translates every official guide navigation label for visible database UI', () => {
+    for (const entry of GUIDE_PAGE_CATALOG) {
+      expect(translateGuideText(entry.label), entry.label).not.toBe(entry.label);
+    }
+
+    expect(translateGuideText('Changelogs')).toBe('更新日志');
+    expect(translateGuideText('Uni Armor')).toBe('暗金护甲');
+    expect(translateGuideText('Gems/Runes')).toBe('宝石/符文');
+    expect(translateGuideText('Mercenary and Oskill Information')).toBe('佣兵与 Oskill 信息');
   });
 });
