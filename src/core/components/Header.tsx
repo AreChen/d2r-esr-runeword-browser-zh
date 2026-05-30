@@ -13,6 +13,7 @@ const GITHUB_URL = 'https://github.com/AreChen/d2r-esr-runeword-browser-zh';
 
 const NAV_ITEMS = [
   { to: '/', label: '符文之语', end: true },
+  { to: '/gemwords', label: '宝石之语', end: false },
   { to: '/socketables', label: '镶嵌物', end: false },
   { to: '/uniques', label: '暗金物品', end: false },
   { to: '/mythicals', label: '神话暗金', end: false },

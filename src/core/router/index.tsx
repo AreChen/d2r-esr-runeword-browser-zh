@@ -2,6 +2,7 @@ import { createBrowserRouter } from 'react-router-dom';
 import { AppLayout } from '@/core/layouts/AppLayout';
 import { SocketablesScreen } from '@/features/socketables';
 import { RunewordsScreen } from '@/features/runewords';
+import { GemwordsScreen } from '@/features/gemwords';
 import { HtmUniqueItemsScreen } from '@/features/htm-unique-items';
 import { MythicalUniquesScreen } from '@/features/mythical-uniques';
 import { AscendanciesScreen } from '@/features/ascendancies';
@@ -14,6 +15,7 @@ export const router = createBrowserRouter(
       element: <AppLayout />,
       children: [
         { index: true, element: <RunewordsScreen /> },
+        { path: 'gemwords', element: <GemwordsScreen /> },
         { path: 'socketables', element: <SocketablesScreen /> },
         { path: 'uniques', element: <HtmUniqueItemsScreen /> },
         { path: 'mythicals', element: <MythicalUniquesScreen /> },

@@ -117,6 +117,21 @@ export interface Runeword {
   readonly jewelInfo?: string; // Optional jewel info for Kanji runewords, e.g. "(0-3) Jewels"
 }
 
+// Gemword types
+
+export interface Gemword {
+  readonly name: string;
+  readonly variant: number;
+  readonly sockets: number;
+  readonly reqLevel: number;
+  readonly sortKey: number;
+  readonly gems: readonly string[];
+  readonly ingredients: readonly string[];
+  readonly allowedItems: readonly string[];
+  readonly affixes: readonly Affix[];
+  readonly columnAffixes: SocketableBonuses;
+}
+
 // HTM Unique Items
 
 export type HtmUniqueItemPage = 'weapons' | 'armors' | 'other';

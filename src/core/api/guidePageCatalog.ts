@@ -73,6 +73,7 @@ export const GUIDE_PAGE_CATALOG = [
 
 export const CORE_GUIDE_PAGE_IDS = [
   'gems',
+  'gemwords',
   'runewords',
   'uniqueWeapons',
   'uniqueArmors',

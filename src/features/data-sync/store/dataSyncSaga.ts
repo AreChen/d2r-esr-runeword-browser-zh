@@ -2,6 +2,7 @@ import { all, call, put, takeLatest } from 'redux-saga/effects';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import {
   fetchGemsHtml,
+  fetchGemwordsHtml,
   fetchRunewordsHtml,
   fetchUniqueWeaponsHtml,
   fetchUniqueArmorsHtml,
@@ -22,6 +23,7 @@ import {
   parseLodRunesHtml,
   parseKanjiRunesHtml,
   parseCrystalsHtml,
+  parseGemwordsHtml,
   parseRunewordsHtml,
   parseHtmUniqueItems,
   parseMythicalUniques,
@@ -51,7 +53,7 @@ import {
   type FetchedHtmlData,
 } from './dataSyncSlice';
 import { handleStartupCheck } from './startupSaga';
-import type { AffixPattern, Gem, EsrRune, LodRune, KanjiRune, Crystal, Runeword } from '@/core/db';
+import type { AffixPattern, Gem, EsrRune, LodRune, KanjiRune, Crystal, Runeword, Gemword } from '@/core/db';
 import type { ParsedData } from '../interfaces';
 
 function* handleFetchHtml(action: PayloadAction<{ force?: boolean } | undefined>) {
@@ -59,6 +61,7 @@ function* handleFetchHtml(action: PayloadAction<{ force?: boolean } | undefined>
     console.log('[HTML] Fetching HTML files...', { force: action.payload?.force ?? false });
     const [
       gemsHtml,
+      gemwordsHtml,
       runewordsHtml,
       uniqueWeaponsHtml,
       uniqueArmorsHtml,
@@ -68,6 +71,7 @@ function* handleFetchHtml(action: PayloadAction<{ force?: boolean } | undefined>
       additionalGuidePageHtmls,
     ] = (yield all([
       call(fetchGemsHtml),
+      call(fetchGemwordsHtml),
       call(fetchRunewordsHtml),
       call(fetchUniqueWeaponsHtml),
       call(fetchUniqueArmorsHtml),
@@ -75,10 +79,11 @@ function* handleFetchHtml(action: PayloadAction<{ force?: boolean } | undefined>
       call(fetchUniqueMythicalsHtml),
       call(fetchAscendanciesHtml),
       call(fetchAdditionalGuidePageHtmls),
-    ])) as [string, string, string, string, string, string, string, FetchedGuidePageHtml[]];
+    ])) as [string, string, string, string, string, string, string, string, FetchedGuidePageHtml[]];
 
     const guidePageHtmls: readonly FetchedGuidePageHtml[] = [
       { entry: getGuidePageEntry('gems'), html: gemsHtml },
+      { entry: getGuidePageEntry('gemwords'), html: gemwordsHtml },
       { entry: getGuidePageEntry('runewords'), html: runewordsHtml },
       { entry: getGuidePageEntry('uniqueWeapons'), html: uniqueWeaponsHtml },
       { entry: getGuidePageEntry('uniqueArmors'), html: uniqueArmorsHtml },
@@ -90,6 +95,7 @@ function* handleFetchHtml(action: PayloadAction<{ force?: boolean } | undefined>
 
     console.log('[HTML] Fetched HTML files', {
       gemsHtmlLength: gemsHtml.length,
+      gemwordsHtmlLength: gemwordsHtml.length,
       runewordsHtmlLength: runewordsHtml.length,
       uniqueWeaponsHtmlLength: uniqueWeaponsHtml.length,
       uniqueArmorsHtmlLength: uniqueArmorsHtml.length,
@@ -101,6 +107,7 @@ function* handleFetchHtml(action: PayloadAction<{ force?: boolean } | undefined>
     yield put(
       fetchHtmlSuccess({
         gemsHtml,
+        gemwordsHtml,
         runewordsHtml,
         uniqueWeaponsHtml,
         uniqueArmorsHtml,
@@ -137,6 +144,7 @@ function* handleParseData(action: PayloadAction<FetchedHtmlData>) {
     console.log('[HTML] Parsing HTML data...');
     const {
       gemsHtml,
+      gemwordsHtml,
       runewordsHtml,
       uniqueWeaponsHtml,
       uniqueArmorsHtml,
@@ -236,6 +244,9 @@ function* handleParseData(action: PayloadAction<FetchedHtmlData>) {
     const runewords = parseRunewordsHtml(runewordsHtml, runePointsLookup, runeReqLevelLookup, runePriorityLookup, gemReqLevelLookup);
     console.log('[HTML] Parsed runewords:', runewords.length);
 
+    const gemwords = parseGemwordsHtml(gemwordsHtml, gemReqLevelLookup);
+    console.log('[HTML] Parsed gemwords:', gemwords.length);
+
     const htmUniqueWeapons = parseHtmUniqueItems(uniqueWeaponsHtml, 'weapons');
     console.log('[HTML] Parsed HTM unique weapons:', htmUniqueWeapons.length);
     const htmUniqueArmors = parseHtmUniqueItems(uniqueArmorsHtml, 'armors');
@@ -262,6 +273,7 @@ function* handleParseData(action: PayloadAction<FetchedHtmlData>) {
         kanjiRunes,
         crystals,
         runewords,
+        gemwords,
         htmUniqueItems,
         mythicalUniques,
         ascendancies,
@@ -276,8 +288,19 @@ function* handleParseData(action: PayloadAction<FetchedHtmlData>) {
 
 function* handleStoreData(action: PayloadAction<ParsedData>) {
   try {
-    const { gems, esrRunes, lodRunes, kanjiRunes, crystals, runewords, htmUniqueItems, mythicalUniques, ascendancies, guidePages } =
-      action.payload;
+    const {
+      gems,
+      esrRunes,
+      lodRunes,
+      kanjiRunes,
+      crystals,
+      runewords,
+      gemwords,
+      htmUniqueItems,
+      mythicalUniques,
+      ascendancies,
+      guidePages,
+    } = action.payload;
 
     console.log('[HTML] Storing data to IndexedDB...');
 
@@ -293,6 +316,7 @@ function* handleStoreData(action: PayloadAction<ParsedData>) {
       call(() => db.kanjiRunes.bulkPut(kanjiRunes)),
       call(() => db.crystals.bulkPut(crystals)),
       call(() => db.runewords.bulkPut(runewords)),
+      call(() => db.gemwords.bulkPut(gemwords)),
       call(() => db.htmUniqueItems.bulkPut(htmUniqueItems)),
       call(() => db.mythicalUniques.bulkPut(mythicalUniques)),
       call(() => db.ascendancies.bulkPut(ascendancies)),
@@ -322,6 +346,7 @@ function* handleStoreData(action: PayloadAction<ParsedData>) {
       kanjiRunes: kanjiRunes.length,
       crystals: crystals.length,
       runewords: runewords.length,
+      gemwords: gemwords.length,
       htmUniqueItems: htmUniqueItems.length,
       mythicalUniques: mythicalUniques.length,
       ascendancies: ascendancies.length,
@@ -349,6 +374,7 @@ function* handleExtractAffixes() {
 
     // Read all data from IndexedDB
     const runewords: Runeword[] = (yield call(() => db.runewords.toArray())) as Runeword[];
+    const gemwords: Gemword[] = (yield call(() => db.gemwords.toArray())) as Gemword[];
     const gems: Gem[] = (yield call(() => db.gems.toArray())) as Gem[];
     const esrRunes: EsrRune[] = (yield call(() => db.esrRunes.toArray())) as EsrRune[];
     const lodRunes: LodRune[] = (yield call(() => db.lodRunes.toArray())) as LodRune[];
@@ -361,6 +387,16 @@ function* handleExtractAffixes() {
     // From runewords (all columns to catch column-specific bonuses)
     for (const rw of runewords) {
       const { weaponsGloves, helmsBoots, armorShieldsBelts } = rw.columnAffixes;
+      for (const affix of [...weaponsGloves, ...helmsBoots, ...armorShieldsBelts]) {
+        if (!affixMap.has(affix.pattern)) {
+          affixMap.set(affix.pattern, { pattern: affix.pattern, valueType: affix.valueType });
+        }
+      }
+    }
+
+    // From gemwords (same three item-category columns as runewords)
+    for (const gw of gemwords) {
+      const { weaponsGloves, helmsBoots, armorShieldsBelts } = gw.columnAffixes;
       for (const affix of [...weaponsGloves, ...helmsBoots, ...armorShieldsBelts]) {
         if (!affixMap.has(affix.pattern)) {
           affixMap.set(affix.pattern, { pattern: affix.pattern, valueType: affix.valueType });

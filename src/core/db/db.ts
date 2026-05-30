@@ -6,6 +6,7 @@ import type {
   KanjiRune,
   Crystal,
   Runeword,
+  Gemword,
   AffixPattern,
   HtmUniqueItem,
   MythicalUnique,
@@ -21,6 +22,7 @@ class AppDatabase extends Dexie {
   kanjiRunes!: EntityTable<KanjiRune, 'name'>;
   crystals!: EntityTable<Crystal, 'name'>;
   runewords!: Table<Runeword, [string, number]>; // Compound key: [name, variant]
+  gemwords!: Table<Gemword, [string, number]>;
   affixes!: EntityTable<AffixPattern, 'pattern'>;
   htmUniqueItems!: EntityTable<HtmUniqueItem, 'id'>;
   mythicalUniques!: EntityTable<MythicalUnique, 'id'>;
@@ -31,13 +33,14 @@ class AppDatabase extends Dexie {
   constructor() {
     super('d2r-esr-runeword-browser');
 
-    this.version(13).stores({
+    this.version(14).stores({
       gems: 'name, type, quality, color',
       esrRunes: 'name, order, tier, color',
       lodRunes: 'name, order',
       kanjiRunes: 'name',
       crystals: 'name, type, quality, color',
       runewords: '[name+variant], name, sockets, reqLevel, sortKey',
+      gemwords: '[name+variant], name, sockets, reqLevel, sortKey',
       affixes: 'pattern',
       htmUniqueItems: '++id, name, page, category, reqLevel',
       mythicalUniques: '++id, name, category, reqLevel',
