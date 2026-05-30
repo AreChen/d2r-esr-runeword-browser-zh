@@ -33,6 +33,7 @@ import {
   type GemReqLevelLookup,
 } from '../parsers';
 import { DEFAULT_ESR_RUNE_POINTS, DEFAULT_LOD_RUNE_POINTS } from '../constants/defaultRunePoints';
+import { DATA_CACHE_VERSION, DATA_CACHE_VERSION_METADATA_KEY } from '../constants/dataCacheVersion';
 import {
   startupCheck,
   startupUseCached,
@@ -311,6 +312,7 @@ function* handleStoreData(action: PayloadAction<ParsedData>) {
     }
     yield call(() => db.metadata.put({ key: 'lastUpdated', value: new Date().toISOString() }));
     yield call(() => db.metadata.put({ key: 'appVersion', value: appVersion.version }));
+    yield call(() => db.metadata.put({ key: DATA_CACHE_VERSION_METADATA_KEY, value: DATA_CACHE_VERSION }));
     console.log('[HTML] Stored metadata with ESR version:', storedVersion, 'app version:', appVersion.version);
 
     console.log('[HTML] Store complete:', {

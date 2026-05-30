@@ -106,10 +106,13 @@ describe('guide text translation', () => {
     expect(translateGuideText('Properties')).toBe('属性');
     expect(translateGuideText('Dur')).toBe('耐久');
     expect(translateGuideText('Req Lvl')).toBe('需求等级');
+    expect(translateGuideText('Required Level')).toBe('需求等级');
     expect(translateGuideText('Req Str')).toBe('需求力量');
     expect(translateGuideText('Gem Type')).toBe('宝石类型');
     expect(translateGuideText('Str/Dex Bonus')).toBe('力量/敏捷加成');
     expect(translateGuideText('Item Level: 45')).toBe('物品等级: 45');
+    expect(translateGuideText('Required Level: 40')).toBe('所需等级：40');
+    expect(translateGuideText('Item Level: 35 Required Level: 40')).toBe('物品等级: 35 需求等级: 40');
     expect(translateGuideText('Gamble Item:')).toBe('赌博物品:');
     expect(translateGuideText('(Cannot be Gambled)')).toBe('（无法赌博获得）');
     expect(translateGuideText('Ancient Coupon Unique')).toBe('古代券暗金');
@@ -357,6 +360,11 @@ describe('guide text translation', () => {
       )
     ).toBe('毒箭、焚烧箭、冰冻箭、闪电箭 使这些技能每 5 次攻击触发一次特殊效果 而不是每 3 次触发一次，但总伤害提高 20%');
     expect(translateGuideText('Lut Gohlein\nThe Sewer\nSouth Entrance')).toBe('鲁高因 下水道 南入口');
+    expect(
+      translateGuideText(
+        "Autolycus' Robes\nQuilted Armor (qui)\nLvl 5 / Req Lvl 3\nGamble Item: Quilted Armor (qui)\n+30 Defense\n+5 to Dexterity\nAll Resistances +10"
+      )
+    ).toBe('阿托利库斯的长袍 绗缝铠甲 (qui) 等级 5 / 需求等级 3 赌博物品: 绗缝铠甲 (qui) +30 防御 +5 敏捷 所有抗性 +10');
   });
 
   it('translates ascendancy challenge prose and ascendancy names', () => {

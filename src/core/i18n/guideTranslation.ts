@@ -41,6 +41,7 @@ const guideExactTranslations: Readonly<Record<string, string>> = {
   'Excluding:': '排除:',
   'Mag Lvl': '魔法等级',
   'Req Lvl': '需求等级',
+  'Required Level': '需求等级',
   'Req Str': '需求力量',
   'Req Dex': '需求敏捷',
   'Block%': '格挡率%',
@@ -2021,6 +2022,13 @@ function translateGuideSpecialFormat(normalized: string): string | null {
 
   const itemLevelMatch = /^Item Level:\s*(\d+)$/iu.exec(normalized);
   if (itemLevelMatch) return `物品等级: ${itemLevelMatch[1]}`;
+
+  const combinedItemRequiredLevelMatch = /^Item Level:\s*(\d+)\s+Required Level:\s*(\d+)$/iu.exec(normalized);
+  if (combinedItemRequiredLevelMatch)
+    return `物品等级: ${combinedItemRequiredLevelMatch[1]} 需求等级: ${combinedItemRequiredLevelMatch[2]}`;
+
+  const requiredLevelLabelMatch = /^Required Level:\s*(\d+)$/iu.exec(normalized);
+  if (requiredLevelLabelMatch) return `需求等级: ${requiredLevelLabelMatch[1]}`;
 
   const gambleMatch = /^Gamble Item:\s*(.+)$/u.exec(normalized);
   if (gambleMatch) return `赌博物品: ${translateGuideCompositeText(gambleMatch[1])}`;

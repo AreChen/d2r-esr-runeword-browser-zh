@@ -5,10 +5,13 @@ import { fetchLatestVersion, type ChangelogVersion } from '@/core/api';
 import { isVersionDifferent } from '@/core/utils';
 import { startupUseCached, startupNeedsFetch, setNetworkWarning, fatalError, initDataLoad } from './dataSyncSlice';
 import appVersion from '@/assets/version.json';
+import { DATA_CACHE_VERSION, DATA_CACHE_VERSION_METADATA_KEY } from '../constants/dataCacheVersion';
 
 interface CachedDataCheck {
   hasData: boolean;
   storedVersion: string | null;
+  storedAppVersion: string | null;
+  storedDataCacheVersion: string | null;
 }
 
 function* checkCachedData(): Generator<unknown, CachedDataCheck, unknown> {
@@ -17,6 +20,8 @@ function* checkCachedData(): Generator<unknown, CachedDataCheck, unknown> {
 
   // Get stored version
   const versionMeta = (yield call(() => db.metadata.get('esrVersion'))) as Metadata | undefined;
+  const appVersionMeta = (yield call(() => db.metadata.get('appVersion'))) as Metadata | undefined;
+  const dataCacheVersionMeta = (yield call(() => db.metadata.get(DATA_CACHE_VERSION_METADATA_KEY))) as Metadata | undefined;
 
   // Get last updated timestamp for logging
   const lastUpdatedMeta = (yield call(() => db.metadata.get('lastUpdated'))) as Metadata | undefined;
@@ -29,7 +34,13 @@ function* checkCachedData(): Generator<unknown, CachedDataCheck, unknown> {
   return {
     hasData: count > 0,
     storedVersion: versionMeta?.value ?? null,
+    storedAppVersion: appVersionMeta?.value ?? null,
+    storedDataCacheVersion: dataCacheVersionMeta?.value ?? null,
   };
+}
+
+function cachedDataNeedsRefresh(cached: CachedDataCheck): boolean {
+  return cached.storedAppVersion !== appVersion.version || cached.storedDataCacheVersion !== DATA_CACHE_VERSION;
 }
 
 export function* handleStartupCheck() {
@@ -49,11 +60,16 @@ export function* handleStartupCheck() {
     } catch {
       // Network error during version check
       console.log('[HTML] Network error during version check');
-      if (cached.hasData) {
+      if (cached.hasData && !cachedDataNeedsRefresh(cached)) {
         // We have cached data, use it with a warning
         console.log('[HTML] Using cached data (network unavailable)');
         yield put(setNetworkWarning('无法检查更新，正在使用缓存数据。'));
         yield put(startupUseCached());
+        return;
+      } else if (cached.hasData) {
+        console.log('[HTML] Cached data is stale and version check failed - attempting full refetch');
+        yield put(startupNeedsFetch());
+        yield put(initDataLoad({ force: false }));
         return;
       } else {
         // No cached data and no network - fatal error
@@ -109,11 +125,23 @@ export function* handleStartupCheck() {
       }
 
       // Check if app version changed (catches data model changes and logic fixes)
-      const storedAppVersion = (yield call(() => db.metadata.get('appVersion'))) as Metadata | undefined;
       const currentVersion = appVersion.version;
 
-      if (!storedAppVersion || storedAppVersion.value !== currentVersion) {
-        console.log('[HTML] App version changed:', storedAppVersion?.value, '→', currentVersion, '- refetching...');
+      if (cached.storedAppVersion !== currentVersion) {
+        console.log('[HTML] App version changed:', cached.storedAppVersion ?? undefined, '→', currentVersion, '- refetching...');
+        yield put(startupNeedsFetch());
+        yield put(initDataLoad({ force: false }));
+        return;
+      }
+
+      if (cached.storedDataCacheVersion !== DATA_CACHE_VERSION) {
+        console.log(
+          '[HTML] Data cache version changed:',
+          cached.storedDataCacheVersion ?? undefined,
+          '→',
+          DATA_CACHE_VERSION,
+          '- refetching...'
+        );
         yield put(startupNeedsFetch());
         yield put(initDataLoad({ force: false }));
         return;
