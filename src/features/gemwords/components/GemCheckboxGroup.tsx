@@ -5,6 +5,7 @@ import { toggleGem, toggleGemGroup, selectSelectedGems } from '../store/gemwords
 import { translateGameText } from '@/core/i18n';
 import { cn } from '@/lib/utils';
 import { GEM_SWATCH_COLORS } from '@/features/runewords/constants/gemColors';
+import { GEM_FILTER_OPTION_CLASS, GEM_FILTER_OPTIONS_GRID_CLASS, GEM_FILTER_ROW_CLASS } from '../constants/filterLayout';
 import type { GemGroup } from '../types';
 
 type GroupState = 'all' | 'some' | 'none';
@@ -32,7 +33,7 @@ function GemGroupSection({ group }: GemGroupSectionProps) {
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-[7rem_1fr] items-start gap-x-3 gap-y-1">
+    <div className={GEM_FILTER_ROW_CLASS}>
       <label className="flex h-7 items-center gap-1.5 cursor-pointer shrink-0">
         <Checkbox
           checked={groupState === 'all' ? true : groupState === 'some' ? 'indeterminate' : false}
@@ -42,19 +43,13 @@ function GemGroupSection({ group }: GemGroupSectionProps) {
         <span className="font-medium text-sm text-muted-foreground">{translateGameText(group.type)}:</span>
       </label>
 
-      <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+      <div className={GEM_FILTER_OPTIONS_GRID_CLASS}>
         {group.gems.map((gem) => {
           const selected = selectedGems[gem.name] ?? true;
           const swatchClass = GEM_SWATCH_COLORS[gem.color] ?? 'bg-muted border-border';
 
           return (
-            <label
-              key={gem.name}
-              className={cn(
-                'inline-flex h-7 min-w-28 cursor-pointer items-center gap-1.5 rounded-md border border-border/70 px-2 text-sm transition-colors hover:bg-muted/60',
-                !selected && 'opacity-50'
-              )}
-            >
+            <label key={gem.name} className={cn(GEM_FILTER_OPTION_CLASS, !selected && 'opacity-50')}>
               <Checkbox
                 checked={selected}
                 onCheckedChange={() => {
@@ -62,7 +57,7 @@ function GemGroupSection({ group }: GemGroupSectionProps) {
                 }}
               />
               <span className={cn('size-3 rounded-full border shadow-sm', swatchClass)} aria-hidden="true" />
-              <span className="whitespace-nowrap">{translateGameText(gem.name)}</span>
+              <span className="min-w-0 whitespace-nowrap">{translateGameText(gem.name)}</span>
             </label>
           );
         })}
