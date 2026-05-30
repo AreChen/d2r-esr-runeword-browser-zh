@@ -1,16 +1,21 @@
+import { Star } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { GemBadge } from '@/features/runewords/components/GemBadge';
 import { useGemBonuses } from '../hooks/useGemBonuses';
 import { getRelevantCategories, translateCategoryLabel, type BonusCategory } from '@/features/runewords/utils/itemCategoryMapping';
 import { translateGameText } from '@/core/i18n';
+import { cn } from '@/lib/utils';
 import type { Gemword } from '@/core/db/models';
 
 interface GemwordCardProps {
   readonly gemword: Gemword;
+  readonly isFavorite?: boolean;
+  readonly onToggleFavorite?: (gemword: Gemword) => void;
 }
 
-export function GemwordCard({ gemword }: GemwordCardProps) {
+export function GemwordCard({ gemword, isFavorite = false, onToggleFavorite }: GemwordCardProps) {
   const { name, sockets, reqLevel, gems, allowedItems, affixes } = gemword;
   const gemBonuses = useGemBonuses(gems);
   const relevantCategories = getRelevantCategories(allowedItems);
@@ -38,8 +43,23 @@ export function GemwordCard({ gemword }: GemwordCardProps) {
     <Card className="h-full">
       <CardHeader className="pb-0">
         <div className="flex items-start justify-between gap-2">
-          <CardTitle className="text-lg text-amber-700 dark:text-amber-400">{translateGameText(name)}</CardTitle>
-          <div className="flex gap-1">
+          <CardTitle className="min-w-0 text-lg text-amber-700 dark:text-amber-400">{translateGameText(name)}</CardTitle>
+          <div className="flex shrink-0 items-center gap-1">
+            {onToggleFavorite && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon-sm"
+                aria-pressed={isFavorite}
+                aria-label={isFavorite ? `取消收藏 ${translateGameText(name)}` : `收藏 ${translateGameText(name)}`}
+                title={isFavorite ? '取消收藏' : '收藏'}
+                onClick={() => {
+                  onToggleFavorite(gemword);
+                }}
+              >
+                <Star className={cn('size-4', isFavorite && 'fill-amber-400 text-amber-500')} />
+              </Button>
+            )}
             <Badge variant="secondary">{sockets} 孔</Badge>
             <Badge variant="outline">等级 {reqLevel}</Badge>
           </div>

@@ -87,8 +87,8 @@ function ItemGroupSection({ group, favoriteItemTypes, onFavoriteItemTypesChange 
               <button
                 type="button"
                 className="grid size-5 place-items-center rounded-sm text-muted-foreground hover:bg-muted hover:text-foreground"
-                aria-label={favorite ? `取消收藏 ${translateGameText(itemType)}` : `收藏 ${translateGameText(itemType)}`}
-                title={favorite ? '取消收藏' : '收藏'}
+                aria-label={favorite ? `取消常用部件 ${translateGameText(itemType)}` : `设为常用部件 ${translateGameText(itemType)}`}
+                title={favorite ? '取消常用部件' : '设为常用部件'}
                 onClick={() => {
                   onFavoriteItemTypesChange(toggleFavoriteItemType(itemType, favoriteItemTypes));
                 }}
@@ -138,7 +138,7 @@ export function ItemTypeFilter() {
           disabled={favoriteItemTypes.length === 0}
         >
           <Star className={cn('size-4', favoriteItemTypes.length > 0 && 'fill-amber-400 text-amber-500')} />
-          收藏
+          常用部件
         </Button>
       </div>
       <div className="space-y-1.5">

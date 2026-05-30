@@ -80,39 +80,123 @@ function parseTableCell(cell: Element): string {
   return cleanHtmlLines(cell.innerHTML).join('\n');
 }
 
+interface ParsedTableRow {
+  readonly cells: readonly string[];
+  readonly isSingleColspanRow: boolean;
+}
+
+function parseCellSpan(cell: Element): number {
+  const rawColspan = cell.getAttribute('colspan');
+  if (rawColspan === null) return 1;
+
+  const colspan = Number.parseInt(rawColspan, 10);
+  return Number.isFinite(colspan) && colspan > 1 ? colspan : 1;
+}
+
+function parseRowSpan(cell: Element): number {
+  const rawRowspan = cell.getAttribute('rowspan');
+  if (rawRowspan === null) return 1;
+
+  const rowspan = Number.parseInt(rawRowspan, 10);
+  return Number.isFinite(rowspan) && rowspan > 1 ? rowspan : 1;
+}
+
+function consumeActiveRowspanPlaceholders(cells: string[], activeRowspans: number[], startColumnIndex: number): number {
+  let columnIndex = startColumnIndex;
+
+  while ((activeRowspans[columnIndex] ?? 0) > 0) {
+    cells.push('');
+    activeRowspans[columnIndex] -= 1;
+    columnIndex += 1;
+  }
+
+  return columnIndex;
+}
+
+function hasActiveRowspanAtOrAfter(activeRowspans: readonly number[], startColumnIndex: number): boolean {
+  return activeRowspans.some((remainingRows, index) => index >= startColumnIndex && remainingRows > 0);
+}
+
+function parseTableRow(row: Element, activeRowspans: number[]): ParsedTableRow {
+  const cellElements = Array.from(row.querySelectorAll('th,td'));
+  const cells: string[] = [];
+  let columnIndex = 0;
+
+  for (const cell of cellElements) {
+    columnIndex = consumeActiveRowspanPlaceholders(cells, activeRowspans, columnIndex);
+
+    const text = parseTableCell(cell);
+    const colspan = parseCellSpan(cell);
+    const rowspan = parseRowSpan(cell);
+
+    for (let offset = 0; offset < colspan; offset += 1) {
+      cells.push(offset === 0 ? text : '');
+      if (rowspan > 1) {
+        activeRowspans[columnIndex + offset] = Math.max(activeRowspans[columnIndex + offset] ?? 0, rowspan - 1);
+      }
+    }
+
+    columnIndex += colspan;
+  }
+
+  while (hasActiveRowspanAtOrAfter(activeRowspans, columnIndex)) {
+    if ((activeRowspans[columnIndex] ?? 0) > 0) {
+      columnIndex = consumeActiveRowspanPlaceholders(cells, activeRowspans, columnIndex);
+      continue;
+    }
+
+    cells.push('');
+    columnIndex += 1;
+  }
+
+  return {
+    cells,
+    isSingleColspanRow: cellElements.length === 1 && parseCellSpan(cellElements[0]) > 1,
+  };
+}
+
+function padRow(row: readonly string[], width: number): readonly string[] {
+  if (row.length >= width) return row;
+  return [...row, ...Array<string>(width - row.length).fill('')];
+}
+
 function parseTable(table: Element, id: string): GuideTableBlock | null {
   if (table.querySelector('table')) return null;
 
   const rowElements = Array.from(table.querySelectorAll('tr'));
+  const activeRowspans: number[] = [];
   const parsedRows = rowElements
-    .map((row) => Array.from(row.querySelectorAll('th,td')).map(parseTableCell))
-    .filter((row) => row.some((cell) => cell.length > 0));
+    .map((row) => parseTableRow(row, activeRowspans))
+    .filter((row) => row.cells.some((cell) => cell.length > 0));
+  const rows = parsedRows.map((row) => row.cells);
 
-  if (parsedRows.length < 2) return null;
-  if (parsedRows.every((row) => row.length <= 1)) return null;
+  if (rows.length < 2) return null;
+  if (rows.every((row) => row.length <= 1)) return null;
 
   let caption = '';
   let headers: readonly string[] = [];
-  let rows: readonly (readonly string[])[] = parsedRows;
+  let tableRows: readonly (readonly string[])[] = rows;
 
-  const firstRowHasSingleColspan = rowElements[0]?.querySelector('td[colspan],th[colspan]') !== null && parsedRows[0]?.length === 1;
-  if (firstRowHasSingleColspan) {
-    caption = parsedRows[0][0];
-    headers = parsedRows[1] ?? [];
-    rows = parsedRows.slice(2);
+  if (parsedRows[0]?.isSingleColspanRow) {
+    caption = rows[0]?.[0] ?? '';
+    headers = rows[1] ?? [];
+    tableRows = rows.slice(2);
   } else {
-    headers = parsedRows[0] ?? [];
-    rows = parsedRows.slice(1);
+    headers = rows[0] ?? [];
+    tableRows = rows.slice(1);
   }
 
-  if (headers.length === 0 && rows.length === 0) return null;
+  if (headers.length === 0 && tableRows.length === 0) return null;
+  const tableWidth = Math.max(headers.length, ...tableRows.map((row) => row.length));
+  headers = padRow(headers, tableWidth);
+  tableRows = tableRows.map((row) => padRow(row, tableWidth));
 
   return {
     id,
     kind: 'table',
     caption,
     headers,
-    rows,
+    rows: tableRows,
   };
 }
 

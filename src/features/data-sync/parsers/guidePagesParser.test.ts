@@ -128,6 +128,131 @@ describe('guide page parser', () => {
     expect(table.rows[0]).toEqual(['Precision Bow', '', '', '+1 Bow Skills']);
   });
 
+  it('expands colspan cells so base-data table headers stay aligned with row cells', () => {
+    const page = parseGuidePage(
+      `
+        <html>
+          <body>
+            <table>
+              <tr><td colspan="17"><b>Amazon Bow</b></td></tr>
+              <tr>
+                <th>Name</th>
+                <th colspan="3">Damage</th>
+                <th>Dur</th>
+                <th>Range</th>
+                <th>WSM</th>
+                <th>Qlvl</th>
+                <th>Req Lvl</th>
+                <th>Req Str</th>
+                <th>Req Dex</th>
+                <th>Str/Dex Bonus</th>
+                <th>Soc</th>
+                <th>Gem Type</th>
+                <th>Automod</th>
+                <th>Staffmod</th>
+              </tr>
+              <tr>
+                <td>Precision Bow<br>apb</td>
+                <td>2H</td>
+                <td>5 to 27</td>
+                <td>16.0 Avg</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>33</td>
+                <td>0</td>
+                <td>35</td>
+                <td>65</td>
+                <td>0/75</td>
+                <td>4</td>
+                <td>0</td>
+                <td>+1 Bow Skills</td>
+                <td></td>
+              </tr>
+            </table>
+          </body>
+        </html>
+      `,
+      sampleEntry
+    );
+
+    const table = page.blocks.find((block) => block.kind === 'table');
+
+    expect(table).toBeDefined();
+    if (!table || table.kind !== 'table') return;
+    expect(table.caption).toBe('Amazon Bow');
+    expect(table.headers).toHaveLength(16);
+    expect(table.headers.slice(0, 7)).toEqual(['Name', 'Damage', '', '', 'Dur', 'Range', 'WSM']);
+    expect(table.rows[0]).toHaveLength(table.headers.length);
+    expect(table.rows[0]?.[4]).toBe('');
+    expect(table.rows[0]?.[6]).toBe('');
+    expect(table.rows[0]?.[7]).toBe('33');
+    expect(table.rows[0]?.[14]).toBe('+1 Bow Skills');
+  });
+
+  it('inserts placeholders for rowspans so continuation rows stay under their original columns', () => {
+    const page = parseGuidePage(
+      `
+        <html>
+          <body>
+            <table>
+              <tr><td colspan="16"><b>Amazon Javelin</b></td></tr>
+              <tr>
+                <th>Name</th>
+                <th colspan="3">Damage</th>
+                <th>Dur</th>
+                <th>Range</th>
+                <th>WSM</th>
+                <th>Qlvl</th>
+                <th>Req Lvl</th>
+                <th>Req Str</th>
+                <th>Req Dex</th>
+                <th>Str/Dex Bonus</th>
+                <th>Soc</th>
+                <th>Gem Type</th>
+                <th>Automod</th>
+                <th>Staffmod</th>
+              </tr>
+              <tr>
+                <td rowspan="2">Maiden Javelin<br>am5</td>
+                <td>1H</td>
+                <td>6 to 22</td>
+                <td>14.0 Avg</td>
+                <td rowspan="2">60</td>
+                <td rowspan="2">2</td>
+                <td rowspan="2">-10</td>
+                <td rowspan="2">24</td>
+                <td rowspan="2">17</td>
+                <td rowspan="2">33</td>
+                <td rowspan="2">47</td>
+                <td rowspan="2">75/75</td>
+                <td rowspan="2">3</td>
+                <td rowspan="2">0</td>
+                <td rowspan="2">+1 Javelin Skills</td>
+                <td rowspan="2"></td>
+              </tr>
+              <tr>
+                <td>Mis</td>
+                <td>6 to 22</td>
+                <td>14.0 Avg</td>
+              </tr>
+            </table>
+          </body>
+        </html>
+      `,
+      sampleEntry
+    );
+
+    const table = page.blocks.find((block) => block.kind === 'table');
+
+    expect(table).toBeDefined();
+    if (!table || table.kind !== 'table') return;
+    expect(table.headers).toHaveLength(16);
+    expect(table.rows[1]).toHaveLength(table.headers.length);
+    expect(table.rows[1]?.slice(0, 8)).toEqual(['', 'Mis', '6 to 22', '14.0 Avg', '', '', '', '']);
+    expect(table.rows[1]?.[14]).toBe('');
+  });
+
   it('parses the real changelog fixture as a guide page without keeping the nav menu as content', () => {
     const [page] = parseGuidePages([
       {
