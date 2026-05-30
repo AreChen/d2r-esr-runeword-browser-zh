@@ -2,7 +2,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { GemBadge } from '@/features/runewords/components/GemBadge';
 import { useGemBonuses } from '../hooks/useGemBonuses';
-import { getRelevantCategories, getCategoryLabel, type BonusCategory } from '@/features/runewords/utils/itemCategoryMapping';
+import { getRelevantCategories, translateCategoryLabel, type BonusCategory } from '@/features/runewords/utils/itemCategoryMapping';
 import { translateGameText } from '@/core/i18n';
 import type { Gemword } from '@/core/db/models';
 
@@ -68,9 +68,7 @@ export function GemwordCard({ gemword }: GemwordCardProps) {
                   if (column.length === 0) return null;
                   return (
                     <div key={category}>
-                      <p className="font-medium text-muted-foreground text-xs mb-1">
-                        {translateGameText(getCategoryLabel(allowedItems, category))}:
-                      </p>
+                      <p className="font-medium text-muted-foreground text-xs mb-1">{translateCategoryLabel(allowedItems, category)}:</p>
                       <ul className="space-y-0.5 text-[#8080E6] text-xs">
                         {column.map((affix, index) => (
                           <li key={`${String(index)}-${affix.rawText}`}>{translateGameText(affix.rawText)}</li>
@@ -106,9 +104,7 @@ export function GemwordCard({ gemword }: GemwordCardProps) {
                   if (bonuses.length === 0) return null;
                   return (
                     <div key={category}>
-                      <p className="font-medium text-muted-foreground text-xs mb-1">
-                        {translateGameText(getCategoryLabel(allowedItems, category))}:
-                      </p>
+                      <p className="font-medium text-muted-foreground text-xs mb-1">{translateCategoryLabel(allowedItems, category)}:</p>
                       <ul className="space-y-0.5 text-[#8080E6] text-xs">
                         {bonuses.map((bonus, index) => (
                           <li key={`${String(index)}-${bonus}`}>{translateGameText(bonus)}</li>

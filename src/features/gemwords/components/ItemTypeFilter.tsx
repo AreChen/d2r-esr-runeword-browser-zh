@@ -35,8 +35,8 @@ function ItemGroupSection({ group }: ItemGroupSectionProps) {
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-      <label className="flex items-center gap-1.5 cursor-pointer shrink-0 md:min-w-32">
+    <div className="grid grid-cols-1 md:grid-cols-[8rem_1fr] items-start gap-x-3 gap-y-1">
+      <label className="flex h-7 items-center gap-1.5 cursor-pointer shrink-0">
         <Checkbox
           checked={groupState === 'all' ? true : groupState === 'some' ? 'indeterminate' : false}
           onCheckedChange={handleGroupToggle}
@@ -44,17 +44,19 @@ function ItemGroupSection({ group }: ItemGroupSectionProps) {
         <span className="font-bold text-sm text-muted-foreground">{translateGameText(group.label)}:</span>
       </label>
 
-      {group.itemTypes.map((itemType) => (
-        <label key={itemType} className="flex items-center gap-1 cursor-pointer">
-          <Checkbox
-            checked={selectedItemTypes[itemType] ?? true}
-            onCheckedChange={() => {
-              dispatch(toggleItemType(itemType));
-            }}
-          />
-          <span className="text-sm">{translateGameText(itemType)}</span>
-        </label>
-      ))}
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+        {group.itemTypes.map((itemType) => (
+          <label key={itemType} className="flex h-7 items-center gap-1 cursor-pointer">
+            <Checkbox
+              checked={selectedItemTypes[itemType] ?? true}
+              onCheckedChange={() => {
+                dispatch(toggleItemType(itemType));
+              }}
+            />
+            <span className="text-sm">{translateGameText(itemType)}</span>
+          </label>
+        ))}
+      </div>
     </div>
   );
 }

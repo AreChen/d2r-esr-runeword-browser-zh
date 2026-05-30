@@ -1,3 +1,5 @@
+import { translateGameText } from '@/core/i18n';
+
 export type BonusCategory = 'weaponsGloves' | 'helmsBoots' | 'armorShieldsBelts';
 
 // Keywords to match item types to bonus columns (case-insensitive).
@@ -83,4 +85,11 @@ export function getRelevantCategories(allowedItems: readonly string[]): BonusCat
 export function getCategoryLabel(allowedItems: readonly string[], category: BonusCategory): string {
   const matchingItems = allowedItems.filter((item) => getItemCategory(item) === category);
   return matchingItems.length > 0 ? matchingItems.join('/') : CATEGORY_LABELS[category];
+}
+
+export function translateCategoryLabel(allowedItems: readonly string[], category: BonusCategory): string {
+  return getCategoryLabel(allowedItems, category)
+    .split('/')
+    .map((part) => translateGameText(part.trim()))
+    .join('/');
 }

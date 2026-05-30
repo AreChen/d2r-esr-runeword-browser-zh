@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getRelevantCategories, getItemCategory, getCategoryLabel } from './itemCategoryMapping';
+import { getRelevantCategories, getItemCategory, getCategoryLabel, translateCategoryLabel } from './itemCategoryMapping';
 
 describe('getRelevantCategories', () => {
   describe('single item type', () => {
@@ -163,5 +163,12 @@ describe('getCategoryLabel', () => {
   it('should fall back to default labels when no items match', () => {
     expect(getCategoryLabel(['Charm'], 'weaponsGloves')).toBe('Weapons/Gloves');
     expect(getCategoryLabel(['Sword'], 'armorShieldsBelts')).toBe('Armor/Shields/Belts');
+  });
+});
+
+describe('translateCategoryLabel', () => {
+  it('translates slash-separated dynamic item labels part by part', () => {
+    expect(translateCategoryLabel(['Helm', 'Charm', 'Boots'], 'helmsBoots')).toBe('头盔/护身符/靴子');
+    expect(translateCategoryLabel(['Body Armor', 'Any Shield', 'Belt'], 'armorShieldsBelts')).toBe('身体护甲/任意盾牌/腰带');
   });
 });
