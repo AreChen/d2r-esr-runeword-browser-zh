@@ -32,9 +32,9 @@
       "postbump": "npm run version:extract && git add src/assets/version.json"
     },
     "tagPrefix": "v",
-    "commitUrlFormat": "https://github.com/istvan-panczel/d2r-esr-runeword-browser/commit/{{hash}}",
-    "compareUrlFormat": "https://github.com/istvan-panczel/d2r-esr-runeword-browser/compare/{{previousTag}}...{{currentTag}}",
-    "issueUrlFormat": "https://github.com/istvan-panczel/d2r-esr-runeword-browser/issues/{{id}}",
+    "commitUrlFormat": "https://github.com/AreChen/d2r-esr-runeword-browser-zh/commit/{{hash}}",
+    "compareUrlFormat": "https://github.com/AreChen/d2r-esr-runeword-browser-zh/compare/{{previousTag}}...{{currentTag}}",
+    "issueUrlFormat": "https://github.com/AreChen/d2r-esr-runeword-browser-zh/issues/{{id}}",
     "userUrlFormat": "https://github.com/{{user}}",
     "types": [
       {
