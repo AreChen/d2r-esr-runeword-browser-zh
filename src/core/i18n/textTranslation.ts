@@ -33,12 +33,15 @@ export function normalizeTranslationKey(text: string): string {
 
 export function createTextTranslator(data: TranslationData): TextTranslator {
   const exactTranslations = normalizeExactTranslations(data.exactTranslations);
+  const caseInsensitiveExactTranslations = normalizeCaseInsensitiveExactTranslations(exactTranslations);
   const templates = data.templateTranslations.map(([source, target]) => compileTemplate(source, target));
 
   const translateText = (text: string): string => {
     const { key: normalizedText, suffix } = splitFootnoteSuffix(normalizeTranslationKey(text));
     const exact = exactTranslations[normalizedText];
     if (exact) return `${exact}${suffix}`;
+    const caseInsensitiveExact = caseInsensitiveExactTranslations[normalizedText.toLocaleLowerCase()];
+    if (caseInsensitiveExact) return `${caseInsensitiveExact}${suffix}`;
 
     for (const template of templates) {
       const match = template.regex.exec(normalizedText);
@@ -73,6 +76,17 @@ function normalizeExactTranslations(exactTranslations: Readonly<Record<string, s
     const targetText = normalizeTranslationKey(target);
     if (sourceKey && targetText && sourceKey !== targetText) {
       normalized[sourceKey] = targetText;
+    }
+  }
+  return normalized;
+}
+
+function normalizeCaseInsensitiveExactTranslations(exactTranslations: Readonly<Record<string, string>>): Record<string, string> {
+  const normalized: Record<string, string> = {};
+  for (const [source, target] of Object.entries(exactTranslations)) {
+    const lowerSource = source.toLocaleLowerCase();
+    if (!Object.hasOwn(normalized, lowerSource)) {
+      normalized[lowerSource] = target;
     }
   }
   return normalized;

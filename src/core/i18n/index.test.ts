@@ -25,6 +25,10 @@ describe('game text i18n facade', () => {
     expect(translateGameText('Battlemage')).toBe('战斗法师');
   });
 
+  it('matches exact dictionary entries regardless of guide capitalization', () => {
+    expect(translateGameText('Rejuvenation Potion')).toBe('复苏药水');
+  });
+
   it('translates unique item scaled affixes', () => {
     expect(translateGameText('+1 to Maximum Damage to Attacks (Based on Character Level)')).toBe('+1 攻击最大伤害（基于角色等级）');
     expect(translateGameText('Socketed (1 to 3)')).toBe('镶孔 (1 to 3)');
