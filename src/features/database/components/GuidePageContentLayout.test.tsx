@@ -28,6 +28,22 @@ const pageWithHeadings: GuidePage = {
   blocks: [{ id: 'section', kind: 'heading', level: 2, text: 'Section' }, ...pageWithoutHeadings.blocks],
 };
 
+const pageWithTableSectionRows: GuidePage = {
+  ...pageWithoutHeadings,
+  blocks: [
+    {
+      id: 'recipe-table',
+      kind: 'table',
+      caption: 'Rings/Amulets',
+      headers: ['Input', 'Output'],
+      rows: [
+        ['Standard Reroll', ''],
+        ['3 Magic Rings', 'Magic Ring'],
+      ],
+    },
+  ],
+};
+
 describe('GuidePageContent layout', () => {
   it('does not reserve the table-of-contents column when the page has no headings', () => {
     const html = renderToStaticMarkup(<GuidePageContent page={pageWithoutHeadings} />);
@@ -39,5 +55,12 @@ describe('GuidePageContent layout', () => {
     const html = renderToStaticMarkup(<GuidePageContent page={pageWithHeadings} />);
 
     expect(html).toContain('xl:grid-cols-[minmax(0,1fr)_14rem]');
+  });
+
+  it('renders single-value recipe section rows across the full table width', () => {
+    const html = renderToStaticMarkup(<GuidePageContent page={pageWithTableSectionRows} />);
+
+    expect(html).toContain('colSpan="2"');
+    expect(html).toContain('标准重置');
   });
 });

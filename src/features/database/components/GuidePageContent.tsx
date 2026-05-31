@@ -38,6 +38,10 @@ function renderMultilineCell(text: string): React.ReactNode {
   );
 }
 
+function isFullWidthSectionRow(row: readonly string[]): boolean {
+  return row.length > 1 && Boolean(row[0]?.trim()) && row.slice(1).every((cell) => cell.trim().length === 0);
+}
+
 function GuideTable({ block }: { readonly block: GuideTableBlock }) {
   const [visibleRows, setVisibleRows] = useState(INITIAL_GUIDE_TABLE_RENDER_COUNT);
   const renderedRows = block.rows.slice(0, visibleRows);
@@ -46,6 +50,13 @@ function GuideTable({ block }: { readonly block: GuideTableBlock }) {
   return (
     <section id={block.id} className="scroll-mt-20 space-y-2">
       {block.caption && <h3 className="text-base font-semibold text-amber-700 dark:text-amber-400">{translated(block.caption)}</h3>}
+      {block.notes && block.notes.length > 0 && (
+        <div className="space-y-1 text-sm leading-6 text-muted-foreground">
+          {block.notes.map((note, index) => (
+            <p key={`${block.id}-note-${String(index)}`}>{renderMultilineCell(note)}</p>
+          ))}
+        </div>
+      )}
       <div className="overflow-x-auto rounded-md border">
         <table className="w-full min-w-max border-collapse text-sm">
           {block.headers.length > 0 && (
@@ -60,15 +71,30 @@ function GuideTable({ block }: { readonly block: GuideTableBlock }) {
             </thead>
           )}
           <tbody>
-            {renderedRows.map((row, rowIndex) => (
-              <tr key={`row-${String(rowIndex)}`} className="odd:bg-card even:bg-muted/30">
-                {row.map((cell, cellIndex) => (
-                  <td key={`${String(rowIndex)}-${String(cellIndex)}`} className="border-b px-3 py-2 align-top">
-                    {renderMultilineCell(cell)}
-                  </td>
-                ))}
-              </tr>
-            ))}
+            {renderedRows.map((row, rowIndex) => {
+              if (isFullWidthSectionRow(row)) {
+                return (
+                  <tr key={`row-${String(rowIndex)}`} className="bg-muted/50">
+                    <td
+                      colSpan={Math.max(block.headers.length, row.length)}
+                      className="border-b px-3 py-2 font-semibold text-amber-700 dark:text-amber-400"
+                    >
+                      {renderMultilineCell(row[0] ?? '')}
+                    </td>
+                  </tr>
+                );
+              }
+
+              return (
+                <tr key={`row-${String(rowIndex)}`} className="odd:bg-card even:bg-muted/30">
+                  {row.map((cell, cellIndex) => (
+                    <td key={`${String(rowIndex)}-${String(cellIndex)}`} className="border-b px-3 py-2 align-top">
+                      {renderMultilineCell(cell)}
+                    </td>
+                  ))}
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

@@ -201,6 +201,7 @@ export interface GuideTableBlock {
   readonly id: string;
   readonly kind: 'table';
   readonly caption: string;
+  readonly notes?: readonly string[];
   readonly headers: readonly string[];
   readonly rows: readonly (readonly string[])[];
 }

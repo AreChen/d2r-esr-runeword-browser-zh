@@ -307,4 +307,71 @@ describe('guide page parser', () => {
       expect(tableRows, id).toBeGreaterThan(10);
     }
   }, 20000);
+
+  it('uses the real Input/Output row as headers for every two-column cube recipe category', () => {
+    const entry = GUIDE_PAGE_CATALOG.find((page) => page.id === 'cubeRecipes');
+    expect(entry).toBeDefined();
+    if (!entry) return;
+
+    const page = parseGuidePage(readFileSync(resolve(fixtureDir, entry.sourcePath), 'utf-8'), entry);
+    const tables = page.blocks.filter((block) => block.kind === 'table');
+    const recipeCaptions = [
+      'Special',
+      'Uber/Endgame Map Recipes',
+      'Legendary Consumables',
+      'Misc/Repair',
+      'Gems/Crystals',
+      'Ancient Relics',
+      'Cubing Materials',
+      'Normal Items',
+      'Magic/Rare Items',
+      'Set Items',
+      'Legacy Craft (LoD Craft)',
+      'Class Craft',
+      'Rings/Amulets',
+      'Charms',
+      'Jewels',
+      'Arrow/Bolt Quivers',
+      'Tinkering',
+      'Base Upgrades/Changes',
+      'Socket Recipes',
+      '(Former) Secret Recipes',
+    ];
+
+    for (const caption of recipeCaptions) {
+      const table = tables.find((block) => block.caption.startsWith(caption));
+      expect(table, caption).toBeDefined();
+      if (!table) continue;
+
+      expect(table.headers, caption).toEqual(['Input', 'Output']);
+      expect(table.rows[0], caption).not.toEqual(['Input', 'Output']);
+    }
+  }, 20000);
+
+  it('keeps cube recipe preface notes out of Ring and Jewel table headers', () => {
+    const entry = GUIDE_PAGE_CATALOG.find((page) => page.id === 'cubeRecipes');
+    expect(entry).toBeDefined();
+    if (!entry) return;
+
+    const page = parseGuidePage(readFileSync(resolve(fixtureDir, entry.sourcePath), 'utf-8'), entry);
+    const tables = page.blocks.filter((block) => block.kind === 'table');
+    const ringsTable = tables.find((block) => block.caption === 'Rings/Amulets');
+    const jewelsTable = tables.find((block) => block.caption === 'Jewels');
+
+    expect(ringsTable).toBeDefined();
+    expect(jewelsTable).toBeDefined();
+    if (!ringsTable || !jewelsTable) return;
+
+    expect(ringsTable.headers).toEqual(['Input', 'Output']);
+    expect(ringsTable.notes?.[0]).toContain('When you reroll multiple Amulets or Rings');
+    expect(ringsTable.rows[0]).toEqual(['Standard Reroll', '']);
+    expect(ringsTable.rows[1]).toEqual(['3 Magic Rings', 'Magic Ring\n(ilvl = char level)']);
+
+    expect(jewelsTable.headers).toEqual(['Input', 'Output']);
+    expect(jewelsTable.notes?.[0]).toContain('Rerolling Orb no longer accepts Crafted Rings and Amulets');
+    expect(jewelsTable.rows[0]).toEqual([
+      'Magic Jewel\nPerfect Gem\n(You can use a Gem Can instead.\nThe selected Gem Points are used)',
+      'Magic Jewel\n(ilvl = char level)',
+    ]);
+  }, 20000);
 });

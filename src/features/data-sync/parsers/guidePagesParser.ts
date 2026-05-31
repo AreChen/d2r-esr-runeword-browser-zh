@@ -160,7 +160,105 @@ function padRow(row: readonly string[], width: number): readonly string[] {
   return [...row, ...Array<string>(width - row.length).fill('')];
 }
 
-function parseTable(table: Element, id: string): GuideTableBlock | null {
+function isInputOutputHeaderRow(row: readonly string[]): boolean {
+  const input = row[0]?.trim() ?? '';
+  const output = row[1]?.trim() ?? '';
+  return /^Input(?:\(s\))?$/iu.test(input) && /^Output(?:\(s\))?$/iu.test(output);
+}
+
+function looksLikeCubeRecipeNote(text: string): boolean {
+  return text.length > 60 || text.includes('\n') || /[.!?]/u.test(text);
+}
+
+function splitCubeRecipeCaption(text: string): { readonly caption: string; readonly notes: readonly string[] } {
+  const lines = text
+    .split('\n')
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0);
+
+  if (lines.length < 2 || lines[0].length > 48) {
+    return { caption: text, notes: [] };
+  }
+
+  const notes = lines.slice(1).join('\n');
+  if (!looksLikeCubeRecipeNote(notes)) {
+    return { caption: text, notes: [] };
+  }
+
+  return {
+    caption: lines[0],
+    notes: [notes],
+  };
+}
+
+function normalizeCubeRecipeRow(row: ParsedTableRow, width: number): readonly string[] {
+  if (!row.isSingleColspanRow) return padRow(row.cells, width);
+
+  return [row.cells[0] ?? '', ...Array<string>(Math.max(width - 1, 0)).fill('')];
+}
+
+function isLikelyTwoColumnCubeRecipeTable(caption: string, rows: readonly ParsedTableRow[], startIndex: number): boolean {
+  if (!caption || caption.length > 80 || caption.includes('\n')) return false;
+
+  return rows
+    .slice(startIndex)
+    .some((row) => !row.isSingleColspanRow && row.cells.length >= 2 && Boolean(row.cells[0]) && Boolean(row.cells[1]));
+}
+
+function parseCubeRecipeTable(parsedRows: readonly ParsedTableRow[], id: string): GuideTableBlock | null {
+  if (parsedRows.length < 2) return null;
+
+  let caption = '';
+  const notes: string[] = [];
+  let firstRecipeRowIndex = 0;
+
+  if (parsedRows[0]?.isSingleColspanRow) {
+    const splitCaption = splitCubeRecipeCaption(parsedRows[0].cells[0] ?? '');
+    caption = splitCaption.caption;
+    notes.push(...splitCaption.notes);
+    firstRecipeRowIndex = 1;
+  }
+
+  const inputOutputHeaderIndex = parsedRows.findIndex((row, index) => index >= firstRecipeRowIndex && isInputOutputHeaderRow(row.cells));
+  const tableWidth = Math.max(2, ...parsedRows.slice(firstRecipeRowIndex).map((row) => row.cells.length));
+
+  if (inputOutputHeaderIndex >= 0) {
+    const leadingRows: readonly (readonly string[])[] = parsedRows
+      .slice(firstRecipeRowIndex, inputOutputHeaderIndex)
+      .flatMap((row): readonly (readonly string[])[] => {
+        const text = row.cells[0]?.trim() ?? '';
+        if (!text) return [];
+        if (row.isSingleColspanRow && looksLikeCubeRecipeNote(text)) {
+          notes.push(text);
+          return [];
+        }
+        return [normalizeCubeRecipeRow(row, tableWidth)];
+      });
+    const recipeRows = parsedRows.slice(inputOutputHeaderIndex + 1).map((row) => normalizeCubeRecipeRow(row, tableWidth));
+
+    return {
+      id,
+      kind: 'table',
+      caption,
+      ...(notes.length > 0 ? { notes } : {}),
+      headers: ['Input', 'Output'],
+      rows: [...leadingRows, ...recipeRows],
+    };
+  }
+
+  if (!isLikelyTwoColumnCubeRecipeTable(caption, parsedRows, firstRecipeRowIndex)) return null;
+
+  return {
+    id,
+    kind: 'table',
+    caption,
+    ...(notes.length > 0 ? { notes } : {}),
+    headers: ['Input', 'Output'],
+    rows: parsedRows.slice(firstRecipeRowIndex).map((row) => normalizeCubeRecipeRow(row, tableWidth)),
+  };
+}
+
+function parseTable(table: Element, id: string, pageId: string): GuideTableBlock | null {
   if (table.querySelector('table')) return null;
 
   const rowElements = Array.from(table.querySelectorAll('tr'));
@@ -172,6 +270,11 @@ function parseTable(table: Element, id: string): GuideTableBlock | null {
 
   if (rows.length < 2) return null;
   if (rows.every((row) => row.length <= 1)) return null;
+
+  if (pageId === 'cubeRecipes') {
+    const cubeRecipeTable = parseCubeRecipeTable(parsedRows, id);
+    if (cubeRecipeTable) return cubeRecipeTable;
+  }
 
   let caption = '';
   let headers: readonly string[] = [];
@@ -206,7 +309,7 @@ function buildTextIndex(blocks: readonly GuideContentBlock[]): string {
     if (block.kind === 'heading' || block.kind === 'paragraph') {
       textParts.push(block.text);
     } else if (block.kind === 'table') {
-      textParts.push(block.caption, ...block.headers, ...block.rows.flat());
+      textParts.push(block.caption, ...(block.notes ?? []), ...block.headers, ...block.rows.flat());
     } else {
       textParts.push(block.alt);
     }
@@ -261,7 +364,7 @@ export function parseGuidePage(html: string, entry: GuidePageCatalogEntry): Guid
     }
 
     if (node.tagName === 'TABLE') {
-      const table = parseTable(node, nextId('table'));
+      const table = parseTable(node, nextId('table'), entry.id);
       if (table) {
         blocks.push(table);
       } else {

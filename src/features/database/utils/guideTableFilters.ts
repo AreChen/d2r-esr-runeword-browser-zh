@@ -144,7 +144,7 @@ function buildGuideSearchText(parts: readonly string[]): string {
 
 function rowMatchesSearch(row: readonly string[], block: GuideTableBlock, sectionKey: string, searchTerms: readonly string[]): boolean {
   if (searchTerms.length === 0) return true;
-  const searchable = buildGuideSearchText([sectionKey, block.caption, ...block.headers, ...row]);
+  const searchable = buildGuideSearchText([sectionKey, block.caption, ...(block.notes ?? []), ...block.headers, ...row]);
   return searchTerms.every((term) => searchable.includes(term));
 }
 
