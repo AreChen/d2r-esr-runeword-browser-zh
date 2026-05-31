@@ -70,6 +70,31 @@ describe('guide table filtering helpers', () => {
     expect(result.page.blocks.some((block) => block.kind === 'table' && block.id === 'helm')).toBe(false);
   });
 
+  it('removes loose paragraphs while a table filter is active', () => {
+    const result = filterGuidePageTables(samplePage, {
+      searchText: '',
+      selectedSections: ['Body Armor'],
+      favoriteSections: [],
+      showFavoritesOnly: false,
+      maxReqLevel: null,
+    });
+
+    expect(result.page.blocks.some((block) => block.kind === 'paragraph')).toBe(false);
+    expect(result.page.blocks.filter((block) => block.kind === 'table').map((block) => block.caption)).toEqual(['Body Armor']);
+  });
+
+  it('keeps loose paragraphs when no table filter is active', () => {
+    const result = filterGuidePageTables(samplePage, {
+      searchText: '',
+      selectedSections: [],
+      favoriteSections: [],
+      showFavoritesOnly: false,
+      maxReqLevel: null,
+    });
+
+    expect(result.page.blocks.some((block) => block.kind === 'paragraph' && block.text === 'Intro')).toBe(true);
+  });
+
   it('can restrict visible rows to favorite sections only', () => {
     const result = filterGuidePageTables(samplePage, {
       searchText: '',

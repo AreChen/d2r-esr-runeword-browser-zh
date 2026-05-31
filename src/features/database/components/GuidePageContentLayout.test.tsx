@@ -44,6 +44,20 @@ const pageWithTableSectionRows: GuidePage = {
   ],
 };
 
+const pageWithTableNotes: GuidePage = {
+  ...pageWithoutHeadings,
+  blocks: [
+    {
+      id: 'recipe-table',
+      kind: 'table',
+      caption: 'Rings/Amulets',
+      notes: ['First source line\nsecond source line'],
+      headers: ['Input', 'Output'],
+      rows: [['3 Magic Rings', 'Magic Ring']],
+    },
+  ],
+};
+
 describe('GuidePageContent layout', () => {
   it('does not reserve the table-of-contents column when the page has no headings', () => {
     const html = renderToStaticMarkup(<GuidePageContent page={pageWithoutHeadings} />);
@@ -62,5 +76,12 @@ describe('GuidePageContent layout', () => {
 
     expect(html).toContain('colSpan="2"');
     expect(html).toContain('标准重置');
+  });
+
+  it('renders table notes as compact prose instead of one paragraph per source line', () => {
+    const html = renderToStaticMarkup(<GuidePageContent page={pageWithTableNotes} />);
+
+    expect(html).toContain('First source line second source line');
+    expect(html).not.toContain('First source line</p><p');
   });
 });

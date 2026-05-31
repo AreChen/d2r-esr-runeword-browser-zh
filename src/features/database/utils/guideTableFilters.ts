@@ -173,7 +173,9 @@ export function filterGuidePageTables(page: GuidePage, filters: GuideTableFilter
 
   for (const block of page.blocks) {
     if (block.kind !== 'table') {
-      filteredBlocks.push(block);
+      if (!isFiltering) {
+        filteredBlocks.push(block);
+      }
       continue;
     }
 

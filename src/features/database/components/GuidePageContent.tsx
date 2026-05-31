@@ -38,6 +38,14 @@ function renderMultilineCell(text: string): React.ReactNode {
   );
 }
 
+function renderCompactNote(text: string): string {
+  return text
+    .split(/\n+/)
+    .map((line) => translated(line.trim()))
+    .filter((line) => line.length > 0)
+    .join(' ');
+}
+
 function isFullWidthSectionRow(row: readonly string[]): boolean {
   return row.length > 1 && Boolean(row[0]?.trim()) && row.slice(1).every((cell) => cell.trim().length === 0);
 }
@@ -53,7 +61,7 @@ function GuideTable({ block }: { readonly block: GuideTableBlock }) {
       {block.notes && block.notes.length > 0 && (
         <div className="space-y-1 text-sm leading-6 text-muted-foreground">
           {block.notes.map((note, index) => (
-            <p key={`${block.id}-note-${String(index)}`}>{renderMultilineCell(note)}</p>
+            <p key={`${block.id}-note-${String(index)}`}>{renderCompactNote(note)}</p>
           ))}
         </div>
       )}
