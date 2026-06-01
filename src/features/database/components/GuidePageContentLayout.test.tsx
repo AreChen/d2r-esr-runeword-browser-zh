@@ -106,7 +106,12 @@ const pageWithHighlightedCellLines: GuidePage = {
       kind: 'table',
       caption: 'Corruption Outcomes',
       headers: ['Input', 'Output'],
-      rows: [['Worldstone Shard\nAncient Decipherer', '+(150 to 200)% Enhanced Damage\n+1 to All Skills']],
+      rows: [
+        [
+          "El Rune\nPerfect Ruby\nWorldstone Shard\nDiablo's Demonic Horn\nDragon Stone\nElixir\nAncient Decipherer",
+          '+(150 to 200)% Enhanced Damage\n+1 to All Skills',
+        ],
+      ],
     },
   ],
 };
@@ -177,6 +182,13 @@ describe('GuidePageContent layout', () => {
 
     expect(html).toContain('data-guide-line-kind="material"');
     expect(html).toContain('data-guide-line-kind="affix"');
+    expect(html).toContain('data-guide-material-kind="rune"');
+    expect(html).toContain('data-guide-material-kind="gem"');
+    expect(html).toContain('data-guide-material-kind="corruption"');
+    expect(html).toContain('data-guide-material-kind="organ"');
+    expect(html).toContain('data-guide-material-kind="cube"');
+    expect(html).toContain('data-guide-material-kind="consumable"');
+    expect(html).toContain('data-guide-material-kind="currency"');
     expect(html).toContain('世界石碎片');
     expect(html).toContain('+(150 to 200)% 增强伤害');
     expect(html).toContain('+1 所有技能等级');

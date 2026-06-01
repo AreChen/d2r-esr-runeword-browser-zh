@@ -17,20 +17,64 @@ interface GuidePageContentProps {
   readonly page: GuidePage;
 }
 
-type GuideCellLineKind = 'plain' | 'material' | 'affix';
+type GuideMaterialLineKind = 'rune' | 'gem' | 'corruption' | 'organ' | 'cube' | 'consumable' | 'currency';
 
-const GUIDE_CELL_LINE_CLASSES: Record<Exclude<GuideCellLineKind, 'plain'>, string> = {
-  material: 'inline rounded-sm border border-amber-400/30 bg-amber-500/10 px-1 py-0.5 font-medium text-amber-800 dark:text-amber-300',
-  affix: 'inline rounded-sm border border-sky-400/25 bg-sky-500/10 px-1 py-0.5 font-medium text-sky-700 dark:text-sky-300',
+type GuideCellLineClassification =
+  | { readonly kind: 'plain' }
+  | { readonly kind: 'affix' }
+  | { readonly kind: 'material'; readonly materialKind: GuideMaterialLineKind };
+
+const AFFIX_LINE_CLASS = 'inline rounded-sm border border-sky-400/25 bg-sky-500/10 px-1 py-0.5 font-medium text-sky-700 dark:text-sky-300';
+
+const MATERIAL_LINE_CLASSES: Record<GuideMaterialLineKind, string> = {
+  rune: 'inline rounded-sm border border-violet-400/30 bg-violet-500/10 px-1 py-0.5 font-medium text-violet-700 dark:text-violet-300',
+  gem: 'inline rounded-sm border border-emerald-400/30 bg-emerald-500/10 px-1 py-0.5 font-medium text-emerald-700 dark:text-emerald-300',
+  corruption: 'inline rounded-sm border border-rose-400/30 bg-rose-500/10 px-1 py-0.5 font-medium text-rose-700 dark:text-rose-300',
+  organ: 'inline rounded-sm border border-red-400/30 bg-red-500/10 px-1 py-0.5 font-medium text-red-700 dark:text-red-300',
+  cube: 'inline rounded-sm border border-amber-400/30 bg-amber-500/10 px-1 py-0.5 font-medium text-amber-800 dark:text-amber-300',
+  consumable: 'inline rounded-sm border border-teal-400/30 bg-teal-500/10 px-1 py-0.5 font-medium text-teal-700 dark:text-teal-300',
+  currency: 'inline rounded-sm border border-yellow-400/30 bg-yellow-500/10 px-1 py-0.5 font-medium text-yellow-800 dark:text-yellow-300',
 };
 
-const MATERIAL_LINE_PATTERNS = [
-  /\b(?:Worldstone Shards?|Ancient Decipherers?|Dragon Stones?|Maple Leaves?|Perfect Gems?|Flawless Gems?)\b/iu,
-  /\b(?:Ancient Coupons?|Diablo's Demonic Horn|Baal's Demonic Eye|Mephisto's Demonic Brain|Viper Amulet)\b/iu,
-  /\b(?:Heart|Brain|Eye|Horn|Soul|Token|Elixir|Steak)\b/iu,
-  /\b[A-Z][a-z]+ Rune\b/u,
-  /(?:世界石碎片|古代解读器|古代解密者|古代优惠券|龙石|枫叶|完美宝石|无瑕宝石|碎裂宝石|裂开的宝石)/u,
-  /(?:符文|恶魔之角|恶魔之眼|恶魔大脑|蛇护符|心脏|大脑|眼球|灵魂|灵药|牛排)/u,
+const MATERIAL_KIND_PATTERNS: readonly { readonly kind: GuideMaterialLineKind; readonly patterns: readonly RegExp[] }[] = [
+  {
+    kind: 'corruption',
+    patterns: [/\bWorldstone Shards?\b/iu, /(?:世界石碎片|世界石碎片袋)/u],
+  },
+  {
+    kind: 'organ',
+    patterns: [
+      /\b(?:Diablo's Demonic Horn|Baal's Demonic Eye|Mephisto's Demonic Brain|Viper Amulet)\b/iu,
+      /\b(?:Heart|Brain|Eye|Horn|Soul)\b/iu,
+      /(?:迪亚布罗的恶魔之角|巴尔的恶魔之眼|墨菲斯托的恶魔之脑|恶魔之角|恶魔之眼|恶魔大脑|蛇护符|心脏|大脑|眼球|灵魂)/u,
+    ],
+  },
+  {
+    kind: 'rune',
+    patterns: [/\b[A-Z][a-z]+ Rune\b/u, /(?:符文|新符|古符|汉字符文|空白符文)/u],
+  },
+  {
+    kind: 'gem',
+    patterns: [
+      /\b(?:Chipped|Flawed|Blemished|Flawless|Perfect)?\s*(?:Gem|Ruby|Sapphire|Emerald|Topaz|Diamond|Amethyst|Skull|Obsidian)s?\b/iu,
+      /(?:宝石|珠宝|红宝石|蓝宝石|绿宝石|黄玉|钻石|紫水晶|头骨|黑曜石)/u,
+    ],
+  },
+  {
+    kind: 'cube',
+    patterns: [/\b(?:Dragon Stones?|Maple Leaves?)\b/iu, /(?:龙石|枫叶|铁砧之石)/u],
+  },
+  {
+    kind: 'consumable',
+    patterns: [/\b(?:Elixir|Steak|Potion|Scroll|Key)\b/iu, /(?:秘药|灵药|牛排|药水|卷轴|钥匙|传送卷轴|鉴定卷轴)/u],
+  },
+  {
+    kind: 'currency',
+    patterns: [
+      /\b(?:Ancient Decipherers?|Ancient Coupons?|Token)\b/iu,
+      /(?:古代解读器|古代解密者|古代优惠券|解读器|解密者|优惠券|奖券|代币)/u,
+    ],
+  },
 ] as const;
 
 const AFFIX_LINE_PATTERNS = [
@@ -56,18 +100,37 @@ function getTranslatedLines(text: string): string[] {
     .filter((line) => line.length > 0);
 }
 
-function getGuideCellLineKind(line: string): GuideCellLineKind {
-  if (AFFIX_LINE_PATTERNS.some((pattern) => pattern.test(line))) return 'affix';
-  if (MATERIAL_LINE_PATTERNS.some((pattern) => pattern.test(line))) return 'material';
-  return 'plain';
+function getGuideMaterialLineKind(line: string): GuideMaterialLineKind | null {
+  for (const entry of MATERIAL_KIND_PATTERNS) {
+    if (entry.patterns.some((pattern) => pattern.test(line))) return entry.kind;
+  }
+
+  return null;
+}
+
+function getGuideCellLineClassification(line: string): GuideCellLineClassification {
+  if (AFFIX_LINE_PATTERNS.some((pattern) => pattern.test(line))) return { kind: 'affix' };
+  const materialKind = getGuideMaterialLineKind(line);
+  if (materialKind !== null) return { kind: 'material', materialKind };
+  return { kind: 'plain' };
 }
 
 function renderGuideCellLine(line: string): React.ReactNode {
-  const kind = getGuideCellLineKind(line);
-  if (kind === 'plain') return line;
+  const classification = getGuideCellLineClassification(line);
+  if (classification.kind === 'plain') return line;
+
+  if (classification.kind === 'affix') {
+    return (
+      <span data-guide-line-kind="affix" className={cn(AFFIX_LINE_CLASS)}>
+        {line}
+      </span>
+    );
+  }
+
+  const materialKind = classification.materialKind;
 
   return (
-    <span data-guide-line-kind={kind} className={cn(GUIDE_CELL_LINE_CLASSES[kind])}>
+    <span data-guide-line-kind="material" data-guide-material-kind={materialKind} className={cn(MATERIAL_LINE_CLASSES[materialKind])}>
       {line}
     </span>
   );
