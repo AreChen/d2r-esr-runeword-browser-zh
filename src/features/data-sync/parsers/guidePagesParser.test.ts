@@ -354,6 +354,16 @@ describe('guide page parser', () => {
     }
   });
 
+  it('integrates DPDNS material data as a native base page instead of off-site chrome', () => {
+    const entry = GUIDE_PAGE_CATALOG.find((page) => page.id === 'd2rMaterials');
+
+    expect(entry).toBeDefined();
+    expect(entry?.group).toBe('base');
+    expect(entry?.label).toBe('Materials');
+    expect(entry?.title).toBe('材料资料');
+    expect(entry ? getGuidePageEntrySourceUrl(entry) : '').toBe('https://d2r.dpdns.org/Materials.html');
+  });
+
   it('uses DPDNS as the canonical source for duplicated feature guide pages', () => {
     const replacements = [
       ['corruptions', 'd2rCorruption', 'https://d2r.dpdns.org/Corruption.html'],

@@ -321,7 +321,7 @@ function GuideBlock({ block, sourceUrl }: { readonly block: GuideContentBlock; r
 }
 
 export function GuidePageContent({ page }: GuidePageContentProps) {
-  const groupLabel = page.group === 'base' ? '基础资料' : page.group === 'features' ? '机制说明' : '站外资料';
+  const groupLabel = page.group === 'base' ? '基础资料' : page.group === 'features' ? '机制说明' : '攻略资料';
   const loadMoreTablesRef = useRef<HTMLDivElement | null>(null);
   const [visibleTableLimit, setVisibleTableLimit] = useState(INITIAL_GUIDE_TABLE_BLOCK_RENDER_COUNT);
   const { visibleBlocks, renderedTableCount, totalTableCount } = getVisibleGuideBlocks(page.blocks, visibleTableLimit);

@@ -140,10 +140,10 @@ describe('GuidePageContent layout', () => {
     expect(html).toContain('xl:grid-cols-[minmax(0,1fr)_14rem]');
   });
 
-  it('labels DPDNS guide pages as off-site material in the content header', () => {
+  it('labels supplemental guide pages as guide material in the content header', () => {
     const html = renderToStaticMarkup(<GuidePageContent page={communityPage} />);
 
-    expect(html).toContain('站外资料');
+    expect(html).toContain('攻略资料');
     expect(html).not.toContain('机制说明');
   });
 

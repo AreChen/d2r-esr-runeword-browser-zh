@@ -6,7 +6,7 @@ The core data feature handles fetching HTML sources, parsing game data, and stor
 
 ## Data Sources
 
-Core item data is fetched from the ESR documentation site. Guide pages can either use the official ESR source or DPDNS as the canonical source when the DPDNS page is more complete for the native app page; those DPDNS-backed entries keep the native app page IDs instead of becoming duplicate off-site pages.
+Core item data is fetched from the ESR documentation site. Guide pages can either use the official ESR source or DPDNS as the canonical source when the DPDNS page is more complete for the native app page; those DPDNS-backed entries keep native app page IDs and labels instead of becoming duplicate off-site pages.
 DPDNS standalone explanation tables are compacted into readable guide paragraphs instead of preserving source `<br>` line breaks as separate loose paragraphs.
 
 | Data | URL |
@@ -19,7 +19,7 @@ DPDNS standalone explanation tables are compacted into readable guide paragraphs
 | Unique Others | `https://easternsunresurrected.com/unique_others.htm` |
 | Mythical Uniques | `https://easternsunresurrected.com/unique_mythicals.htm` |
 | Ascendancies | `https://easternsunresurrected.com/ascendancies.htm` |
-| Guide Pages | Native base information and mechanism pages, with DPDNS used as canonical source where it is more complete, plus supplemental DPDNS materials, endgame pages, and class guides |
+| Guide Pages | Native base information, material, and mechanism pages, with DPDNS used as canonical source where it is more complete, plus supplemental class guides |
 
 Remote URLs are configured in `src/core/api/remoteConfig.ts`; guide page catalog entries live in `src/core/api/guidePageCatalog.ts`.
 
@@ -132,7 +132,7 @@ When a full parse is triggered:
    - unique_mythicals.htm
    - ascendancies.htm
    - Guide database pages from the official Base Information navigation where the ESR source remains canonical
-   - DPDNS-backed canonical/supplemental guide pages from `https://d2r.dpdns.org/`
+   - DPDNS-backed canonical base/material/mechanism pages and supplemental class guides from `https://d2r.dpdns.org/`
 2. Parse gems.htm:
    a. Extract Gems (8 types x 6 tiers = 48 items)
    b. Extract ESR Runes (~50 items)
