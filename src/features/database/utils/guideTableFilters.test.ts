@@ -56,6 +56,23 @@ describe('guide table filtering helpers', () => {
     ]);
   });
 
+  it('adds per-section match counts from row filters without applying section selection', () => {
+    expect(
+      getGuideTableSections(samplePage, {
+        searchText: 'Thrown Axe',
+        selectedSections: ['Body Armor'],
+        favoriteSections: [],
+        showFavoritesOnly: false,
+        maxReqLevel: null,
+        selectedMarkers: [],
+      })
+    ).toEqual([
+      { key: 'Body Armor', label: 'Body Armor', rowCount: 3, matchedRowCount: 0 },
+      { key: 'Helm', label: 'Helm', rowCount: 1, matchedRowCount: 0 },
+      { key: 'Tier 1', label: 'Tier 1', rowCount: 1, matchedRowCount: 1 },
+    ]);
+  });
+
   it('filters rows by section, localized search, and maximum required level', () => {
     const result = filterGuidePageTables(samplePage, {
       searchText: '冰冷抗性',

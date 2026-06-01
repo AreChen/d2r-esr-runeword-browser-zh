@@ -200,7 +200,7 @@ function GuidePagePanel({ page }: { readonly page: GuidePage }) {
     DEFAULT_GUIDE_TABLE_FILTERS,
     isGuideTableFilterState
   );
-  const sections = getGuideTableSections(page);
+  const sections = getGuideTableSections(page, filters);
   const markerOptions = getGuideRowMarkerOptions(page);
   const filteredPage = filterGuidePageTables(page, filters);
 

@@ -25,6 +25,7 @@ export interface GuideTableSection {
   readonly key: string;
   readonly label: string;
   readonly rowCount: number;
+  readonly matchedRowCount?: number;
 }
 
 export interface GuideRowMarkerOption {
@@ -102,25 +103,49 @@ function normalizeGuideTableBlock(block: GuideTableBlock): GuideTableBlock {
   };
 }
 
-function getTableRowCount(block: GuideTableBlock): number {
-  return normalizeGuideTableBlock(block).rows.length;
+function sectionHasActiveRowFilters(filters: GuideTableFilterState | undefined, searchTerms: readonly string[]): boolean {
+  if (!filters) return false;
+  return searchTerms.length > 0 || filters.maxReqLevel !== null || (filters.selectedMarkers?.length ?? 0) > 0;
 }
 
-export function getGuideTableSections(page: GuidePage): readonly GuideTableSection[] {
+function getSectionMatchedRowCount(
+  block: GuideTableBlock,
+  sectionKey: string,
+  filters: GuideTableFilterState,
+  searchTerms: readonly string[]
+): number {
+  return block.rows.filter(
+    (row) =>
+      rowMatchesSearch(row, block, sectionKey, searchTerms) &&
+      rowMatchesRequiredLevel(row, block.headers, filters.maxReqLevel) &&
+      rowMatchesMarkers(row, filters.selectedMarkers)
+  ).length;
+}
+
+export function getGuideTableSections(page: GuidePage, filters?: GuideTableFilterState): readonly GuideTableSection[] {
   const sectionMap = new Map<string, GuideTableSection>();
+  const searchTerms = filters ? parseSearchTerms(filters.searchText) : [];
+  const includeMatchedCounts = sectionHasActiveRowFilters(filters, searchTerms);
 
   for (const block of page.blocks) {
     if (block.kind !== 'table') continue;
 
-    const key = getGuideTableSectionKey(block.caption);
+    const normalizedBlock = normalizeGuideTableBlock(block);
+    const key = getGuideTableSectionKey(normalizedBlock.caption);
     const existing = sectionMap.get(key);
-    const rowCount = getTableRowCount(block);
+    const rowCount = normalizedBlock.rows.length;
+    const matchedRowCount =
+      includeMatchedCounts && filters ? getSectionMatchedRowCount(normalizedBlock, key, filters, searchTerms) : undefined;
     if (existing) {
-      sectionMap.set(key, { ...existing, rowCount: existing.rowCount + rowCount });
+      sectionMap.set(key, {
+        ...existing,
+        rowCount: existing.rowCount + rowCount,
+        ...(includeMatchedCounts ? { matchedRowCount: (existing.matchedRowCount ?? 0) + (matchedRowCount ?? 0) } : {}),
+      });
       continue;
     }
 
-    sectionMap.set(key, { key, label: key, rowCount });
+    sectionMap.set(key, { key, label: key, rowCount, ...(includeMatchedCounts ? { matchedRowCount: matchedRowCount ?? 0 } : {}) });
   }
 
   return [...sectionMap.values()];

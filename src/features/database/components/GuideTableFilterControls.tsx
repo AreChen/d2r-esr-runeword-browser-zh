@@ -70,6 +70,11 @@ function hasFavorites(filters: GuideTableFilterState): boolean {
   return filters.favoriteSections.length > 0;
 }
 
+function getSectionCountLabel(section: GuideTableSection): string {
+  if (section.matchedRowCount === undefined) return String(section.rowCount);
+  return `${String(section.matchedRowCount)}/${String(section.rowCount)}`;
+}
+
 const MARKER_DOT_CLASSES: Record<GuideRowMarkerKind, string> = {
   rune: 'bg-violet-500',
   gem: 'bg-emerald-500',
@@ -266,13 +271,15 @@ export function GuideTableFilterControls({
         {sections.map((section) => {
           const selected = isGuideTableSectionSelected(section.key, filters.selectedSections);
           const favorite = filters.favoriteSections.includes(section.key);
+          const hasNoMatches = section.matchedRowCount === 0;
 
           return (
             <div
               key={section.key}
               className={cn(
                 'flex min-h-9 items-center justify-between gap-2 rounded-md border bg-card px-2 py-1.5',
-                selected ? 'border-border' : 'border-muted bg-muted/40 text-muted-foreground'
+                selected ? 'border-border' : 'border-muted bg-muted/40 text-muted-foreground',
+                hasNoMatches && 'opacity-60'
               )}
             >
               <label className="flex min-w-0 flex-1 cursor-pointer items-center gap-2">
@@ -286,7 +293,9 @@ export function GuideTableFilterControls({
                   }}
                 />
                 <span className="truncate text-sm font-medium">{getSectionLabel(section)}</span>
-                <span className="rounded-full bg-muted px-1.5 py-0.5 text-[11px] text-muted-foreground">{section.rowCount}</span>
+                <span className="rounded-full bg-muted px-1.5 py-0.5 text-[11px] text-muted-foreground">
+                  {getSectionCountLabel(section)}
+                </span>
               </label>
               <Button
                 type="button"

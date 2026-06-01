@@ -42,7 +42,7 @@ export function VesselOfSoulsScreen() {
     );
   }
 
-  const sections = getGuideTableSections(page);
+  const sections = getGuideTableSections(page, filters);
   const markerOptions = getGuideRowMarkerOptions(page);
   const filteredPage = filterGuidePageTables(page, filters);
 
