@@ -88,7 +88,6 @@ function* handleFetchHtml(action: PayloadAction<{ force?: boolean } | undefined>
       { entry: getGuidePageEntry('uniqueWeapons'), html: uniqueWeaponsHtml },
       { entry: getGuidePageEntry('uniqueArmors'), html: uniqueArmorsHtml },
       { entry: getGuidePageEntry('uniqueOthers'), html: uniqueOthersHtml },
-      { entry: getGuidePageEntry('uniqueMythicals'), html: mythicalsHtml },
       ...additionalGuidePageHtmls,
     ].sort((a, b) => a.entry.order - b.entry.order);
 

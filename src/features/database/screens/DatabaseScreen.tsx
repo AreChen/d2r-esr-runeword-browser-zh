@@ -101,7 +101,7 @@ export function DatabaseScreen() {
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold">资料库 ({pages.length})</h1>
-          <p className="mt-1 text-sm text-muted-foreground">官方基础资料、DPDNS 补全机制与攻略资料的中文整理版。</p>
+          <p className="mt-1 text-sm text-muted-foreground">基础资料、DPDNS 补全机制与攻略资料的中文整理版。</p>
         </div>
         <div className="flex flex-wrap gap-2">
           {GROUP_FILTERS.map((filter) => (
