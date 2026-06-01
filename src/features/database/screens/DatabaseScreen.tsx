@@ -18,6 +18,7 @@ import { getGuidePageBlockSummary } from '../utils/guidePageSummary';
 import {
   DEFAULT_GUIDE_TABLE_FILTERS,
   filterGuidePageTables,
+  getGuideRowMarkerOptions,
   getGuideTableSections,
   isGuideTableFilterState,
   type GuideTableFilterState,
@@ -200,12 +201,14 @@ function GuidePagePanel({ page }: { readonly page: GuidePage }) {
     isGuideTableFilterState
   );
   const sections = getGuideTableSections(page);
+  const markerOptions = getGuideRowMarkerOptions(page);
   const filteredPage = filterGuidePageTables(page, filters);
 
   return (
     <div className="space-y-4">
       <GuideTableFilterControls
         sections={sections}
+        markerOptions={markerOptions}
         filters={filters}
         visibleRowCount={filteredPage.visibleRowCount}
         totalRowCount={filteredPage.totalRowCount}

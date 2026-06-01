@@ -2,7 +2,13 @@ import type { GuideContentBlock, GuidePage, GuideTableBlock } from '@/core/db';
 import { buildLocalizedSearchText } from '@/core/i18n';
 import { translateGuideText } from '@/core/i18n/guideTranslation';
 import { parseSearchTerms } from '@/features/runewords/utils/filteringHelpers';
-import { getGuideCellLineClassification, isGuideRowMarkerKind, type GuideRowMarkerKind } from './guideCellClassification';
+import {
+  GUIDE_ROW_MARKER_KINDS,
+  GUIDE_ROW_MARKER_LABELS,
+  getGuideCellLineClassification,
+  isGuideRowMarkerKind,
+  type GuideRowMarkerKind,
+} from './guideCellClassification';
 
 export const NO_SECTION_SELECTED = '__none__';
 
@@ -17,6 +23,12 @@ export interface GuideTableFilterState {
 
 export interface GuideTableSection {
   readonly key: string;
+  readonly label: string;
+  readonly rowCount: number;
+}
+
+export interface GuideRowMarkerOption {
+  readonly kind: GuideRowMarkerKind;
   readonly label: string;
   readonly rowCount: number;
 }
@@ -186,6 +198,27 @@ function getGuideRowMarkers(row: readonly string[]): ReadonlySet<GuideRowMarkerK
   }
 
   return markers;
+}
+
+export function getGuideRowMarkerOptions(page: GuidePage): readonly GuideRowMarkerOption[] {
+  const rowCounts = new Map<GuideRowMarkerKind, number>();
+
+  for (const block of page.blocks) {
+    if (block.kind !== 'table') continue;
+
+    const normalizedBlock = normalizeGuideTableBlock(block);
+    for (const row of normalizedBlock.rows) {
+      for (const marker of getGuideRowMarkers(row)) {
+        rowCounts.set(marker, (rowCounts.get(marker) ?? 0) + 1);
+      }
+    }
+  }
+
+  return GUIDE_ROW_MARKER_KINDS.flatMap((kind) => {
+    const rowCount = rowCounts.get(kind) ?? 0;
+    if (rowCount === 0) return [];
+    return [{ kind, label: GUIDE_ROW_MARKER_LABELS[kind], rowCount }];
+  });
 }
 
 function rowMatchesMarkers(row: readonly string[], selectedMarkers: readonly GuideRowMarkerKind[] | undefined): boolean {

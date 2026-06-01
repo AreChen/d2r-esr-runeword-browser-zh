@@ -8,6 +8,7 @@ import { useGuidePages } from '@/features/database/hooks/useGuidePages';
 import {
   DEFAULT_GUIDE_TABLE_FILTERS,
   filterGuidePageTables,
+  getGuideRowMarkerOptions,
   getGuideTableSections,
   isGuideTableFilterState,
   type GuideTableFilterState,
@@ -42,6 +43,7 @@ export function VesselOfSoulsScreen() {
   }
 
   const sections = getGuideTableSections(page);
+  const markerOptions = getGuideRowMarkerOptions(page);
   const filteredPage = filterGuidePageTables(page, filters);
 
   return (
@@ -53,6 +55,7 @@ export function VesselOfSoulsScreen() {
 
       <GuideTableFilterControls
         sections={sections}
+        markerOptions={markerOptions}
         filters={filters}
         visibleRowCount={filteredPage.visibleRowCount}
         totalRowCount={filteredPage.totalRowCount}

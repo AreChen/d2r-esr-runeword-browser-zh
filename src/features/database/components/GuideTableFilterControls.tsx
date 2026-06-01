@@ -5,17 +5,19 @@ import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 import { translateGuideText } from '@/core/i18n/guideTranslation';
-import { GUIDE_ROW_MARKER_KINDS, GUIDE_ROW_MARKER_LABELS, type GuideRowMarkerKind } from '../utils/guideCellClassification';
+import { GUIDE_ROW_MARKER_LABELS, type GuideRowMarkerKind } from '../utils/guideCellClassification';
 import {
   DEFAULT_GUIDE_TABLE_FILTERS,
   NO_SECTION_SELECTED,
   isGuideTableSectionSelected,
+  type GuideRowMarkerOption,
   type GuideTableFilterState,
   type GuideTableSection,
 } from '../utils/guideTableFilters';
 
 interface GuideTableFilterControlsProps {
   readonly sections: readonly GuideTableSection[];
+  readonly markerOptions: readonly GuideRowMarkerOption[];
   readonly filters: GuideTableFilterState;
   readonly visibleRowCount: number;
   readonly totalRowCount: number;
@@ -81,6 +83,7 @@ const MARKER_DOT_CLASSES: Record<GuideRowMarkerKind, string> = {
 
 export function GuideTableFilterControls({
   sections,
+  markerOptions,
   filters,
   visibleRowCount,
   totalRowCount,
@@ -90,6 +93,13 @@ export function GuideTableFilterControls({
 
   const allSelected = filters.selectedSections.length === 0;
   const noneSelected = filters.selectedSections.includes(NO_SECTION_SELECTED);
+  const markerOptionKinds = new Set(markerOptions.map((option) => option.kind));
+  const visibleMarkerOptions: readonly GuideRowMarkerOption[] = [
+    ...markerOptions,
+    ...(filters.selectedMarkers ?? [])
+      .filter((marker) => !markerOptionKinds.has(marker))
+      .map((marker) => ({ kind: marker, label: GUIDE_ROW_MARKER_LABELS[marker], rowCount: 0 })),
+  ];
 
   return (
     <section className="space-y-3 rounded-md border bg-muted/20 p-3">
@@ -218,36 +228,39 @@ export function GuideTableFilterControls({
         当前匹配 {visibleRowCount} / {totalRowCount} 行。星标会保存在本机，可用“收藏”快速只看常用部件或公式阶级。
       </div>
 
-      <div className="space-y-2 rounded-md border bg-card/70 p-2">
-        <div className="text-xs font-medium text-muted-foreground">行标记</div>
-        <div className="flex flex-wrap gap-2">
-          {GUIDE_ROW_MARKER_KINDS.map((marker) => {
-            const selected = filters.selectedMarkers?.includes(marker) ?? false;
+      {visibleMarkerOptions.length > 0 && (
+        <div className="space-y-2 rounded-md border bg-card/70 p-2">
+          <div className="text-xs font-medium text-muted-foreground">行标记</div>
+          <div className="flex flex-wrap gap-2">
+            {visibleMarkerOptions.map((option) => {
+              const selected = filters.selectedMarkers?.includes(option.kind) ?? false;
 
-            return (
-              <label
-                key={marker}
-                className={cn(
-                  'flex min-h-8 cursor-pointer items-center gap-2 rounded-md border px-2 py-1 text-sm',
-                  selected ? 'border-primary bg-primary/10 text-foreground' : 'border-border bg-background text-muted-foreground'
-                )}
-              >
-                <Checkbox
-                  checked={selected}
-                  onCheckedChange={() => {
-                    onFiltersChange((current) => ({
-                      ...current,
-                      selectedMarkers: toggleMarker(marker, current.selectedMarkers),
-                    }));
-                  }}
-                />
-                <span className={cn('size-2.5 rounded-full', MARKER_DOT_CLASSES[marker])} />
-                <span>{GUIDE_ROW_MARKER_LABELS[marker]}</span>
-              </label>
-            );
-          })}
+              return (
+                <label
+                  key={option.kind}
+                  className={cn(
+                    'flex min-h-8 cursor-pointer items-center gap-2 rounded-md border px-2 py-1 text-sm',
+                    selected ? 'border-primary bg-primary/10 text-foreground' : 'border-border bg-background text-muted-foreground'
+                  )}
+                >
+                  <Checkbox
+                    checked={selected}
+                    onCheckedChange={() => {
+                      onFiltersChange((current) => ({
+                        ...current,
+                        selectedMarkers: toggleMarker(option.kind, current.selectedMarkers),
+                      }));
+                    }}
+                  />
+                  <span className={cn('size-2.5 rounded-full', MARKER_DOT_CLASSES[option.kind])} />
+                  <span>{option.label}</span>
+                  <span className="rounded-full bg-muted px-1.5 py-0.5 text-[11px] text-muted-foreground">{option.rowCount}</span>
+                </label>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
         {sections.map((section) => {

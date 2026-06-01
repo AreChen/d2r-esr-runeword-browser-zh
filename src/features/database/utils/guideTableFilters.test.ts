@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import type { GuidePage } from '@/core/db';
-import { filterGuidePageTables, getGuideTableSections, isGuideTableFilterState, parseGuideRowRequiredLevel } from './guideTableFilters';
+import {
+  filterGuidePageTables,
+  getGuideRowMarkerOptions,
+  getGuideTableSections,
+  isGuideTableFilterState,
+  parseGuideRowRequiredLevel,
+} from './guideTableFilters';
 
 const samplePage: GuidePage = {
   id: 'sample',
@@ -164,6 +170,14 @@ describe('guide table filtering helpers', () => {
       ['Mage Plate Mage Plate (xtp)', 'Item Level: 45 Required Level: 30', '+100 Defense'],
       ['Cap of the Raven Cap (cap)', 'Item Level: 4 Required Level: 4', '+1 to Summoning Skills (Druid Only)'],
       ['Vessel of Souls\n2x Heart\nBrain\nTail\nQuill', 'Same Item\n+5% Chance to Cast Level 15 Thrown Axe on Striking'],
+    ]);
+  });
+
+  it('builds row marker filter options only for markers found on the current guide page', () => {
+    expect(getGuideRowMarkerOptions(samplePage)).toEqual([
+      { kind: 'organ', label: '器官', rowCount: 1 },
+      { kind: 'cube', label: '方块材料', rowCount: 1 },
+      { kind: 'affix', label: '属性词缀', rowCount: 4 },
     ]);
   });
 });

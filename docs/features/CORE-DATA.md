@@ -156,7 +156,7 @@ Tables: `gems`, `esrRunes`, `lodRunes`, `kanjiRunes`, `crystals`, `runewords`, `
 
 See [DATA-MODELS.md](../technical/DATA-MODELS.md) for the full schema.
 
-Guide page table rendering keeps the parsed text intact for search/filtering, then applies display-only color cues to recognizable material requirements and affix/stat lines in table cells. The same semantic markers power guide row filters, so users can quickly narrow formulas to rows containing runes, gems, corruption materials, organs, cube materials, consumables, coupon/decipherer-style currency, or affix/stat outcomes.
+Guide page table rendering keeps the parsed text intact for search/filtering, then applies display-only color cues to recognizable material requirements and affix/stat lines in table cells. The same semantic markers power guide row filters, so users can quickly narrow formulas to rows containing runes, gems, corruption materials, organs, cube materials, consumables, coupon/decipherer-style currency, or affix/stat outcomes. Marker options are counted from the current guide page and hidden when no rows match that marker, which keeps large formula pages focused on useful filters.
 
 ## Data Models
 
