@@ -42,7 +42,8 @@ describe('guide database translation regressions', () => {
     expect(setsText).not.toContain("Autolycus' Robes");
 
     const corruptionsText = collectTranslatedGuideText(readGuideFixture('corruptions'));
-    expect(corruptionsText).toContain('腐化是通过将世界石碎片与任意物品合成获得的独特加成。');
+    expect(corruptionsText).toContain('请注意 腐化物品可能会使其变成稀有物品。');
+    expect(corruptionsText).toContain('所有物品在腐化时有 25% 的几率变成稀有（废品）。');
     expect(corruptionsText).not.toContain('Corruptions are unique bonuses');
   }, 20000);
 });

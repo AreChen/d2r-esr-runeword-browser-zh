@@ -23,7 +23,7 @@ Project overview, design decisions, and general project information.
 - [Socketables](./features/SOCKETABLES.md) - Unified view of all socketables (gems, runes, crystals) with filters
 - [Unique Items](./features/UNIQUE-ITEMS.md) - Browse and filter unique items parsed from HTM pages
 - [Loot Filter Editor](./features/LOOT-FILTER.md) - Import, preview, adjust, and export D2RLAN Lua loot filter configs
-- Guide Database - Browse official Base Information and Features pages, with DPDNS used to supplement native pages such as cube formulas
+- Guide Database - Browse official Base Information and DPDNS-backed native mechanism pages, plus supplemental guides
 
 ### Technical Documentation
 - [Tech Stack](./technical/TECH-STACK.md) - Libraries, frameworks, and tools
@@ -52,7 +52,7 @@ The app uses a single HTM-based data system. Core item data is fetched from the 
 | Unique Others | `unique_others.htm` |
 | Mythical Uniques | `unique_mythicals.htm` |
 | Ascendancies | `ascendancies.htm` |
-| Guide Database | Official Base Information / Features pages, with DPDNS used for canonical cube formulas and supplemental materials, endgame pages, and class guides |
+| Guide Database | Official Base Information pages, DPDNS-backed canonical cube formulas/mechanisms, and supplemental materials, endgame pages, and class guides |
 | Version info | `changelogs.html` |
 
 ### Features
@@ -65,7 +65,7 @@ The app uses a single HTM-based data system. Core item data is fetched from the 
 | Mythical Uniques | `/mythicals` | Mythical unique items with special properties and notes |
 | Ascendancies | `/ascendancies` | Ascendancy tiers, bonuses, and footnotes |
 | Loot Filter Editor | `/loot-filter` | Local Lua filter import, Chinese editing UI, style preview, audio filename editing, and Lua export |
-| Guide Database | `/database` | Base information, features, and supplemental DPDNS guide data rendered in a searchable Chinese app UI |
+| Guide Database | `/database` | Base information, DPDNS-completed mechanisms, and supplemental guide data rendered in a searchable Chinese app UI |
 
 ---
 

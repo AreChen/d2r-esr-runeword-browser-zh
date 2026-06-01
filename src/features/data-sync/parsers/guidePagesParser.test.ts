@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { GUIDE_PAGE_CATALOG, getGuidePageEntrySourceUrl } from '@/core/api';
+import { CORE_GUIDE_PAGE_IDS, GUIDE_PAGE_CATALOG, getGuidePageEntrySourceUrl } from '@/core/api';
 import { parseGuidePage, parseGuidePages } from './guidePagesParser';
 import type { GuidePageCatalogEntry } from '@/features/database';
 
@@ -320,6 +320,47 @@ describe('guide page parser', () => {
     expect(cubeEntry ? getGuidePageEntrySourceUrl(cubeEntry) : '').toBe('https://d2r.dpdns.org/CubeFormula.html');
   });
 
+  it('uses DPDNS as the canonical source for duplicated feature guide pages', () => {
+    const replacements = [
+      ['corruptions', 'd2rCorruption', 'https://d2r.dpdns.org/Corruption.html'],
+      ['anointments', 'd2rAnointment', 'https://d2r.dpdns.org/Anointment.html'],
+      ['endgameMaps', 'd2rEndMap', 'https://d2r.dpdns.org/EndMap.html'],
+      ['vesselOfSouls', 'd2rVesselOfSouls', 'https://d2r.dpdns.org/Vessel_Of_Souls.html'],
+      ['ascendancies', 'd2rAscendancies', 'https://d2r.dpdns.org/Ascendancies.html'],
+      ['killLedger', 'd2rKillLedger', 'https://d2r.dpdns.org/kill_ledger.html'],
+      ['skillInformation', 'd2rSkillInformation', 'https://d2r.dpdns.org/skill_information.html'],
+      ['weaponMastery', 'd2rWeaponMastery', 'https://d2r.dpdns.org/weapon_mastery.html'],
+    ] as const;
+    const catalogIds = GUIDE_PAGE_CATALOG.map((page) => page.id as string);
+
+    for (const [canonicalId, duplicateId, expectedUrl] of replacements) {
+      const entry = GUIDE_PAGE_CATALOG.find((page) => page.id === canonicalId);
+
+      expect(entry, canonicalId).toBeDefined();
+      expect(entry?.group, canonicalId).toBe('features');
+      expect(entry ? getGuidePageEntrySourceUrl(entry) : '').toBe(expectedUrl);
+      expect(catalogIds, duplicateId).not.toContain(duplicateId);
+    }
+  });
+
+  it('fetches DPDNS-backed canonical feature guide pages through the guide page catalog', () => {
+    const canonicalDpdnsFeatureIds = [
+      'corruptions',
+      'anointments',
+      'endgameMaps',
+      'vesselOfSouls',
+      'ascendancies',
+      'killLedger',
+      'skillInformation',
+      'weaponMastery',
+    ] as const;
+    const skippedCoreIds = new Set<string>(CORE_GUIDE_PAGE_IDS);
+
+    for (const id of canonicalDpdnsFeatureIds) {
+      expect(skippedCoreIds.has(id), id).toBe(false);
+    }
+  });
+
   it('uses the real Input/Output row as headers for DPDNS cube recipe categories', () => {
     const entry = GUIDE_PAGE_CATALOG.find((page) => page.id === 'cubeRecipes');
     expect(entry).toBeDefined();
@@ -440,8 +481,8 @@ describe('guide page parser', () => {
     expect(quickGuidePage.blocks.filter((block) => block.kind === 'paragraph').length).toBeGreaterThan(10);
   }, 20000);
 
-  it('keeps the first d2r formula row when the source table has no explicit header row', () => {
-    const entry = GUIDE_PAGE_CATALOG.find((page) => page.id === 'd2rVesselOfSouls');
+  it('keeps the first DPDNS formula row when the canonical feature source table has no explicit header row', () => {
+    const entry = GUIDE_PAGE_CATALOG.find((page) => page.id === 'vesselOfSouls');
     expect(entry).toBeDefined();
     if (!entry) return;
 

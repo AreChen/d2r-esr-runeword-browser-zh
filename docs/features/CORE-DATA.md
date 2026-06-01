@@ -18,7 +18,7 @@ Core item data is fetched from the ESR documentation site. Guide pages can eithe
 | Unique Others | `https://easternsunresurrected.com/unique_others.htm` |
 | Mythical Uniques | `https://easternsunresurrected.com/unique_mythicals.htm` |
 | Ascendancies | `https://easternsunresurrected.com/ascendancies.htm` |
-| Guide Pages | Official Base Information / Features pages, DPDNS-backed cube formulas, plus supplemental DPDNS materials, endgame pages, and class guides |
+| Guide Pages | Official Base Information pages, DPDNS-backed canonical formulas/mechanisms, plus supplemental DPDNS materials, endgame pages, and class guides |
 
 Remote URLs are configured in `src/core/api/remoteConfig.ts`; guide page catalog entries live in `src/core/api/guidePageCatalog.ts`.
 
@@ -130,7 +130,7 @@ When a full parse is triggered:
    - unique_others.htm
    - unique_mythicals.htm
    - ascendancies.htm
-   - Guide database pages from the official Base Information / Features navigation
+   - Guide database pages from the official Base Information navigation
    - DPDNS-backed canonical/supplemental guide pages from `https://d2r.dpdns.org/`
 2. Parse gems.htm:
    a. Extract Gems (8 types x 6 tiers = 48 items)
