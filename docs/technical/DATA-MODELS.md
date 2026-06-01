@@ -174,7 +174,7 @@ Key-value store for app metadata.
 
 ### guidePages
 
-Stores app-owned renderable versions of the official Base Information / Features pages and optional DPDNS guide pages.
+Stores app-owned renderable guide pages. Catalog entries may use official ESR sources or DPDNS as a canonical/supplemental source for the same native app page.
 
 | Column | Type | Index | Description |
 |--------|------|-------|-------------|

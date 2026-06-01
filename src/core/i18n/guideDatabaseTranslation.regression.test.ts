@@ -7,7 +7,7 @@ import { translateGuideText } from './guideTranslation';
 
 function readGuideFixture(id: string): GuidePage {
   const entry = getGuidePageEntry(id);
-  const html = readFileSync(resolve(process.cwd(), 'test-fixtures', entry.sourcePath), 'utf-8');
+  const html = readFileSync(resolve(process.cwd(), 'test-fixtures', entry.fixturePath ?? entry.sourcePath), 'utf-8');
   return parseGuidePage(html, entry);
 }
 
@@ -28,10 +28,10 @@ function collectTranslatedGuideText(page: GuidePage): string {
 }
 
 describe('guide database translation regressions', () => {
-  it('translates screenshot examples after parsing fresh official guide data', () => {
+  it('translates screenshot examples after parsing fresh guide data', () => {
     const cubeRecipesText = collectTranslatedGuideText(readGuideFixture('cubeRecipes'));
-    expect(cubeRecipesText).toContain('多数会重置投入物的公式在投入物带有锻造时不会生效，但并非全部如此。');
-    expect(cubeRecipesText).toContain('身体部位表示身体护甲。护甲表示所有类型的护甲。');
+    expect(cubeRecipesText).toContain('大多数需要重新投入的配方，若输入物品带有锻造效果，则无法使用。');
+    expect(cubeRecipesText).toContain('“胸甲”指身体护甲。“护甲”指所有种类的护甲。');
     expect(cubeRecipesText).not.toContain('Most, but not all, recipes');
     expect(cubeRecipesText).not.toContain('Torso means Body Armor');
 
@@ -44,5 +44,5 @@ describe('guide database translation regressions', () => {
     const corruptionsText = collectTranslatedGuideText(readGuideFixture('corruptions'));
     expect(corruptionsText).toContain('腐化是通过将世界石碎片与任意物品合成获得的独特加成。');
     expect(corruptionsText).not.toContain('Corruptions are unique bonuses');
-  });
+  }, 20000);
 });

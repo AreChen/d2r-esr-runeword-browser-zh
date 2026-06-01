@@ -23,7 +23,7 @@ Project overview, design decisions, and general project information.
 - [Socketables](./features/SOCKETABLES.md) - Unified view of all socketables (gems, runes, crystals) with filters
 - [Unique Items](./features/UNIQUE-ITEMS.md) - Browse and filter unique items parsed from HTM pages
 - [Loot Filter Editor](./features/LOOT-FILTER.md) - Import, preview, adjust, and export D2RLAN Lua loot filter configs
-- Guide Database - Browse official Base Information, Features, and DPDNS guide pages in the app-owned Chinese interface
+- Guide Database - Browse official Base Information and Features pages, with DPDNS used to supplement native pages such as cube formulas
 
 ### Technical Documentation
 - [Tech Stack](./technical/TECH-STACK.md) - Libraries, frameworks, and tools
@@ -39,7 +39,7 @@ Project overview, design decisions, and general project information.
 
 ## Data System
 
-The app uses a single HTM-based data system. All data is fetched from the ESR documentation site (`easternsunresurrected.com`), parsed with the native `DOMParser` API, and stored in a single IndexedDB database (`d2r-esr-runeword-browser`).
+The app uses a single HTM-based data system. Core item data is fetched from the ESR documentation site (`easternsunresurrected.com`), selected guide data is supplemented from DPDNS, and everything is parsed with the native `DOMParser` API into one IndexedDB database (`d2r-esr-runeword-browser`).
 
 ### Data Sources
 
@@ -52,7 +52,7 @@ The app uses a single HTM-based data system. All data is fetched from the ESR do
 | Unique Others | `unique_others.htm` |
 | Mythical Uniques | `unique_mythicals.htm` |
 | Ascendancies | `ascendancies.htm` |
-| Guide Database | Official Base Information / Features pages plus DPDNS formulas, materials, endgame pages, and class guides |
+| Guide Database | Official Base Information / Features pages, with DPDNS used for canonical cube formulas and supplemental materials, endgame pages, and class guides |
 | Version info | `changelogs.html` |
 
 ### Features
@@ -65,7 +65,7 @@ The app uses a single HTM-based data system. All data is fetched from the ESR do
 | Mythical Uniques | `/mythicals` | Mythical unique items with special properties and notes |
 | Ascendancies | `/ascendancies` | Ascendancy tiers, bonuses, and footnotes |
 | Loot Filter Editor | `/loot-filter` | Local Lua filter import, Chinese editing UI, style preview, audio filename editing, and Lua export |
-| Guide Database | `/database` | Official Base Information, Features, and DPDNS guide pages rendered in a searchable Chinese app UI |
+| Guide Database | `/database` | Base information, features, and supplemental DPDNS guide data rendered in a searchable Chinese app UI |
 
 ---
 

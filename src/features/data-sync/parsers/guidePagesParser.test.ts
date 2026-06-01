@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { GUIDE_PAGE_CATALOG } from '@/core/api';
+import { GUIDE_PAGE_CATALOG, getGuidePageEntrySourceUrl } from '@/core/api';
 import { parseGuidePage, parseGuidePages } from './guidePagesParser';
 import type { GuidePageCatalogEntry } from '@/features/database';
 
@@ -312,7 +312,15 @@ describe('guide page parser', () => {
     }
   }, 20000);
 
-  it('uses the real Input/Output row as headers for every two-column cube recipe category', () => {
+  it('uses DPDNS cube formulas as the canonical formula page instead of a duplicate off-site page', () => {
+    const cubeEntry = GUIDE_PAGE_CATALOG.find((page) => page.id === 'cubeRecipes');
+
+    expect(cubeEntry).toBeDefined();
+    expect(GUIDE_PAGE_CATALOG.map((page) => page.id as string)).not.toContain('d2rCubeFormula');
+    expect(cubeEntry ? getGuidePageEntrySourceUrl(cubeEntry) : '').toBe('https://d2r.dpdns.org/CubeFormula.html');
+  });
+
+  it('uses the real Input/Output row as headers for DPDNS cube recipe categories', () => {
     const entry = GUIDE_PAGE_CATALOG.find((page) => page.id === 'cubeRecipes');
     expect(entry).toBeDefined();
     if (!entry) return;
@@ -320,26 +328,24 @@ describe('guide page parser', () => {
     const page = parseGuidePage(readGuideFixture(entry), entry);
     const tables = page.blocks.filter((block) => block.kind === 'table');
     const recipeCaptions = [
-      'Special',
-      'Uber/Endgame Map Recipes',
-      'Legendary Consumables',
-      'Misc/Repair',
-      'Gems/Crystals',
-      'Ancient Relics',
-      'Cubing Materials',
-      'Normal Items',
-      'Magic/Rare Items',
-      'Set Items',
-      'Legacy Craft (LoD Craft)',
-      'Class Craft',
-      'Rings/Amulets',
-      'Charms',
-      'Jewels',
-      'Arrow/Bolt Quivers',
-      'Tinkering',
-      'Base Upgrades/Changes',
-      'Socket Recipes',
-      '(Former) Secret Recipes',
+      '任务',
+      '超级/终局地图配方',
+      '杂项/回复',
+      '宝石/水晶',
+      '古代优惠券',
+      '赫拉迪姆方块-材料',
+      '普通物品',
+      '魔法/稀有物品',
+      '独特物品',
+      '套装物品',
+      '戒指/护身符',
+      '咒符',
+      '珠宝',
+      '箭矢/弩箭 箭袋',
+      '锻造',
+      '基础升级/更改',
+      '镶崁打孔',
+      '(原)秘密配方',
     ];
 
     for (const caption of recipeCaptions) {
@@ -352,7 +358,7 @@ describe('guide page parser', () => {
     }
   }, 20000);
 
-  it('keeps nested cube recipe tables as tables instead of loose pre-table paragraphs', () => {
+  it('keeps DPDNS cube recipe category notes inside tables instead of loose pre-table paragraphs', () => {
     const entry = GUIDE_PAGE_CATALOG.find((page) => page.id === 'cubeRecipes');
     expect(entry).toBeDefined();
     if (!entry) return;
@@ -360,49 +366,48 @@ describe('guide page parser', () => {
     const page = parseGuidePage(readGuideFixture(entry), entry);
     const tables = page.blocks.filter((block) => block.kind === 'table');
     const looseParagraphs = page.blocks.filter((block) => block.kind === 'paragraph').map((block) => block.text);
-    const uniqueItemsTable = tables.find((block) => block.caption === 'Unique Items');
-    const uniqueRerollRow = uniqueItemsTable?.rows.find((row) => row[0]?.includes('Unique Reroll'));
+    const uniqueItemsTable = tables.find((block) => block.caption === '独特物品');
+    const uniqueRerollRow = uniqueItemsTable?.rows.find((row) => row[0]?.includes('独特重铸'));
 
     expect(uniqueItemsTable).toBeDefined();
     expect(uniqueItemsTable?.headers).toEqual(['Input', 'Output']);
-    expect(uniqueItemsTable?.rows[0]?.[0]).toContain('3 Set Weapons/Armor of the Same Base Item');
-    expect(uniqueItemsTable?.rows[0]?.[1]).toContain('Unique Item of the Same Base Item');
-    expect(uniqueRerollRow?.[0]).toContain("Base upgraded uniques can't be rerolled.");
+    expect(uniqueItemsTable?.rows[0]?.[0]).toContain('套装');
+    expect(uniqueItemsTable?.rows[0]?.[1]).toContain('独特');
+    expect(uniqueRerollRow?.[0]).toContain('基础升级的独特物品无法重铸');
 
-    expect(looseParagraphs).not.toContain('Unique Items');
-    expect(looseParagraphs).not.toContain('Input Output');
-    expect(looseParagraphs.some((paragraph) => paragraph.includes("Base upgraded uniques can't be rerolled."))).toBe(false);
+    expect(looseParagraphs).not.toContain('独特物品');
+    expect(looseParagraphs).not.toContain('输入 输出');
+    expect(looseParagraphs.some((paragraph) => paragraph.includes('基础升级的独特物品无法重铸'))).toBe(false);
   }, 20000);
 
-  it('keeps cube recipe preface notes out of Ring and Jewel table headers', () => {
+  it('keeps DPDNS ring and jewel cube recipe preface notes out of table headers', () => {
     const entry = GUIDE_PAGE_CATALOG.find((page) => page.id === 'cubeRecipes');
     expect(entry).toBeDefined();
     if (!entry) return;
 
     const page = parseGuidePage(readGuideFixture(entry), entry);
     const tables = page.blocks.filter((block) => block.kind === 'table');
-    const ringsTable = tables.find((block) => block.caption === 'Rings/Amulets');
-    const jewelsTable = tables.find((block) => block.caption === 'Jewels');
+    const ringsTable = tables.find((block) => block.caption === '戒指/护身符');
+    const jewelsTable = tables.find((block) => block.caption === '珠宝');
 
     expect(ringsTable).toBeDefined();
     expect(jewelsTable).toBeDefined();
     if (!ringsTable || !jewelsTable) return;
 
     expect(ringsTable.headers).toEqual(['Input', 'Output']);
-    expect(ringsTable.notes?.[0]).toContain('When you reroll multiple Amulets or Rings');
-    expect(ringsTable.rows[0]).toEqual(['Standard Reroll', '']);
-    expect(ringsTable.rows[1]).toEqual(['3 Magic Rings', 'Magic Ring\n(ilvl = char level)']);
+    expect(ringsTable.notes?.[0]).toContain('当你重置多个护身符或戒指');
+    expect(ringsTable.rows[0]).toEqual(['标准重铸', '']);
+    expect(ringsTable.rows[1]?.[0]).toContain('3 魔法戒指');
+    expect(ringsTable.rows[1]?.[1]).toContain('魔法戒指');
 
     expect(jewelsTable.headers).toEqual(['Input', 'Output']);
-    expect(jewelsTable.notes?.[0]).toContain('Rerolling Orb no longer accepts Crafted Rings and Amulets');
-    expect(jewelsTable.rows[0]).toEqual([
-      'Magic Jewel\nPerfect Gem\n(You can use a Gem Can instead.\nThe selected Gem Points are used)',
-      'Magic Jewel\n(ilvl = char level)',
-    ]);
+    expect(jewelsTable.notes?.[0]).toContain('重铸之球不再接受');
+    expect(jewelsTable.rows[0]?.[0]).toContain('魔法珠宝');
+    expect(jewelsTable.rows[0]?.[1]).toContain('魔法珠宝');
   }, 20000);
 
   it('parses d2r.dpdns.org guide fixtures as searchable guide pages', () => {
-    const cubeEntry = GUIDE_PAGE_CATALOG.find((page) => page.id === 'd2rCubeFormula');
+    const cubeEntry = GUIDE_PAGE_CATALOG.find((page) => page.id === 'cubeRecipes');
     const amazonEntry = GUIDE_PAGE_CATALOG.find((page) => page.id === 'd2rAmazonGuide');
     const armorEntry = GUIDE_PAGE_CATALOG.find((page) => page.id === 'd2rArmors');
     const quickGuideEntry = GUIDE_PAGE_CATALOG.find((page) => page.id === 'd2rQuickGuide');
