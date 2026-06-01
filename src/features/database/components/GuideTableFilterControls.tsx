@@ -5,6 +5,7 @@ import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 import { translateGuideText } from '@/core/i18n/guideTranslation';
+import { GUIDE_ROW_MARKER_KINDS, GUIDE_ROW_MARKER_LABELS, type GuideRowMarkerKind } from '../utils/guideCellClassification';
 import {
   DEFAULT_GUIDE_TABLE_FILTERS,
   NO_SECTION_SELECTED,
@@ -54,9 +55,29 @@ function toggleFavoriteSection(sectionKey: string, favoriteSections: readonly st
   return [...favoriteSections, sectionKey];
 }
 
+function toggleMarker(
+  marker: GuideRowMarkerKind,
+  selectedMarkers: readonly GuideRowMarkerKind[] | undefined
+): readonly GuideRowMarkerKind[] {
+  const currentMarkers = selectedMarkers ?? [];
+  if (currentMarkers.includes(marker)) return currentMarkers.filter((selectedMarker) => selectedMarker !== marker);
+  return [...currentMarkers, marker];
+}
+
 function hasFavorites(filters: GuideTableFilterState): boolean {
   return filters.favoriteSections.length > 0;
 }
+
+const MARKER_DOT_CLASSES: Record<GuideRowMarkerKind, string> = {
+  rune: 'bg-violet-500',
+  gem: 'bg-emerald-500',
+  corruption: 'bg-rose-500',
+  organ: 'bg-red-500',
+  cube: 'bg-amber-500',
+  consumable: 'bg-teal-500',
+  currency: 'bg-yellow-500',
+  affix: 'bg-sky-500',
+};
 
 export function GuideTableFilterControls({
   sections,
@@ -195,6 +216,37 @@ export function GuideTableFilterControls({
 
       <div className="text-xs text-muted-foreground">
         当前匹配 {visibleRowCount} / {totalRowCount} 行。星标会保存在本机，可用“收藏”快速只看常用部件或公式阶级。
+      </div>
+
+      <div className="space-y-2 rounded-md border bg-card/70 p-2">
+        <div className="text-xs font-medium text-muted-foreground">行标记</div>
+        <div className="flex flex-wrap gap-2">
+          {GUIDE_ROW_MARKER_KINDS.map((marker) => {
+            const selected = filters.selectedMarkers?.includes(marker) ?? false;
+
+            return (
+              <label
+                key={marker}
+                className={cn(
+                  'flex min-h-8 cursor-pointer items-center gap-2 rounded-md border px-2 py-1 text-sm',
+                  selected ? 'border-primary bg-primary/10 text-foreground' : 'border-border bg-background text-muted-foreground'
+                )}
+              >
+                <Checkbox
+                  checked={selected}
+                  onCheckedChange={() => {
+                    onFiltersChange((current) => ({
+                      ...current,
+                      selectedMarkers: toggleMarker(marker, current.selectedMarkers),
+                    }));
+                  }}
+                />
+                <span className={cn('size-2.5 rounded-full', MARKER_DOT_CLASSES[marker])} />
+                <span>{GUIDE_ROW_MARKER_LABELS[marker]}</span>
+              </label>
+            );
+          })}
+        </div>
       </div>
 
       <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">

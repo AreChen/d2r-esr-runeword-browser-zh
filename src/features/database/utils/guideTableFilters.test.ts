@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { GuidePage } from '@/core/db';
-import { filterGuidePageTables, getGuideTableSections, parseGuideRowRequiredLevel } from './guideTableFilters';
+import { filterGuidePageTables, getGuideTableSections, isGuideTableFilterState, parseGuideRowRequiredLevel } from './guideTableFilters';
 
 const samplePage: GuidePage = {
   id: 'sample',
@@ -21,6 +21,7 @@ const samplePage: GuidePage = {
       rows: [
         ['Zuez Padding Quilted Armor (qui)\nGamble Item: Quilted Armor (qui)', 'Item Level: 9 Required Level: 7', 'Cold Resist +5%'],
         ['Mage Plate Mage Plate (xtp)', 'Item Level: 45 Required Level: 30', '+100 Defense'],
+        ['Forged Plate', 'Dragon Stone\nGreen Aura Stone', 'Same Item'],
       ],
     },
     {
@@ -43,7 +44,7 @@ const samplePage: GuidePage = {
 describe('guide table filtering helpers', () => {
   it('extracts compact section keys from table captions', () => {
     expect(getGuideTableSections(samplePage)).toEqual([
-      { key: 'Body Armor', label: 'Body Armor', rowCount: 2 },
+      { key: 'Body Armor', label: 'Body Armor', rowCount: 3 },
       { key: 'Helm', label: 'Helm', rowCount: 1 },
       { key: 'Tier 1', label: 'Tier 1', rowCount: 1 },
     ]);
@@ -56,9 +57,10 @@ describe('guide table filtering helpers', () => {
       favoriteSections: [],
       showFavoritesOnly: false,
       maxReqLevel: 10,
+      selectedMarkers: [],
     });
 
-    expect(result.totalRowCount).toBe(4);
+    expect(result.totalRowCount).toBe(5);
     expect(result.visibleRowCount).toBe(1);
     expect(result.page.blocks).toContainEqual({
       id: 'body',
@@ -77,6 +79,7 @@ describe('guide table filtering helpers', () => {
       favoriteSections: [],
       showFavoritesOnly: false,
       maxReqLevel: null,
+      selectedMarkers: [],
     });
 
     expect(result.page.blocks.some((block) => block.kind === 'paragraph')).toBe(false);
@@ -90,6 +93,7 @@ describe('guide table filtering helpers', () => {
       favoriteSections: [],
       showFavoritesOnly: false,
       maxReqLevel: null,
+      selectedMarkers: [],
     });
 
     expect(result.page.blocks.some((block) => block.kind === 'paragraph' && block.text === 'Intro')).toBe(true);
@@ -102,6 +106,7 @@ describe('guide table filtering helpers', () => {
       favoriteSections: ['Helm'],
       showFavoritesOnly: true,
       maxReqLevel: null,
+      selectedMarkers: [],
     });
 
     expect(result.visibleRowCount).toBe(1);
@@ -113,5 +118,52 @@ describe('guide table filtering helpers', () => {
     expect(parseGuideRowRequiredLevel(['Item Level: 9 Required Level: 7'])).toBe(7);
     expect(parseGuideRowRequiredLevel(['Quilted Armor', '0'], ['Name', 'Req Lvl'])).toBe(0);
     expect(parseGuideRowRequiredLevel(['No level text'])).toBeNull();
+  });
+
+  it('validates persisted marker filter state while keeping old saved filters compatible', () => {
+    const oldSavedState = {
+      searchText: '',
+      selectedSections: [],
+      favoriteSections: [],
+      showFavoritesOnly: false,
+      maxReqLevel: null,
+    };
+
+    expect(isGuideTableFilterState(oldSavedState)).toBe(true);
+    expect(isGuideTableFilterState({ ...oldSavedState, selectedMarkers: ['cube', 'affix'] })).toBe(true);
+    expect(isGuideTableFilterState({ ...oldSavedState, selectedMarkers: ['not-a-marker'] })).toBe(false);
+  });
+
+  it('filters rows by semantic material and affix markers', () => {
+    const cubeResult = filterGuidePageTables(samplePage, {
+      searchText: '',
+      selectedSections: [],
+      favoriteSections: [],
+      showFavoritesOnly: false,
+      maxReqLevel: null,
+      selectedMarkers: ['cube'],
+    });
+
+    expect(cubeResult.visibleRowCount).toBe(1);
+    expect(cubeResult.page.blocks.filter((block) => block.kind === 'table').flatMap((block) => block.rows)).toEqual([
+      ['Forged Plate', 'Dragon Stone\nGreen Aura Stone', 'Same Item'],
+    ]);
+
+    const affixResult = filterGuidePageTables(samplePage, {
+      searchText: '',
+      selectedSections: [],
+      favoriteSections: [],
+      showFavoritesOnly: false,
+      maxReqLevel: null,
+      selectedMarkers: ['affix'],
+    });
+
+    expect(affixResult.visibleRowCount).toBe(4);
+    expect(affixResult.page.blocks.filter((block) => block.kind === 'table').flatMap((block) => block.rows)).toEqual([
+      ['Zuez Padding Quilted Armor (qui)\nGamble Item: Quilted Armor (qui)', 'Item Level: 9 Required Level: 7', 'Cold Resist +5%'],
+      ['Mage Plate Mage Plate (xtp)', 'Item Level: 45 Required Level: 30', '+100 Defense'],
+      ['Cap of the Raven Cap (cap)', 'Item Level: 4 Required Level: 4', '+1 to Summoning Skills (Druid Only)'],
+      ['Vessel of Souls\n2x Heart\nBrain\nTail\nQuill', 'Same Item\n+5% Chance to Cast Level 15 Thrown Axe on Striking'],
+    ]);
   });
 });

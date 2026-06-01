@@ -2,6 +2,7 @@ import type { GuideContentBlock, GuidePage, GuideTableBlock } from '@/core/db';
 import { buildLocalizedSearchText } from '@/core/i18n';
 import { translateGuideText } from '@/core/i18n/guideTranslation';
 import { parseSearchTerms } from '@/features/runewords/utils/filteringHelpers';
+import { getGuideCellLineClassification, isGuideRowMarkerKind, type GuideRowMarkerKind } from './guideCellClassification';
 
 export const NO_SECTION_SELECTED = '__none__';
 
@@ -11,6 +12,7 @@ export interface GuideTableFilterState {
   readonly favoriteSections: readonly string[];
   readonly showFavoritesOnly: boolean;
   readonly maxReqLevel: number | null;
+  readonly selectedMarkers?: readonly GuideRowMarkerKind[];
 }
 
 export interface GuideTableSection {
@@ -32,10 +34,15 @@ export const DEFAULT_GUIDE_TABLE_FILTERS: GuideTableFilterState = {
   favoriteSections: [],
   showFavoritesOnly: false,
   maxReqLevel: null,
+  selectedMarkers: [],
 };
 
 function isStringArray(value: unknown): value is readonly string[] {
   return Array.isArray(value) && value.every((entry) => typeof entry === 'string');
+}
+
+function isGuideRowMarkerArray(value: unknown): value is readonly GuideRowMarkerKind[] {
+  return Array.isArray(value) && value.every(isGuideRowMarkerKind);
 }
 
 export function isGuideTableFilterState(value: unknown): value is GuideTableFilterState {
@@ -47,7 +54,8 @@ export function isGuideTableFilterState(value: unknown): value is GuideTableFilt
     isStringArray(candidate.selectedSections) &&
     isStringArray(candidate.favoriteSections) &&
     typeof candidate.showFavoritesOnly === 'boolean' &&
-    (candidate.maxReqLevel === null || typeof candidate.maxReqLevel === 'number')
+    (candidate.maxReqLevel === null || typeof candidate.maxReqLevel === 'number') &&
+    (candidate.selectedMarkers === undefined || isGuideRowMarkerArray(candidate.selectedMarkers))
   );
 }
 
@@ -154,6 +162,38 @@ function rowMatchesRequiredLevel(row: readonly string[], headers: readonly strin
   return requiredLevel === null || requiredLevel <= maxReqLevel;
 }
 
+function getTranslatedRowLines(row: readonly string[]): readonly string[] {
+  return row.flatMap((cell) =>
+    cell
+      .split(/\n+/u)
+      .map((line) => translateGuideText(line.trim()))
+      .filter((line) => line.length > 0)
+  );
+}
+
+function getGuideRowMarkers(row: readonly string[]): ReadonlySet<GuideRowMarkerKind> {
+  const markers = new Set<GuideRowMarkerKind>();
+
+  for (const line of getTranslatedRowLines(row)) {
+    const classification = getGuideCellLineClassification(line);
+    if (classification.kind === 'affix') {
+      markers.add('affix');
+      continue;
+    }
+    if (classification.kind === 'material') {
+      markers.add(classification.materialKind);
+    }
+  }
+
+  return markers;
+}
+
+function rowMatchesMarkers(row: readonly string[], selectedMarkers: readonly GuideRowMarkerKind[] | undefined): boolean {
+  if (!selectedMarkers || selectedMarkers.length === 0) return true;
+  const rowMarkers = getGuideRowMarkers(row);
+  return selectedMarkers.some((marker) => rowMarkers.has(marker));
+}
+
 function shouldKeepSection(sectionKey: string, filters: GuideTableFilterState): boolean {
   if (!isSectionSelected(sectionKey, filters.selectedSections)) return false;
   if (filters.showFavoritesOnly && !filters.favoriteSections.includes(sectionKey)) return false;
@@ -161,7 +201,13 @@ function shouldKeepSection(sectionKey: string, filters: GuideTableFilterState): 
 }
 
 function hasActiveFilters(filters: GuideTableFilterState, searchTerms: readonly string[]): boolean {
-  return searchTerms.length > 0 || filters.selectedSections.length > 0 || filters.showFavoritesOnly || filters.maxReqLevel !== null;
+  return (
+    searchTerms.length > 0 ||
+    filters.selectedSections.length > 0 ||
+    filters.showFavoritesOnly ||
+    filters.maxReqLevel !== null ||
+    (filters.selectedMarkers?.length ?? 0) > 0
+  );
 }
 
 export function filterGuidePageTables(page: GuidePage, filters: GuideTableFilterState): FilteredGuidePageTables {
@@ -190,7 +236,8 @@ export function filterGuidePageTables(page: GuidePage, filters: GuideTableFilter
     const rows = normalizedBlock.rows.filter(
       (row) =>
         rowMatchesSearch(row, normalizedBlock, sectionKey, searchTerms) &&
-        rowMatchesRequiredLevel(row, normalizedBlock.headers, filters.maxReqLevel)
+        rowMatchesRequiredLevel(row, normalizedBlock.headers, filters.maxReqLevel) &&
+        rowMatchesMarkers(row, filters.selectedMarkers)
     );
     visibleRowCount += rows.length;
 
