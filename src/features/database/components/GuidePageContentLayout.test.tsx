@@ -28,6 +28,13 @@ const pageWithHeadings: GuidePage = {
   blocks: [{ id: 'section', kind: 'heading', level: 2, text: 'Section' }, ...pageWithoutHeadings.blocks],
 };
 
+const communityPage: GuidePage = {
+  ...pageWithoutHeadings,
+  group: 'community',
+  label: 'DPDNS Cube Formula',
+  title: '盒子公式（DPDNS）',
+};
+
 const pageWithTableSectionRows: GuidePage = {
   ...pageWithoutHeadings,
   blocks: [
@@ -77,6 +84,17 @@ const pageWithTableNotes: GuidePage = {
   ],
 };
 
+const pageWithManyTables: GuidePage = {
+  ...pageWithoutHeadings,
+  blocks: Array.from({ length: 10 }, (_, index) => ({
+    id: `table-${String(index + 1)}`,
+    kind: 'table',
+    caption: `Extra Table ${String(index + 1)}`,
+    headers: ['Input', 'Output'],
+    rows: [[`Input ${String(index + 1)}`, `Output ${String(index + 1)}`]],
+  })),
+};
+
 describe('GuidePageContent layout', () => {
   it('does not reserve the table-of-contents column when the page has no headings', () => {
     const html = renderToStaticMarkup(<GuidePageContent page={pageWithoutHeadings} />);
@@ -88,6 +106,13 @@ describe('GuidePageContent layout', () => {
     const html = renderToStaticMarkup(<GuidePageContent page={pageWithHeadings} />);
 
     expect(html).toContain('xl:grid-cols-[minmax(0,1fr)_14rem]');
+  });
+
+  it('labels DPDNS guide pages as off-site material in the content header', () => {
+    const html = renderToStaticMarkup(<GuidePageContent page={communityPage} />);
+
+    expect(html).toContain('站外资料');
+    expect(html).not.toContain('机制说明');
   });
 
   it('renders single-value recipe section rows across the full table width', () => {
@@ -110,5 +135,16 @@ describe('GuidePageContent layout', () => {
 
     expect(html).toContain('First source line second source line');
     expect(html).not.toContain('First source line</p><p');
+  });
+
+  it('renders long guide pages progressively by table count', () => {
+    const html = renderToStaticMarkup(<GuidePageContent page={pageWithManyTables} />);
+
+    expect(html).toContain('10 张表格');
+    expect(html).toContain('Extra Table 1');
+    expect(html).toContain('Extra Table 8');
+    expect(html).not.toContain('Extra Table 9');
+    expect(html).toContain('已显示 8 / 10 张表格');
+    expect(html).toContain('显示更多表格');
   });
 });

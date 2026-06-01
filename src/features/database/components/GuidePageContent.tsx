@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ExternalLink } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -9,6 +9,8 @@ import { getGuidePageBlockSummary, getGuidePageHeadings } from '../utils/guidePa
 
 const INITIAL_GUIDE_TABLE_RENDER_COUNT = 80;
 const GUIDE_TABLE_RENDER_INCREMENT = 160;
+const INITIAL_GUIDE_TABLE_BLOCK_RENDER_COUNT = 8;
+const GUIDE_TABLE_BLOCK_RENDER_INCREMENT = 8;
 
 interface GuidePageContentProps {
   readonly page: GuidePage;
@@ -61,6 +63,38 @@ function renderTableSectionCell(text: string): React.ReactNode {
 
 function isFullWidthSectionRow(row: readonly string[]): boolean {
   return row.length > 1 && Boolean(row[0]?.trim()) && row.slice(1).every((cell) => cell.trim().length === 0);
+}
+
+function countGuideTables(blocks: readonly GuideContentBlock[]): number {
+  return blocks.filter((block) => block.kind === 'table').length;
+}
+
+function getVisibleGuideBlocks(
+  blocks: readonly GuideContentBlock[],
+  tableLimit: number
+): {
+  readonly visibleBlocks: readonly GuideContentBlock[];
+  readonly renderedTableCount: number;
+  readonly totalTableCount: number;
+} {
+  const totalTableCount = countGuideTables(blocks);
+  if (totalTableCount <= tableLimit) {
+    return { visibleBlocks: blocks, renderedTableCount: totalTableCount, totalTableCount };
+  }
+
+  const visibleBlocks: GuideContentBlock[] = [];
+  let renderedTableCount = 0;
+
+  for (const block of blocks) {
+    if (block.kind === 'table') {
+      if (renderedTableCount >= tableLimit) break;
+      renderedTableCount += 1;
+    }
+
+    visibleBlocks.push(block);
+  }
+
+  return { visibleBlocks, renderedTableCount, totalTableCount };
 }
 
 function GuideTable({ block }: { readonly block: GuideTableBlock }) {
@@ -171,9 +205,37 @@ function GuideBlock({ block, sourceUrl }: { readonly block: GuideContentBlock; r
 }
 
 export function GuidePageContent({ page }: GuidePageContentProps) {
-  const groupLabel = page.group === 'base' ? '基础资料' : '机制说明';
-  const headings = getGuidePageHeadings(page);
+  const groupLabel = page.group === 'base' ? '基础资料' : page.group === 'features' ? '机制说明' : '站外资料';
+  const loadMoreTablesRef = useRef<HTMLDivElement | null>(null);
+  const [visibleTableLimit, setVisibleTableLimit] = useState(INITIAL_GUIDE_TABLE_BLOCK_RENDER_COUNT);
+  const { visibleBlocks, renderedTableCount, totalTableCount } = getVisibleGuideBlocks(page.blocks, visibleTableLimit);
+  const visiblePage = { ...page, blocks: visibleBlocks };
+  const headings = getGuidePageHeadings(visiblePage);
   const summary = getGuidePageBlockSummary(page);
+  const hasMoreTables = renderedTableCount < totalTableCount;
+
+  useEffect(() => {
+    if (!hasMoreTables) return;
+    if (typeof IntersectionObserver === 'undefined') return;
+
+    const target = loadMoreTablesRef.current;
+    if (!target) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          setVisibleTableLimit((current) => current + GUIDE_TABLE_BLOCK_RENDER_INCREMENT);
+        }
+      },
+      { rootMargin: '600px 0px' }
+    );
+
+    observer.observe(target);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [hasMoreTables]);
 
   return (
     <article className="space-y-5">
@@ -201,9 +263,26 @@ export function GuidePageContent({ page }: GuidePageContentProps) {
 
       <div className={headings.length > 0 ? 'grid gap-6 xl:grid-cols-[minmax(0,1fr)_14rem]' : 'grid gap-6'}>
         <div className="min-w-0 space-y-5">
-          {page.blocks.map((block) => (
+          {visibleBlocks.map((block) => (
             <GuideBlock key={block.id} block={block} sourceUrl={page.sourceUrl} />
           ))}
+          {hasMoreTables && (
+            <div ref={loadMoreTablesRef} className="flex flex-wrap items-center justify-between gap-3 rounded-md border bg-muted/20 p-3">
+              <span className="text-sm text-muted-foreground">
+                已显示 {renderedTableCount} / {totalTableCount} 张表格
+              </span>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setVisibleTableLimit((current) => current + GUIDE_TABLE_BLOCK_RENDER_INCREMENT);
+                }}
+              >
+                显示更多表格
+              </Button>
+            </div>
+          )}
         </div>
 
         {headings.length > 0 && (
