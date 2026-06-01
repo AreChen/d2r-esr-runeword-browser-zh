@@ -98,6 +98,19 @@ const pageWithMultipleTableNotes: GuidePage = {
   ],
 };
 
+const pageWithHighlightedCellLines: GuidePage = {
+  ...pageWithoutHeadings,
+  blocks: [
+    {
+      id: 'recipe-table',
+      kind: 'table',
+      caption: 'Corruption Outcomes',
+      headers: ['Input', 'Output'],
+      rows: [['Worldstone Shard\nAncient Decipherer', '+(150 to 200)% Enhanced Damage\n+1 to All Skills']],
+    },
+  ],
+};
+
 const pageWithManyTables: GuidePage = {
   ...pageWithoutHeadings,
   blocks: Array.from({ length: 10 }, (_, index) => ({
@@ -156,6 +169,16 @@ describe('GuidePageContent layout', () => {
 
     expect(html).toContain('First source line second source line Third source line');
     expect(html).not.toContain('second source line</p><p');
+  });
+
+  it('adds semantic color markers to material requirements and affix lines', () => {
+    const html = renderToStaticMarkup(<GuidePageContent page={pageWithHighlightedCellLines} />);
+
+    expect(html).toContain('data-guide-line-kind="material"');
+    expect(html).toContain('data-guide-line-kind="affix"');
+    expect(html).toContain('世界石碎片');
+    expect(html).toContain('+(150 to 200)% 增强伤害');
+    expect(html).toContain('+1 所有技能等级');
   });
 
   it('renders long guide pages progressively by table count', () => {

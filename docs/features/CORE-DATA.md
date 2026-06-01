@@ -155,6 +155,8 @@ Tables: `gems`, `esrRunes`, `lodRunes`, `kanjiRunes`, `crystals`, `runewords`, `
 
 See [DATA-MODELS.md](../technical/DATA-MODELS.md) for the full schema.
 
+Guide page table rendering keeps the parsed text intact for search/filtering, then applies display-only color cues to recognizable material requirements and affix/stat lines in table cells.
+
 ## Data Models
 
 All socketable items share a common bonus structure with three categories:

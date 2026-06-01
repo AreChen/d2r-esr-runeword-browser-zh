@@ -65,7 +65,7 @@ The app uses a single HTM-based data system. Core item data is fetched from the 
 | Mythical Uniques | `/mythicals` | Mythical unique items with special properties and notes |
 | Ascendancies | `/ascendancies` | Ascendancy tiers, bonuses, and footnotes |
 | Loot Filter Editor | `/loot-filter` | Local Lua filter import, Chinese editing UI, style preview, audio filename editing, and Lua export |
-| Guide Database | `/database` | Base information, DPDNS-completed native pages, and supplemental guide data rendered in a searchable Chinese app UI |
+| Guide Database | `/database` | Base information, DPDNS-completed native pages, and supplemental guide data rendered in a searchable Chinese app UI with material/affix color cues |
 
 ---
 

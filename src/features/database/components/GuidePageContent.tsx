@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { ESR_BASE_URL } from '@/core/api';
 import type { GuideContentBlock, GuidePage, GuideTableBlock } from '@/core/db';
 import { translateGuideText } from '@/core/i18n/guideTranslation';
+import { cn } from '@/lib/utils';
 import { getGuidePageBlockSummary, getGuidePageHeadings } from '../utils/guidePageSummary';
 
 const INITIAL_GUIDE_TABLE_RENDER_COUNT = 80;
@@ -15,6 +16,29 @@ const GUIDE_TABLE_BLOCK_RENDER_INCREMENT = 8;
 interface GuidePageContentProps {
   readonly page: GuidePage;
 }
+
+type GuideCellLineKind = 'plain' | 'material' | 'affix';
+
+const GUIDE_CELL_LINE_CLASSES: Record<Exclude<GuideCellLineKind, 'plain'>, string> = {
+  material: 'inline rounded-sm border border-amber-400/30 bg-amber-500/10 px-1 py-0.5 font-medium text-amber-800 dark:text-amber-300',
+  affix: 'inline rounded-sm border border-sky-400/25 bg-sky-500/10 px-1 py-0.5 font-medium text-sky-700 dark:text-sky-300',
+};
+
+const MATERIAL_LINE_PATTERNS = [
+  /\b(?:Worldstone Shards?|Ancient Decipherers?|Dragon Stones?|Maple Leaves?|Perfect Gems?|Flawless Gems?)\b/iu,
+  /\b(?:Ancient Coupons?|Diablo's Demonic Horn|Baal's Demonic Eye|Mephisto's Demonic Brain|Viper Amulet)\b/iu,
+  /\b(?:Heart|Brain|Eye|Horn|Soul|Token|Elixir|Steak)\b/iu,
+  /\b[A-Z][a-z]+ Rune\b/u,
+  /(?:世界石碎片|古代解读器|古代解密者|古代优惠券|龙石|枫叶|完美宝石|无瑕宝石|碎裂宝石|裂开的宝石)/u,
+  /(?:符文|恶魔之角|恶魔之眼|恶魔大脑|蛇护符|心脏|大脑|眼球|灵魂|灵药|牛排)/u,
+] as const;
+
+const AFFIX_LINE_PATTERNS = [
+  /^[+-](?:\(|\d)/u,
+  /\b(?:Enhanced Damage|All Skills|Skill Levels?|Resist|Resistance|Defense|Damage|Chance to Cast|Attack Rating)\b/iu,
+  /\b(?:Life|Mana|Faster|Speed|Leech|Sockets?|Corrupted|Anointed|Forging|Crushing Blow|Deadly Strike)\b/iu,
+  /(?:增强伤害|所有技能|技能等级|抗性|防御|伤害|几率|攻击准确率|生命|法力|速度|吸取|镶孔|腐化|涂油|锻造)/u,
+] as const;
 
 function resolveImageUrl(src: string, sourceUrl: string): string {
   if (/^https?:\/\//i.test(src)) return src;
@@ -32,13 +56,30 @@ function getTranslatedLines(text: string): string[] {
     .filter((line) => line.length > 0);
 }
 
+function getGuideCellLineKind(line: string): GuideCellLineKind {
+  if (AFFIX_LINE_PATTERNS.some((pattern) => pattern.test(line))) return 'affix';
+  if (MATERIAL_LINE_PATTERNS.some((pattern) => pattern.test(line))) return 'material';
+  return 'plain';
+}
+
+function renderGuideCellLine(line: string): React.ReactNode {
+  const kind = getGuideCellLineKind(line);
+  if (kind === 'plain') return line;
+
+  return (
+    <span data-guide-line-kind={kind} className={cn(GUIDE_CELL_LINE_CLASSES[kind])}>
+      {line}
+    </span>
+  );
+}
+
 function renderMultilineCell(text: string): React.ReactNode {
   const lines = getTranslatedLines(text);
-  if (lines.length <= 1) return lines[0] ?? '';
+  if (lines.length <= 1) return renderGuideCellLine(lines[0] ?? '');
   return (
     <div className="space-y-1">
       {lines.map((line, index) => (
-        <p key={`${line}-${String(index)}`}>{line}</p>
+        <p key={`${line}-${String(index)}`}>{renderGuideCellLine(line)}</p>
       ))}
     </div>
   );
