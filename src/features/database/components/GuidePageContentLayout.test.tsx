@@ -108,7 +108,7 @@ const pageWithHighlightedCellLines: GuidePage = {
       headers: ['Input', 'Output'],
       rows: [
         [
-          "El Rune\nPerfect Ruby\nWorldstone Shard\nDiablo's Demonic Horn\nDragon Stone\nElixir\nAncient Decipherer",
+          "El Rune\nPerfect Ruby\nWorldstone Shard\nDiablo's Demonic Horn\nDragon Stone\nGreen Aura Stone\n黑色光环石\nSocket Donut\nRandomize Stone\nOre Shard\nUnique Stone\n碎裂甜酸石\nElixir\nAncient Decipherer",
           '+(150 to 200)% Enhanced Damage\n+1 to All Skills',
         ],
       ],
@@ -190,6 +190,13 @@ describe('GuidePageContent layout', () => {
     expect(html).toContain('data-guide-material-kind="consumable"');
     expect(html).toContain('data-guide-material-kind="currency"');
     expect(html).toContain('世界石碎片');
+    expect(html).toMatch(/data-guide-material-kind="cube"[^>]*>绿色光环石<\/span>/u);
+    expect(html).toMatch(/data-guide-material-kind="cube"[^>]*>黑色光环石<\/span>/u);
+    expect(html).toMatch(/data-guide-material-kind="cube"[^>]*>镶孔甜甜圈<\/span>/u);
+    expect(html).toMatch(/data-guide-material-kind="cube"[^>]*>随机化之石<\/span>/u);
+    expect(html).toMatch(/data-guide-material-kind="cube"[^>]*>矿石碎片<\/span>/u);
+    expect(html).toMatch(/data-guide-material-kind="cube"[^>]*>暗金石头<\/span>/u);
+    expect(html).toMatch(/data-guide-material-kind="gem"[^>]*>碎裂甜酸石<\/span>/u);
     expect(html).toContain('+(150 to 200)% 增强伤害');
     expect(html).toContain('+1 所有技能等级');
   });

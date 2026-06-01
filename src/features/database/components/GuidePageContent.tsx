@@ -58,11 +58,15 @@ const MATERIAL_KIND_PATTERNS: readonly { readonly kind: GuideMaterialLineKind; r
     patterns: [
       /\b(?:Chipped|Flawed|Blemished|Flawless|Perfect)?\s*(?:Gem|Ruby|Sapphire|Emerald|Topaz|Diamond|Amethyst|Skull|Obsidian)s?\b/iu,
       /(?:宝石|珠宝|红宝石|蓝宝石|绿宝石|黄玉|钻石|紫水晶|头骨|黑曜石)/u,
+      /(?:碎裂|裂开|瑕疵|无瑕|完美|缺陷|破裂)(?:的)?[\u4e00-\u9fff]{1,12}(?:石|石英|橄榄石|电气石|黄玉|钻石|水晶|头骨|黑曜石|琥珀|绿松石|锆石|翡翠|宝石)/u,
     ],
   },
   {
     kind: 'cube',
-    patterns: [/\b(?:Dragon Stones?|Maple Leaves?)\b/iu, /(?:龙石|枫叶|铁砧之石)/u],
+    patterns: [
+      /\b(?:Dragon Stones?|Maple Leaves?|Anvil Stones?|Anvils?|Aura Stones?|Socket Donuts?|D-Stones?|Randomiz(?:e|ing) Stones?|Ore Shards?|Tyranium Ores?|Unique Stones?)\b/iu,
+      /(?:龙石|枫叶|铁砧(?:之石|石)?|锻造石|光环石|(?:镶孔)?甜甜圈|随机化?石|随机化之石|矿石碎片|钛金矿石|独特的?石头|暗金石头)/u,
+    ],
   },
   {
     kind: 'consumable',
@@ -109,9 +113,9 @@ function getGuideMaterialLineKind(line: string): GuideMaterialLineKind | null {
 }
 
 function getGuideCellLineClassification(line: string): GuideCellLineClassification {
-  if (AFFIX_LINE_PATTERNS.some((pattern) => pattern.test(line))) return { kind: 'affix' };
   const materialKind = getGuideMaterialLineKind(line);
   if (materialKind !== null) return { kind: 'material', materialKind };
+  if (AFFIX_LINE_PATTERNS.some((pattern) => pattern.test(line))) return { kind: 'affix' };
   return { kind: 'plain' };
 }
 
