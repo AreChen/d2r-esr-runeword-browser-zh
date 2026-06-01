@@ -160,6 +160,7 @@ describe('GuidePageContent layout', () => {
   it('renders table notes as compact prose instead of one paragraph per source line', () => {
     const html = renderToStaticMarkup(<GuidePageContent page={pageWithTableNotes} />);
 
+    expect(html).toContain('说明：');
     expect(html).toContain('First source line second source line');
     expect(html).not.toContain('First source line</p><p');
   });

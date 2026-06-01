@@ -488,6 +488,22 @@ describe('guide page parser', () => {
     expect(jewelsTable.rows[0]?.[1]).toContain('魔法珠宝');
   }, 20000);
 
+  it('compacts standalone DPDNS cube explanation tables into readable paragraphs', () => {
+    const entry = GUIDE_PAGE_CATALOG.find((page) => page.id === 'cubeRecipes');
+    expect(entry).toBeDefined();
+    if (!entry) return;
+
+    const page = parseGuidePage(readGuideFixture(entry), entry);
+    const paragraphs = page.blocks.filter((block) => block.kind === 'paragraph').map((block) => block.text);
+
+    expect(paragraphs).toContain(
+      '大多数需要重新投入的配方，若输入物品带有锻造效果，则无法使用。 若发现配方无法使用，请检查输入物品是否带有锻造效果。'
+    );
+    expect(paragraphs).toContain('“胸甲”指身体护甲。“护甲”指所有种类的护甲。');
+    expect(paragraphs).not.toContain('大多数需要重新投入的配方，若输入物品带有锻造效果，则无法使用。');
+    expect(paragraphs).not.toContain('若发现配方无法使用，请检查输入物品是否带有锻造效果。');
+  }, 20000);
+
   it('parses d2r.dpdns.org guide fixtures as searchable guide pages', () => {
     const cubeEntry = GUIDE_PAGE_CATALOG.find((page) => page.id === 'cubeRecipes');
     const amazonEntry = GUIDE_PAGE_CATALOG.find((page) => page.id === 'd2rAmazonGuide');

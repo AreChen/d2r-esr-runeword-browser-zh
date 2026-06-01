@@ -100,6 +100,19 @@ function parseTableCell(cell: Element): string {
   return cleanHtmlLines(cell.innerHTML).join('\n');
 }
 
+function getCompactFallbackTableParagraphs(table: Element): readonly string[] {
+  if (table.querySelector('table')) return [];
+
+  return getDirectTableRows(table)
+    .map((row) =>
+      getDirectRowCells(row)
+        .flatMap((cell) => cleanHtmlLines(cell.innerHTML))
+        .join(' ')
+    )
+    .map(cleanText)
+    .filter((paragraph) => paragraph.length > 0 && !isSiteChromeText(paragraph));
+}
+
 function getDirectTableRows(table: Element): Element[] {
   return Array.from(table.querySelectorAll('tr')).filter((row) => row.closest('table') === table);
 }
@@ -439,6 +452,17 @@ export function parseGuidePage(html: string, entry: GuidePageCatalogEntry): Guid
       const table = parseTable(node, nextId('table'), entry.id, entry.parserProfile);
       if (table) {
         blocks.push(table);
+      } else if (entry.parserProfile === 'dpdns') {
+        const paragraphs = getCompactFallbackTableParagraphs(node);
+        if (paragraphs.length > 0) {
+          for (const paragraph of paragraphs) {
+            pushParagraph(paragraph);
+          }
+        } else {
+          for (const child of Array.from(node.childNodes)) {
+            visit(child);
+          }
+        }
       } else {
         for (const child of Array.from(node.childNodes)) {
           visit(child);

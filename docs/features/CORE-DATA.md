@@ -7,6 +7,7 @@ The core data feature handles fetching HTML sources, parsing game data, and stor
 ## Data Sources
 
 Core item data is fetched from the ESR documentation site. Guide pages can either use the official ESR source or DPDNS as the canonical source when the DPDNS page is more complete for the native app page; those DPDNS-backed entries keep the native app page IDs instead of becoming duplicate off-site pages.
+DPDNS standalone explanation tables are compacted into readable guide paragraphs instead of preserving source `<br>` line breaks as separate loose paragraphs.
 
 | Data | URL |
 |------|-----|

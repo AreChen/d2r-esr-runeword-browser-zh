@@ -156,7 +156,9 @@ function GuideTable({ block }: { readonly block: GuideTableBlock }) {
       {block.caption && <h3 className="text-base font-semibold text-amber-700 dark:text-amber-400">{translated(block.caption)}</h3>}
       {compactNotes && (
         <div className="rounded-md border bg-muted/30 px-3 py-2 text-sm leading-6 text-muted-foreground">
-          <p>{compactNotes}</p>
+          <p>
+            <span className="font-medium text-foreground">说明：</span> {compactNotes}
+          </p>
         </div>
       )}
       <div className="overflow-x-auto rounded-md border">
