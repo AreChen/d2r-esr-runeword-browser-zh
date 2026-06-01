@@ -84,6 +84,20 @@ const pageWithTableNotes: GuidePage = {
   ],
 };
 
+const pageWithMultipleTableNotes: GuidePage = {
+  ...pageWithoutHeadings,
+  blocks: [
+    {
+      id: 'recipe-table',
+      kind: 'table',
+      caption: 'Unique Items',
+      notes: ['First source line\nsecond source line', 'Third source line'],
+      headers: ['Input', 'Output'],
+      rows: [['3 Magic Rings', 'Magic Ring']],
+    },
+  ],
+};
+
 const pageWithManyTables: GuidePage = {
   ...pageWithoutHeadings,
   blocks: Array.from({ length: 10 }, (_, index) => ({
@@ -135,6 +149,13 @@ describe('GuidePageContent layout', () => {
 
     expect(html).toContain('First source line second source line');
     expect(html).not.toContain('First source line</p><p');
+  });
+
+  it('renders multiple table notes as one compact explanation above the table', () => {
+    const html = renderToStaticMarkup(<GuidePageContent page={pageWithMultipleTableNotes} />);
+
+    expect(html).toContain('First source line second source line Third source line');
+    expect(html).not.toContain('second source line</p><p');
   });
 
   it('renders long guide pages progressively by table count', () => {

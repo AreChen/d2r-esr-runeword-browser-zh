@@ -11,6 +11,12 @@ function readGuideFixture(entry: GuidePageCatalogEntry): string {
   return readFileSync(resolve(fixtureDir, entry.fixturePath ?? entry.sourcePath), 'utf-8');
 }
 
+function isInputOutputLikeRow(row: readonly string[]): boolean {
+  const input = row[0]?.trim() ?? '';
+  const output = row[1]?.trim() ?? '';
+  return /^(?:Input|输入|投入物)$/u.test(input) && /^(?:Output|输出|产物|可能结果)$/u.test(output);
+}
+
 const sampleEntry: GuidePageCatalogEntry = {
   id: 'sample',
   group: 'features',
@@ -396,6 +402,10 @@ describe('guide page parser', () => {
 
       expect(table.headers, caption).toEqual(['Input', 'Output']);
       expect(table.rows[0], caption).not.toEqual(['Input', 'Output']);
+      expect(
+        table.rows.some((row) => isInputOutputLikeRow(row)),
+        caption
+      ).toBe(false);
     }
   }, 20000);
 
@@ -418,6 +428,9 @@ describe('guide page parser', () => {
 
     expect(looseParagraphs).not.toContain('独特物品');
     expect(looseParagraphs).not.toContain('输入 输出');
+    expect(looseParagraphs).not.toContain('投入物 产物');
+    expect(looseParagraphs.some((paragraph) => paragraph.includes('套装武器/护甲同底材'))).toBe(false);
+    expect(looseParagraphs.some((paragraph) => paragraph.includes('暗金重置'))).toBe(false);
     expect(looseParagraphs.some((paragraph) => paragraph.includes('基础升级的独特物品无法重铸'))).toBe(false);
   }, 20000);
 

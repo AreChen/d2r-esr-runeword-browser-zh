@@ -264,7 +264,10 @@ function parseCubeRecipeTable(parsedRows: readonly ParsedTableRow[], id: string)
         }
         return [normalizeCubeRecipeRow(row, tableWidth)];
       });
-    const recipeRows = parsedRows.slice(inputOutputHeaderIndex + 1).map((row) => normalizeCubeRecipeRow(row, tableWidth));
+    const recipeRows = parsedRows
+      .slice(inputOutputHeaderIndex + 1)
+      .filter((row) => !isInputOutputHeaderRow(row.cells))
+      .map((row) => normalizeCubeRecipeRow(row, tableWidth));
 
     return {
       id,

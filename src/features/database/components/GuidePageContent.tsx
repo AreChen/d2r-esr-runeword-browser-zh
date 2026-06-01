@@ -48,6 +48,13 @@ function renderCompactNote(text: string): string {
   return getTranslatedLines(text).join(' ');
 }
 
+function renderCompactNotes(notes: readonly string[] | undefined): string {
+  return (notes ?? [])
+    .map(renderCompactNote)
+    .filter((note) => note.length > 0)
+    .join(' ');
+}
+
 function renderTableSectionCell(text: string): React.ReactNode {
   const [title = '', ...details] = getTranslatedLines(text);
   const detail = details.join(' ');
@@ -101,15 +108,14 @@ function GuideTable({ block }: { readonly block: GuideTableBlock }) {
   const [visibleRows, setVisibleRows] = useState(INITIAL_GUIDE_TABLE_RENDER_COUNT);
   const renderedRows = block.rows.slice(0, visibleRows);
   const hasMoreRows = renderedRows.length < block.rows.length;
+  const compactNotes = renderCompactNotes(block.notes);
 
   return (
     <section id={block.id} className="scroll-mt-20 space-y-2">
       {block.caption && <h3 className="text-base font-semibold text-amber-700 dark:text-amber-400">{translated(block.caption)}</h3>}
-      {block.notes && block.notes.length > 0 && (
-        <div className="space-y-1 text-sm leading-6 text-muted-foreground">
-          {block.notes.map((note, index) => (
-            <p key={`${block.id}-note-${String(index)}`}>{renderCompactNote(note)}</p>
-          ))}
+      {compactNotes && (
+        <div className="rounded-md border bg-muted/30 px-3 py-2 text-sm leading-6 text-muted-foreground">
+          <p>{compactNotes}</p>
         </div>
       )}
       <div className="overflow-x-auto rounded-md border">
