@@ -29,6 +29,7 @@ const GROUP_FILTERS: readonly { readonly value: GroupFilter; readonly label: str
   { value: 'all', label: '全部' },
   { value: 'base', label: '基础资料' },
   { value: 'features', label: '机制说明' },
+  { value: 'community', label: '站外资料' },
 ];
 
 interface DatabaseBrowserState {
@@ -44,7 +45,7 @@ const DEFAULT_DATABASE_BROWSER_STATE: DatabaseBrowserState = {
 };
 
 function isGroupFilter(value: unknown): value is GroupFilter {
-  return value === 'all' || value === 'base' || value === 'features';
+  return value === 'all' || value === 'base' || value === 'features' || value === 'community';
 }
 
 function isDatabaseBrowserState(value: unknown): value is DatabaseBrowserState {
@@ -70,7 +71,9 @@ function filterPages(pages: readonly GuidePage[], groupFilter: GroupFilter, sear
 }
 
 function getGroupName(group: GuidePageGroup): string {
-  return group === 'base' ? '基础资料' : '机制说明';
+  if (group === 'base') return '基础资料';
+  if (group === 'features') return '机制说明';
+  return '站外资料';
 }
 
 export function DatabaseScreen() {
@@ -98,7 +101,7 @@ export function DatabaseScreen() {
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold">资料库 ({pages.length})</h1>
-          <p className="mt-1 text-sm text-muted-foreground">官方基础资料与特色机制子页面的中文整理版。</p>
+          <p className="mt-1 text-sm text-muted-foreground">官方基础资料、特色机制与 DPDNS 攻略资料的中文整理版。</p>
         </div>
         <div className="flex flex-wrap gap-2">
           {GROUP_FILTERS.map((filter) => (

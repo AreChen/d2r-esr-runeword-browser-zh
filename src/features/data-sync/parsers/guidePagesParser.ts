@@ -1,5 +1,5 @@
 import type { GuideContentBlock, GuideImageBlock, GuidePage, GuideParagraphBlock, GuideTableBlock } from '@/core/db';
-import { getGuidePageSourceUrl, type GuidePageCatalogEntry } from '@/core/api/guidePageCatalog';
+import { getGuidePageEntrySourceUrl, type GuidePageCatalogEntry } from '@/core/api/guidePageCatalog';
 import { decodeHtmlEntities } from './shared/parserUtils';
 
 export interface GuidePageHtmlSource {
@@ -57,6 +57,11 @@ function cleanHtmlLines(html: string): string[] {
 function isSiteChromeText(text: string): boolean {
   if (!text) return true;
   if (SITE_NAV_TEXT.has(text)) return true;
+  if (text === '↑') return true;
+  if (text === '加入讨论') return true;
+  if (/^tab\d+$/iu.test(text)) return true;
+  if (/^游戏资料\d+(?:\.\d+)?$/u.test(text)) return true;
+  if (/^Copyright © document\.write\(new Date\(\)\.getFullYear\(\)\); All rights reserved/u.test(text)) return true;
   if (/^Eastern Sun Resurrected\s+\d+(?:\.\d+)?$/i.test(text)) return true;
   if (/^(?:\[[^\]]+\]\s*)+$/.test(text)) return true;
   return false;
@@ -66,6 +71,21 @@ function isNavigationAnchor(element: Element): boolean {
   if (element.tagName !== 'A') return false;
   const text = cleanText(element.textContent);
   return SITE_NAV_TEXT.has(text);
+}
+
+function isNavigationLinkBlock(element: Element): boolean {
+  if (element.querySelector('table,img,h1,h2,h3,h4,h5,h6')) return false;
+
+  const links = Array.from(element.querySelectorAll('a[href]'));
+  const buttons = Array.from(element.querySelectorAll('button[onclick]'));
+  const tabItems = Array.from(element.querySelectorAll('li[onclick^="myclick"]'));
+  if (links.length + buttons.length + tabItems.length < 2) return false;
+
+  const text = cleanText(element.textContent);
+  const linkText = cleanText([...links, ...buttons, ...tabItems].map((link) => link.textContent).join(' '));
+  if (!text || !linkText) return false;
+
+  return text.length < 220 && linkText.length >= text.length * 0.65;
 }
 
 function hasStructuredChild(element: Element): boolean {
@@ -83,6 +103,7 @@ function parseTableCell(cell: Element): string {
 interface ParsedTableRow {
   readonly cells: readonly string[];
   readonly isSingleColspanRow: boolean;
+  readonly hasHeaderCell: boolean;
 }
 
 function parseCellSpan(cell: Element): number {
@@ -152,6 +173,7 @@ function parseTableRow(row: Element, activeRowspans: number[]): ParsedTableRow {
   return {
     cells,
     isSingleColspanRow: cellElements.length === 1 && parseCellSpan(cellElements[0]) > 1,
+    hasHeaderCell: cellElements.some((cell) => cell.tagName === 'TH'),
   };
 }
 
@@ -163,7 +185,7 @@ function padRow(row: readonly string[], width: number): readonly string[] {
 function isInputOutputHeaderRow(row: readonly string[]): boolean {
   const input = row[0]?.trim() ?? '';
   const output = row[1]?.trim() ?? '';
-  return /^Input(?:\(s\))?$/iu.test(input) && /^Output(?:\(s\))?$/iu.test(output);
+  return /^(?:Input(?:\(s\))?|输入|投入物|输入项目)$/iu.test(input) && /^(?:Output(?:\(s\))?|输出|产物|可能结果)$/iu.test(output);
 }
 
 function looksLikeCubeRecipeNote(text: string): boolean {
@@ -258,7 +280,35 @@ function parseCubeRecipeTable(parsedRows: readonly ParsedTableRow[], id: string)
   };
 }
 
-function parseTable(table: Element, id: string, pageId: string): GuideTableBlock | null {
+function isDpdnsNoteOnlyTable(parsedRows: readonly ParsedTableRow[], rows: readonly (readonly string[])[], caption: string): boolean {
+  if (parsedRows.some((row) => row.hasHeaderCell)) return false;
+  if (rows.length > 4) return false;
+  if (caption.length <= 80 && !caption.includes('\n')) return false;
+
+  return rows
+    .flat()
+    .filter((cell) => cell.trim().length > 0)
+    .every((cell) => cell.length > 40 || /[。.!?]/u.test(cell));
+}
+
+function shouldUseSyntheticRecipeHeaders(parsedRows: readonly ParsedTableRow[], headerRowIndex: number, parserProfile?: string): boolean {
+  if (parserProfile !== 'dpdns') return false;
+  if (headerRowIndex < 0 || headerRowIndex >= parsedRows.length) return false;
+
+  const row = parsedRows[headerRowIndex];
+  if (row.hasHeaderCell || row.isSingleColspanRow) return false;
+  if (isInputOutputHeaderRow(row.cells)) return false;
+
+  const nonEmptyCells = row.cells.filter((cell) => cell.trim().length > 0);
+  return row.cells.length === 2 && nonEmptyCells.length === 2;
+}
+
+function parseTable(
+  table: Element,
+  id: string,
+  pageId: string,
+  parserProfile?: GuidePageCatalogEntry['parserProfile']
+): GuideTableBlock | null {
   if (table.querySelector('table')) return null;
 
   const rowElements = Array.from(table.querySelectorAll('tr'));
@@ -270,6 +320,7 @@ function parseTable(table: Element, id: string, pageId: string): GuideTableBlock
 
   if (rows.length < 2) return null;
   if (rows.every((row) => row.length <= 1)) return null;
+  if (parserProfile === 'dpdns' && isDpdnsNoteOnlyTable(parsedRows, rows, rows[0]?.[0] ?? '')) return null;
 
   if (pageId === 'cubeRecipes') {
     const cubeRecipeTable = parseCubeRecipeTable(parsedRows, id);
@@ -282,11 +333,21 @@ function parseTable(table: Element, id: string, pageId: string): GuideTableBlock
 
   if (parsedRows[0]?.isSingleColspanRow) {
     caption = rows[0]?.[0] ?? '';
-    headers = rows[1] ?? [];
-    tableRows = rows.slice(2);
+    if (shouldUseSyntheticRecipeHeaders(parsedRows, 1, parserProfile)) {
+      headers = ['Input', 'Output'];
+      tableRows = rows.slice(1);
+    } else {
+      headers = rows[1] ?? [];
+      tableRows = rows.slice(2);
+    }
   } else {
-    headers = rows[0] ?? [];
-    tableRows = rows.slice(1);
+    if (shouldUseSyntheticRecipeHeaders(parsedRows, 0, parserProfile)) {
+      headers = ['Input', 'Output'];
+      tableRows = rows;
+    } else {
+      headers = rows[0] ?? [];
+      tableRows = rows.slice(1);
+    }
   }
 
   if (headers.length === 0 && tableRows.length === 0) return null;
@@ -363,8 +424,10 @@ export function parseGuidePage(html: string, entry: GuidePageCatalogEntry): Guid
       return;
     }
 
+    if (entry.parserProfile === 'dpdns' && isNavigationLinkBlock(node)) return;
+
     if (node.tagName === 'TABLE') {
-      const table = parseTable(node, nextId('table'), entry.id);
+      const table = parseTable(node, nextId('table'), entry.id, entry.parserProfile);
       if (table) {
         blocks.push(table);
       } else {
@@ -411,7 +474,7 @@ export function parseGuidePage(html: string, entry: GuidePageCatalogEntry): Guid
     label: entry.label,
     title: entry.title,
     sourcePath: entry.sourcePath,
-    sourceUrl: getGuidePageSourceUrl(entry.sourcePath),
+    sourceUrl: getGuidePageEntrySourceUrl(entry),
     order: entry.order,
     blocks,
     textIndex: buildTextIndex(blocks),

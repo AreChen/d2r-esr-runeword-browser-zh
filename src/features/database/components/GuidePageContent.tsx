@@ -14,9 +14,9 @@ interface GuidePageContentProps {
   readonly page: GuidePage;
 }
 
-function resolveImageUrl(src: string): string {
+function resolveImageUrl(src: string, sourceUrl: string): string {
   if (/^https?:\/\//i.test(src)) return src;
-  return `${ESR_BASE_URL}/${src.replace(/^\.\//, '')}`;
+  return new URL(src, sourceUrl || `${ESR_BASE_URL}/`).href;
 }
 
 function translated(text: string): string {
@@ -127,7 +127,7 @@ function GuideTable({ block }: { readonly block: GuideTableBlock }) {
   );
 }
 
-function GuideBlock({ block }: { readonly block: GuideContentBlock }) {
+function GuideBlock({ block, sourceUrl }: { readonly block: GuideContentBlock; readonly sourceUrl: string }) {
   if (block.kind === 'heading') {
     return block.level === 2 ? (
       <h2 id={block.id} className="scroll-mt-20 text-xl font-semibold text-foreground">
@@ -147,7 +147,12 @@ function GuideBlock({ block }: { readonly block: GuideContentBlock }) {
   if (block.kind === 'image') {
     return (
       <figure className="flex justify-center">
-        <img src={resolveImageUrl(block.src)} alt={translated(block.alt)} className="max-h-96 rounded-md object-contain" loading="lazy" />
+        <img
+          src={resolveImageUrl(block.src, sourceUrl)}
+          alt={translated(block.alt)}
+          className="max-h-96 rounded-md object-contain"
+          loading="lazy"
+        />
       </figure>
     );
   }
@@ -187,7 +192,7 @@ export function GuidePageContent({ page }: GuidePageContentProps) {
       <div className={headings.length > 0 ? 'grid gap-6 xl:grid-cols-[minmax(0,1fr)_14rem]' : 'grid gap-6'}>
         <div className="min-w-0 space-y-5">
           {page.blocks.map((block) => (
-            <GuideBlock key={block.id} block={block} />
+            <GuideBlock key={block.id} block={block} sourceUrl={page.sourceUrl} />
           ))}
         </div>
 

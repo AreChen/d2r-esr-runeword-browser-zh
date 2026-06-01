@@ -7,6 +7,10 @@ import type { GuidePageCatalogEntry } from '@/features/database';
 const changelogHtml = readFileSync(resolve(__dirname, '../../../../test-fixtures/changelogs.html'), 'utf-8');
 const fixtureDir = resolve(__dirname, '../../../../test-fixtures');
 
+function readGuideFixture(entry: GuidePageCatalogEntry): string {
+  return readFileSync(resolve(fixtureDir, entry.fixturePath ?? entry.sourcePath), 'utf-8');
+}
+
 const sampleEntry: GuidePageCatalogEntry = {
   id: 'sample',
   group: 'features',
@@ -278,12 +282,12 @@ describe('guide page parser', () => {
   it('parses all official guide page fixtures into app-owned content blocks', () => {
     const sources = GUIDE_PAGE_CATALOG.map((entry) => ({
       entry,
-      html: readFileSync(resolve(fixtureDir, entry.sourcePath), 'utf-8'),
+      html: readGuideFixture(entry),
     }));
 
     const pages = parseGuidePages(sources);
 
-    expect(pages).toHaveLength(23);
+    expect(pages).toHaveLength(GUIDE_PAGE_CATALOG.length);
     for (const page of pages) {
       expect(page.blocks.length, page.id).toBeGreaterThan(0);
       expect(page.textIndex, page.id).not.toContain('Base Information');
@@ -299,7 +303,7 @@ describe('guide page parser', () => {
       expect(entry, id).toBeDefined();
       if (!entry) continue;
 
-      const page = parseGuidePage(readFileSync(resolve(fixtureDir, entry.sourcePath), 'utf-8'), entry);
+      const page = parseGuidePage(readGuideFixture(entry), entry);
       const tables = page.blocks.filter((block) => block.kind === 'table');
       const tableRows = tables.reduce((total, table) => total + table.rows.length, 0);
 
@@ -313,7 +317,7 @@ describe('guide page parser', () => {
     expect(entry).toBeDefined();
     if (!entry) return;
 
-    const page = parseGuidePage(readFileSync(resolve(fixtureDir, entry.sourcePath), 'utf-8'), entry);
+    const page = parseGuidePage(readGuideFixture(entry), entry);
     const tables = page.blocks.filter((block) => block.kind === 'table');
     const recipeCaptions = [
       'Special',
@@ -353,7 +357,7 @@ describe('guide page parser', () => {
     expect(entry).toBeDefined();
     if (!entry) return;
 
-    const page = parseGuidePage(readFileSync(resolve(fixtureDir, entry.sourcePath), 'utf-8'), entry);
+    const page = parseGuidePage(readGuideFixture(entry), entry);
     const tables = page.blocks.filter((block) => block.kind === 'table');
     const ringsTable = tables.find((block) => block.caption === 'Rings/Amulets');
     const jewelsTable = tables.find((block) => block.caption === 'Jewels');
@@ -373,5 +377,54 @@ describe('guide page parser', () => {
       'Magic Jewel\nPerfect Gem\n(You can use a Gem Can instead.\nThe selected Gem Points are used)',
       'Magic Jewel\n(ilvl = char level)',
     ]);
+  }, 20000);
+
+  it('parses d2r.dpdns.org guide fixtures as searchable guide pages', () => {
+    const cubeEntry = GUIDE_PAGE_CATALOG.find((page) => page.id === 'd2rCubeFormula');
+    const amazonEntry = GUIDE_PAGE_CATALOG.find((page) => page.id === 'd2rAmazonGuide');
+    const armorEntry = GUIDE_PAGE_CATALOG.find((page) => page.id === 'd2rArmors');
+    const quickGuideEntry = GUIDE_PAGE_CATALOG.find((page) => page.id === 'd2rQuickGuide');
+    expect(cubeEntry).toBeDefined();
+    expect(amazonEntry).toBeDefined();
+    expect(armorEntry).toBeDefined();
+    expect(quickGuideEntry).toBeDefined();
+    if (!cubeEntry || !amazonEntry || !armorEntry || !quickGuideEntry) return;
+
+    const cubePage = parseGuidePage(readGuideFixture(cubeEntry), cubeEntry);
+    const amazonPage = parseGuidePage(readGuideFixture(amazonEntry), amazonEntry);
+    const armorPage = parseGuidePage(readGuideFixture(armorEntry), armorEntry);
+    const quickGuidePage = parseGuidePage(readGuideFixture(quickGuideEntry), quickGuideEntry);
+    const cubeLeadingParagraphs = cubePage.blocks
+      .filter((block) => block.kind === 'paragraph')
+      .slice(0, 3)
+      .map((block) => block.text);
+
+    expect(cubePage.sourceUrl).toBe('https://d2r.dpdns.org/CubeFormula.html');
+    expect(cubePage.textIndex).toContain('盒子公式');
+    expect(cubeLeadingParagraphs).not.toContain('新手装备 手工装备 镶崁打孔 宝石/水晶 符文');
+    expect(cubePage.blocks.find((block) => block.kind === 'table' && block.caption.startsWith('大多数需要重新投入的配方'))).toBeUndefined();
+    expect(cubePage.blocks.filter((block) => block.kind === 'table').length).toBeGreaterThan(20);
+    expect(amazonPage.textIndex).toContain('亚马逊');
+    expect(amazonPage.textIndex).not.toContain('tab2');
+    expect(amazonPage.blocks.filter((block) => block.kind === 'heading').length).toBeGreaterThan(5);
+    expect(armorPage.textIndex).toContain('防具底材');
+    expect(armorPage.blocks.filter((block) => block.kind === 'table').length).toBeGreaterThan(10);
+    expect(quickGuidePage.textIndex).toContain('新手');
+    expect(quickGuidePage.blocks.filter((block) => block.kind === 'paragraph').length).toBeGreaterThan(10);
+  }, 20000);
+
+  it('keeps the first d2r formula row when the source table has no explicit header row', () => {
+    const entry = GUIDE_PAGE_CATALOG.find((page) => page.id === 'd2rVesselOfSouls');
+    expect(entry).toBeDefined();
+    if (!entry) return;
+
+    const page = parseGuidePage(readGuideFixture(entry), entry);
+    const tierOneTable = page.blocks.find((block) => block.kind === 'table' && block.caption.includes('等级 1'));
+
+    expect(tierOneTable).toBeDefined();
+    if (!tierOneTable || tierOneTable.kind !== 'table') return;
+    expect(tierOneTable.headers).toEqual(['Input', 'Output']);
+    expect(tierOneTable.rows[0]?.[0]).toContain('灵魂容器');
+    expect(tierOneTable.rows[0]?.[1]).toContain('相同物品');
   }, 20000);
 });

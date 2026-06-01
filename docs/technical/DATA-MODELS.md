@@ -174,16 +174,16 @@ Key-value store for app metadata.
 
 ### guidePages
 
-Stores app-owned renderable versions of the official Base Information and Features pages.
+Stores app-owned renderable versions of the official Base Information / Features pages and optional DPDNS guide pages.
 
 | Column | Type | Index | Description |
 |--------|------|-------|-------------|
 | id | string | Primary | Stable catalog id, e.g. `corruptions` |
-| group | `'base' \| 'features'` | Yes | Official navigation group |
+| group | `'base' \| 'features' \| 'community'` | Yes | Source/content group |
 | label | string | No | Original English navigation label |
 | title | string | Yes | Chinese page title |
-| sourcePath | string | No | Official source path |
-| sourceUrl | string | No | Full official source URL |
+| sourcePath | string | No | Source path relative to the configured source base URL |
+| sourceUrl | string | No | Full source URL |
 | order | number | Yes | Sort order from the catalog |
 | blocks | GuideContentBlock[] | No | Parsed headings, paragraphs, tables, and images |
 | textIndex | string | No | Search text assembled from all blocks |

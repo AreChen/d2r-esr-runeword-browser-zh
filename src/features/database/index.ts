@@ -2,6 +2,7 @@ export {
   GUIDE_PAGE_CATALOG,
   CORE_GUIDE_PAGE_IDS,
   getGuidePageEntry,
+  getGuidePageEntrySourceUrl,
   getGuidePageSourceUrl,
   type GuidePageCatalogEntry,
 } from '@/core/api/guidePageCatalog';

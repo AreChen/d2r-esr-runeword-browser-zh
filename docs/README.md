@@ -23,7 +23,7 @@ Project overview, design decisions, and general project information.
 - [Socketables](./features/SOCKETABLES.md) - Unified view of all socketables (gems, runes, crystals) with filters
 - [Unique Items](./features/UNIQUE-ITEMS.md) - Browse and filter unique items parsed from HTM pages
 - [Loot Filter Editor](./features/LOOT-FILTER.md) - Import, preview, adjust, and export D2RLAN Lua loot filter configs
-- Guide Database - Browse official Base Information and Features pages in the app-owned Chinese interface
+- Guide Database - Browse official Base Information, Features, and DPDNS guide pages in the app-owned Chinese interface
 
 ### Technical Documentation
 - [Tech Stack](./technical/TECH-STACK.md) - Libraries, frameworks, and tools
@@ -52,7 +52,7 @@ The app uses a single HTM-based data system. All data is fetched from the ESR do
 | Unique Others | `unique_others.htm` |
 | Mythical Uniques | `unique_mythicals.htm` |
 | Ascendancies | `ascendancies.htm` |
-| Guide Database | 23 official Base Information / Features pages from `changelogs.html` navigation |
+| Guide Database | Official Base Information / Features pages plus DPDNS formulas, materials, endgame pages, and class guides |
 | Version info | `changelogs.html` |
 
 ### Features
@@ -65,7 +65,7 @@ The app uses a single HTM-based data system. All data is fetched from the ESR do
 | Mythical Uniques | `/mythicals` | Mythical unique items with special properties and notes |
 | Ascendancies | `/ascendancies` | Ascendancy tiers, bonuses, and footnotes |
 | Loot Filter Editor | `/loot-filter` | Local Lua filter import, Chinese editing UI, style preview, audio filename editing, and Lua export |
-| Guide Database | `/database` | Official Base Information and Features pages rendered in a Chinese app UI |
+| Guide Database | `/database` | Official Base Information, Features, and DPDNS guide pages rendered in a searchable Chinese app UI |
 
 ---
 

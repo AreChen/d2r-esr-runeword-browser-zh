@@ -182,7 +182,7 @@ export interface Ascendancy {
 
 // Guide pages
 
-export type GuidePageGroup = 'base' | 'features';
+export type GuidePageGroup = 'base' | 'features' | 'community';
 
 export interface GuideHeadingBlock {
   readonly id: string;

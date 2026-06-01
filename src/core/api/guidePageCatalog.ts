@@ -1,4 +1,4 @@
-import { ESR_BASE_URL } from './remoteConfig';
+import { D2R_DPDNS_BASE_URL, ESR_BASE_URL } from './remoteConfig';
 import type { GuidePageGroup } from '@/core/db';
 
 export interface GuidePageCatalogEntry {
@@ -7,8 +7,19 @@ export interface GuidePageCatalogEntry {
   readonly label: string;
   readonly title: string;
   readonly sourcePath: string;
+  readonly sourceBaseUrl?: string;
+  readonly fixturePath?: string;
+  readonly optional?: boolean;
+  readonly parserProfile?: 'official' | 'dpdns';
   readonly order: number;
 }
+
+const D2R_DPDNS_GUIDE_DEFAULTS = {
+  group: 'community',
+  sourceBaseUrl: D2R_DPDNS_BASE_URL,
+  optional: true,
+  parserProfile: 'dpdns',
+} as const;
 
 export const GUIDE_PAGE_CATALOG = [
   { id: 'changelogs', group: 'base', label: 'Changelogs', title: '更新日志', sourcePath: 'changelogs.html', order: 0 },
@@ -69,6 +80,204 @@ export const GUIDE_PAGE_CATALOG = [
     order: 106,
   },
   { id: 'weaponMastery', group: 'features', label: 'Weapon Mastery', title: '武器精通机制', sourcePath: 'weapon_mastery.html', order: 107 },
+  {
+    ...D2R_DPDNS_GUIDE_DEFAULTS,
+    id: 'd2rCubeFormula',
+    label: 'DPDNS Cube Formula',
+    title: '盒子公式（DPDNS）',
+    sourcePath: 'CubeFormula.html',
+    fixturePath: 'd2r-dpdns/CubeFormula.html',
+    order: 200,
+  },
+  {
+    ...D2R_DPDNS_GUIDE_DEFAULTS,
+    id: 'd2rMaterials',
+    label: 'DPDNS Materials',
+    title: '材料资料（DPDNS）',
+    sourcePath: 'Materials.html',
+    fixturePath: 'd2r-dpdns/Materials.html',
+    order: 201,
+  },
+  {
+    ...D2R_DPDNS_GUIDE_DEFAULTS,
+    id: 'd2rAnointment',
+    label: 'DPDNS Anointment',
+    title: '装备祝福（DPDNS）',
+    sourcePath: 'Anointment.html',
+    fixturePath: 'd2r-dpdns/Anointment.html',
+    order: 202,
+  },
+  {
+    ...D2R_DPDNS_GUIDE_DEFAULTS,
+    id: 'd2rCorruption',
+    label: 'DPDNS Corruption',
+    title: '装备腐化（DPDNS）',
+    sourcePath: 'Corruption.html',
+    fixturePath: 'd2r-dpdns/Corruption.html',
+    order: 203,
+  },
+  {
+    ...D2R_DPDNS_GUIDE_DEFAULTS,
+    id: 'd2rEndMap',
+    label: 'DPDNS End Map',
+    title: '终局地图与 BOSS（DPDNS）',
+    sourcePath: 'EndMap.html',
+    fixturePath: 'd2r-dpdns/EndMap.html',
+    order: 204,
+  },
+  {
+    ...D2R_DPDNS_GUIDE_DEFAULTS,
+    id: 'd2rVesselOfSouls',
+    label: 'DPDNS Vessel of Souls',
+    title: '灵魂容器（DPDNS）',
+    sourcePath: 'Vessel_Of_Souls.html',
+    fixturePath: 'd2r-dpdns/Vessel_Of_Souls.html',
+    order: 205,
+  },
+  {
+    ...D2R_DPDNS_GUIDE_DEFAULTS,
+    id: 'd2rKillLedger',
+    label: 'DPDNS Kill Ledger',
+    title: '击杀记录（DPDNS）',
+    sourcePath: 'kill_ledger.html',
+    fixturePath: 'd2r-dpdns/kill_ledger.html',
+    order: 206,
+  },
+  {
+    ...D2R_DPDNS_GUIDE_DEFAULTS,
+    id: 'd2rAscendancies',
+    label: 'DPDNS Ascendancies',
+    title: '职业升华（DPDNS）',
+    sourcePath: 'Ascendancies.html',
+    fixturePath: 'd2r-dpdns/Ascendancies.html',
+    order: 207,
+  },
+  {
+    ...D2R_DPDNS_GUIDE_DEFAULTS,
+    id: 'd2rMythicals',
+    label: 'DPDNS Mythicals',
+    title: '神话装备（DPDNS）',
+    sourcePath: 'Mythicals.html',
+    fixturePath: 'd2r-dpdns/Mythicals.html',
+    order: 208,
+  },
+  {
+    ...D2R_DPDNS_GUIDE_DEFAULTS,
+    id: 'd2rWeapons',
+    label: 'DPDNS Weapon Bases',
+    title: '武器底材（DPDNS）',
+    sourcePath: 'Weapons.html',
+    fixturePath: 'd2r-dpdns/Weapons.html',
+    order: 209,
+  },
+  {
+    ...D2R_DPDNS_GUIDE_DEFAULTS,
+    id: 'd2rArmors',
+    label: 'DPDNS Armor Bases',
+    title: '防具底材（DPDNS）',
+    sourcePath: 'Armor.html',
+    fixturePath: 'd2r-dpdns/Armor.html',
+    order: 210,
+  },
+  {
+    ...D2R_DPDNS_GUIDE_DEFAULTS,
+    id: 'd2rMaps',
+    label: 'DPDNS Maps',
+    title: '普通地图（DPDNS）',
+    sourcePath: 'Map.html',
+    fixturePath: 'd2r-dpdns/Map.html',
+    order: 211,
+  },
+  {
+    ...D2R_DPDNS_GUIDE_DEFAULTS,
+    id: 'd2rSkillInformation',
+    label: 'DPDNS Skill Information',
+    title: '装备技能与佣兵技能（DPDNS）',
+    sourcePath: 'skill_information.html',
+    fixturePath: 'd2r-dpdns/skill_information.html',
+    order: 212,
+  },
+  {
+    ...D2R_DPDNS_GUIDE_DEFAULTS,
+    id: 'd2rWeaponMastery',
+    label: 'DPDNS Weapon Mastery',
+    title: '武器精通（DPDNS）',
+    sourcePath: 'weapon_mastery.html',
+    fixturePath: 'd2r-dpdns/weapon_mastery.html',
+    order: 213,
+  },
+  {
+    ...D2R_DPDNS_GUIDE_DEFAULTS,
+    id: 'd2rQuickGuide',
+    label: 'DPDNS Quick Guide',
+    title: '简要攻略（DPDNS）',
+    sourcePath: 'GameGuide_Quick.html',
+    fixturePath: 'd2r-dpdns/GameGuide_Quick.html',
+    order: 214,
+  },
+  {
+    ...D2R_DPDNS_GUIDE_DEFAULTS,
+    id: 'd2rAmazonGuide',
+    label: 'DPDNS Amazon Guide',
+    title: '亚马逊攻略（DPDNS）',
+    sourcePath: 'GameGuide_Amazon.html',
+    fixturePath: 'd2r-dpdns/GameGuide_Amazon.html',
+    order: 220,
+  },
+  {
+    ...D2R_DPDNS_GUIDE_DEFAULTS,
+    id: 'd2rAssassinGuide',
+    label: 'DPDNS Assassin Guide',
+    title: '刺客攻略（DPDNS）',
+    sourcePath: 'GameGuide_Assassin.html',
+    fixturePath: 'd2r-dpdns/GameGuide_Assassin.html',
+    order: 221,
+  },
+  {
+    ...D2R_DPDNS_GUIDE_DEFAULTS,
+    id: 'd2rBarbarianGuide',
+    label: 'DPDNS Barbarian Guide',
+    title: '野蛮人攻略（DPDNS）',
+    sourcePath: 'GameGuide_Barbarian.html',
+    fixturePath: 'd2r-dpdns/GameGuide_Barbarian.html',
+    order: 222,
+  },
+  {
+    ...D2R_DPDNS_GUIDE_DEFAULTS,
+    id: 'd2rDruidGuide',
+    label: 'DPDNS Druid Guide',
+    title: '德鲁伊攻略（DPDNS）',
+    sourcePath: 'GameGuide_Druid.html',
+    fixturePath: 'd2r-dpdns/GameGuide_Druid.html',
+    order: 223,
+  },
+  {
+    ...D2R_DPDNS_GUIDE_DEFAULTS,
+    id: 'd2rNecromancerGuide',
+    label: 'DPDNS Necromancer Guide',
+    title: '死灵法师攻略（DPDNS）',
+    sourcePath: 'GameGuide_Necromancer.html',
+    fixturePath: 'd2r-dpdns/GameGuide_Necromancer.html',
+    order: 224,
+  },
+  {
+    ...D2R_DPDNS_GUIDE_DEFAULTS,
+    id: 'd2rPaladinGuide',
+    label: 'DPDNS Paladin Guide',
+    title: '圣骑士攻略（DPDNS）',
+    sourcePath: 'GameGuide_Paladin.html',
+    fixturePath: 'd2r-dpdns/GameGuide_Paladin.html',
+    order: 225,
+  },
+  {
+    ...D2R_DPDNS_GUIDE_DEFAULTS,
+    id: 'd2rSorceressGuide',
+    label: 'DPDNS Sorceress Guide',
+    title: '法师攻略（DPDNS）',
+    sourcePath: 'GameGuide_Sorceress.html',
+    fixturePath: 'd2r-dpdns/GameGuide_Sorceress.html',
+    order: 226,
+  },
 ] as const satisfies readonly GuidePageCatalogEntry[];
 
 export const CORE_GUIDE_PAGE_IDS = [
@@ -82,8 +291,12 @@ export const CORE_GUIDE_PAGE_IDS = [
   'ascendancies',
 ] as const;
 
-export function getGuidePageSourceUrl(sourcePath: string): string {
-  return `${ESR_BASE_URL}/${encodeURI(sourcePath)}`;
+export function getGuidePageSourceUrl(sourcePath: string, sourceBaseUrl: string = ESR_BASE_URL): string {
+  return new URL(sourcePath, `${sourceBaseUrl.replace(/\/+$/u, '')}/`).href;
+}
+
+export function getGuidePageEntrySourceUrl(entry: GuidePageCatalogEntry): string {
+  return getGuidePageSourceUrl(entry.sourcePath, entry.sourceBaseUrl);
 }
 
 export function getGuidePageEntry(id: string): GuidePageCatalogEntry {

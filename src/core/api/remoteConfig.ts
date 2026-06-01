@@ -1,5 +1,6 @@
 // Base URL for ESR documentation
 export const ESR_BASE_URL = 'https://easternsunresurrected.com';
+export const D2R_DPDNS_BASE_URL = 'https://d2r.dpdns.org';
 
 // Remote data URLs
 export const REMOTE_URLS = {

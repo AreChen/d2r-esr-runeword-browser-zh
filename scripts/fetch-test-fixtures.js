@@ -8,6 +8,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const FIXTURES_DIR = join(__dirname, '..', 'test-fixtures');
 
 const ESR_BASE_URL = 'https://easternsunresurrected.com';
+const D2R_DPDNS_BASE_URL = 'https://d2r.dpdns.org';
 
 const FILES = [
   { url: `${ESR_BASE_URL}/gems.htm`, name: 'gems.htm' },
@@ -33,6 +34,28 @@ const FILES = [
   { url: `${ESR_BASE_URL}/kill_ledger.htm`, name: 'kill_ledger.htm' },
   { url: `${ESR_BASE_URL}/skill_information.htm`, name: 'skill_information.htm' },
   { url: `${ESR_BASE_URL}/weapon_mastery.html`, name: 'weapon_mastery.html' },
+  { url: `${D2R_DPDNS_BASE_URL}/CubeFormula.html`, name: 'd2r-dpdns/CubeFormula.html' },
+  { url: `${D2R_DPDNS_BASE_URL}/Materials.html`, name: 'd2r-dpdns/Materials.html' },
+  { url: `${D2R_DPDNS_BASE_URL}/Anointment.html`, name: 'd2r-dpdns/Anointment.html' },
+  { url: `${D2R_DPDNS_BASE_URL}/Corruption.html`, name: 'd2r-dpdns/Corruption.html' },
+  { url: `${D2R_DPDNS_BASE_URL}/EndMap.html`, name: 'd2r-dpdns/EndMap.html' },
+  { url: `${D2R_DPDNS_BASE_URL}/Vessel_Of_Souls.html`, name: 'd2r-dpdns/Vessel_Of_Souls.html' },
+  { url: `${D2R_DPDNS_BASE_URL}/kill_ledger.html`, name: 'd2r-dpdns/kill_ledger.html' },
+  { url: `${D2R_DPDNS_BASE_URL}/Ascendancies.html`, name: 'd2r-dpdns/Ascendancies.html' },
+  { url: `${D2R_DPDNS_BASE_URL}/Mythicals.html`, name: 'd2r-dpdns/Mythicals.html' },
+  { url: `${D2R_DPDNS_BASE_URL}/Weapons.html`, name: 'd2r-dpdns/Weapons.html' },
+  { url: `${D2R_DPDNS_BASE_URL}/Armor.html`, name: 'd2r-dpdns/Armor.html' },
+  { url: `${D2R_DPDNS_BASE_URL}/Map.html`, name: 'd2r-dpdns/Map.html' },
+  { url: `${D2R_DPDNS_BASE_URL}/skill_information.html`, name: 'd2r-dpdns/skill_information.html' },
+  { url: `${D2R_DPDNS_BASE_URL}/weapon_mastery.html`, name: 'd2r-dpdns/weapon_mastery.html' },
+  { url: `${D2R_DPDNS_BASE_URL}/GameGuide_Quick.html`, name: 'd2r-dpdns/GameGuide_Quick.html' },
+  { url: `${D2R_DPDNS_BASE_URL}/GameGuide_Amazon.html`, name: 'd2r-dpdns/GameGuide_Amazon.html' },
+  { url: `${D2R_DPDNS_BASE_URL}/GameGuide_Assassin.html`, name: 'd2r-dpdns/GameGuide_Assassin.html' },
+  { url: `${D2R_DPDNS_BASE_URL}/GameGuide_Barbarian.html`, name: 'd2r-dpdns/GameGuide_Barbarian.html' },
+  { url: `${D2R_DPDNS_BASE_URL}/GameGuide_Druid.html`, name: 'd2r-dpdns/GameGuide_Druid.html' },
+  { url: `${D2R_DPDNS_BASE_URL}/GameGuide_Necromancer.html`, name: 'd2r-dpdns/GameGuide_Necromancer.html' },
+  { url: `${D2R_DPDNS_BASE_URL}/GameGuide_Paladin.html`, name: 'd2r-dpdns/GameGuide_Paladin.html' },
+  { url: `${D2R_DPDNS_BASE_URL}/GameGuide_Sorceress.html`, name: 'd2r-dpdns/GameGuide_Sorceress.html' },
 ];
 
 async function fetchFile(file) {
@@ -45,6 +68,7 @@ async function fetchFile(file) {
 
   const content = await response.text();
   const filePath = join(FIXTURES_DIR, file.name);
+  await mkdir(dirname(filePath), { recursive: true });
   await writeFile(filePath, content, 'utf-8');
   console.log(`  ✓ Saved ${file.name} (${(content.length / 1024).toFixed(1)} KB)`);
 }
