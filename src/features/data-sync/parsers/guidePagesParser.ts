@@ -100,6 +100,14 @@ function parseTableCell(cell: Element): string {
   return cleanHtmlLines(cell.innerHTML).join('\n');
 }
 
+function getDirectTableRows(table: Element): Element[] {
+  return Array.from(table.querySelectorAll('tr')).filter((row) => row.closest('table') === table);
+}
+
+function getDirectRowCells(row: Element): Element[] {
+  return Array.from(row.children).filter((child) => child.tagName === 'TH' || child.tagName === 'TD');
+}
+
 interface ParsedTableRow {
   readonly cells: readonly string[];
   readonly isSingleColspanRow: boolean;
@@ -139,7 +147,7 @@ function hasActiveRowspanAtOrAfter(activeRowspans: readonly number[], startColum
 }
 
 function parseTableRow(row: Element, activeRowspans: number[]): ParsedTableRow {
-  const cellElements = Array.from(row.querySelectorAll('th,td'));
+  const cellElements = getDirectRowCells(row);
   const cells: string[] = [];
   let columnIndex = 0;
 
@@ -309,9 +317,7 @@ function parseTable(
   pageId: string,
   parserProfile?: GuidePageCatalogEntry['parserProfile']
 ): GuideTableBlock | null {
-  if (table.querySelector('table')) return null;
-
-  const rowElements = Array.from(table.querySelectorAll('tr'));
+  const rowElements = getDirectTableRows(table);
   const activeRowspans: number[] = [];
   const parsedRows = rowElements
     .map((row) => parseTableRow(row, activeRowspans))

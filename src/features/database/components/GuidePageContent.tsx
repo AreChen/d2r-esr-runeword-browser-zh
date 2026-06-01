@@ -23,11 +23,15 @@ function translated(text: string): string {
   return translateGuideText(text);
 }
 
-function renderMultilineCell(text: string): React.ReactNode {
-  const lines = text
+function getTranslatedLines(text: string): string[] {
+  return text
     .split(/\n+/)
     .map((line) => translated(line.trim()))
     .filter((line) => line.length > 0);
+}
+
+function renderMultilineCell(text: string): React.ReactNode {
+  const lines = getTranslatedLines(text);
   if (lines.length <= 1) return lines[0] ?? '';
   return (
     <div className="space-y-1">
@@ -39,11 +43,20 @@ function renderMultilineCell(text: string): React.ReactNode {
 }
 
 function renderCompactNote(text: string): string {
-  return text
-    .split(/\n+/)
-    .map((line) => translated(line.trim()))
-    .filter((line) => line.length > 0)
-    .join(' ');
+  return getTranslatedLines(text).join(' ');
+}
+
+function renderTableSectionCell(text: string): React.ReactNode {
+  const [title = '', ...details] = getTranslatedLines(text);
+  const detail = details.join(' ');
+  if (!detail) return <span className="font-semibold text-amber-700 dark:text-amber-400">{title}</span>;
+
+  return (
+    <div className="space-y-1">
+      <p className="font-semibold text-amber-700 dark:text-amber-400">{title}</p>
+      <p className="font-normal text-muted-foreground">{detail}</p>
+    </div>
+  );
 }
 
 function isFullWidthSectionRow(row: readonly string[]): boolean {
@@ -83,11 +96,8 @@ function GuideTable({ block }: { readonly block: GuideTableBlock }) {
               if (isFullWidthSectionRow(row)) {
                 return (
                   <tr key={`row-${String(rowIndex)}`} className="bg-muted/50">
-                    <td
-                      colSpan={Math.max(block.headers.length, row.length)}
-                      className="border-b px-3 py-2 font-semibold text-amber-700 dark:text-amber-400"
-                    >
-                      {renderMultilineCell(row[0] ?? '')}
+                    <td colSpan={Math.max(block.headers.length, row.length)} className="border-b px-3 py-2">
+                      {renderTableSectionCell(row[0] ?? '')}
                     </td>
                   </tr>
                 );

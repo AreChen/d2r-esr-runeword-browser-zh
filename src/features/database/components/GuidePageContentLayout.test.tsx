@@ -44,6 +44,25 @@ const pageWithTableSectionRows: GuidePage = {
   ],
 };
 
+const pageWithDetailedTableSectionRow: GuidePage = {
+  ...pageWithoutHeadings,
+  blocks: [
+    {
+      id: 'recipe-table',
+      kind: 'table',
+      caption: 'Unique Items',
+      headers: ['Input', 'Output'],
+      rows: [
+        [
+          'Unique Reroll\nBase upgraded uniques cannot be rerolled.\nItems that had sockets added before reroll will lose their sockets.',
+          '',
+        ],
+        ['3 Unique Rings', 'Unique Ring'],
+      ],
+    },
+  ],
+};
+
 const pageWithTableNotes: GuidePage = {
   ...pageWithoutHeadings,
   blocks: [
@@ -76,6 +95,14 @@ describe('GuidePageContent layout', () => {
 
     expect(html).toContain('colSpan="2"');
     expect(html).toContain('标准重置');
+  });
+
+  it('renders detailed table section rows as a compact note instead of one paragraph per source line', () => {
+    const html = renderToStaticMarkup(<GuidePageContent page={pageWithDetailedTableSectionRow} />);
+
+    expect(html).toContain('暗金重置');
+    expect(html).toContain('Base upgraded uniques cannot be rerolled. Items that had sockets added before reroll will lose their sockets.');
+    expect(html).not.toContain('Base upgraded uniques cannot be rerolled.</p><p');
   });
 
   it('renders table notes as compact prose instead of one paragraph per source line', () => {

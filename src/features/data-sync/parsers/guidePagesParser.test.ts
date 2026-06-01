@@ -352,6 +352,28 @@ describe('guide page parser', () => {
     }
   }, 20000);
 
+  it('keeps nested cube recipe tables as tables instead of loose pre-table paragraphs', () => {
+    const entry = GUIDE_PAGE_CATALOG.find((page) => page.id === 'cubeRecipes');
+    expect(entry).toBeDefined();
+    if (!entry) return;
+
+    const page = parseGuidePage(readGuideFixture(entry), entry);
+    const tables = page.blocks.filter((block) => block.kind === 'table');
+    const looseParagraphs = page.blocks.filter((block) => block.kind === 'paragraph').map((block) => block.text);
+    const uniqueItemsTable = tables.find((block) => block.caption === 'Unique Items');
+    const uniqueRerollRow = uniqueItemsTable?.rows.find((row) => row[0]?.includes('Unique Reroll'));
+
+    expect(uniqueItemsTable).toBeDefined();
+    expect(uniqueItemsTable?.headers).toEqual(['Input', 'Output']);
+    expect(uniqueItemsTable?.rows[0]?.[0]).toContain('3 Set Weapons/Armor of the Same Base Item');
+    expect(uniqueItemsTable?.rows[0]?.[1]).toContain('Unique Item of the Same Base Item');
+    expect(uniqueRerollRow?.[0]).toContain("Base upgraded uniques can't be rerolled.");
+
+    expect(looseParagraphs).not.toContain('Unique Items');
+    expect(looseParagraphs).not.toContain('Input Output');
+    expect(looseParagraphs.some((paragraph) => paragraph.includes("Base upgraded uniques can't be rerolled."))).toBe(false);
+  }, 20000);
+
   it('keeps cube recipe preface notes out of Ring and Jewel table headers', () => {
     const entry = GUIDE_PAGE_CATALOG.find((page) => page.id === 'cubeRecipes');
     expect(entry).toBeDefined();
