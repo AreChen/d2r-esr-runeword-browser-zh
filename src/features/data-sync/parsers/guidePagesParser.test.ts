@@ -318,12 +318,14 @@ describe('guide page parser', () => {
     }
   }, 20000);
 
-  it('uses DPDNS cube formulas as the canonical formula page instead of a duplicate off-site page', () => {
+  it('uses the official ESR cube recipes page as the canonical formula source', () => {
     const cubeEntry = GUIDE_PAGE_CATALOG.find((page) => page.id === 'cubeRecipes');
 
     expect(cubeEntry).toBeDefined();
     expect(GUIDE_PAGE_CATALOG.map((page) => page.id as string)).not.toContain('d2rCubeFormula');
-    expect(cubeEntry ? getGuidePageEntrySourceUrl(cubeEntry) : '').toBe('https://d2r.dpdns.org/CubeFormula.html');
+    expect(cubeEntry ? getGuidePageEntrySourceUrl(cubeEntry) : '').toBe(
+      'https://easternsunresurrected.com/Eastern%20Sun%20Resurrected%20Cube%20Recipes.html'
+    );
   });
 
   it('uses DPDNS as the canonical source for duplicated base guide pages', () => {
@@ -363,6 +365,24 @@ describe('guide page parser', () => {
     expect(entry?.title).toBe('材料资料');
     expect(entry ? getGuidePageEntrySourceUrl(entry) : '').toBe('https://d2r.dpdns.org/Materials.html');
   });
+
+  it('splits the official D-Stone compound recipe table into searchable subtables', () => {
+    const entry = GUIDE_PAGE_CATALOG.find((page) => page.id === 'cubeRecipes');
+    expect(entry).toBeDefined();
+    if (!entry) return;
+
+    const page = parseGuidePage(readGuideFixture(entry), entry);
+    const tables = page.blocks.filter((block) => block.kind === 'table');
+    const findTable = (caption: string) => tables.find((table) => table.caption === caption);
+
+    expect(findTable('Dragon Stone Cycling')?.rows).toHaveLength(7);
+    expect(findTable('D-Stoning Weapon')?.rows).toHaveLength(20);
+    expect(findTable('D-Stoning Torso/Helm/Shield')?.rows).toHaveLength(16);
+    expect(findTable('D-Stoning Gloves/Belt/Boots')?.rows).toHaveLength(16);
+    expect(findTable('D-Stoning Ring/Amulet')?.rows).toHaveLength(21);
+    expect(findTable('Gem Melding')?.rows).toHaveLength(7);
+    expect(tables.find((table) => table.caption === 'D-Stoning')).toBeUndefined();
+  }, 20000);
 
   it('uses DPDNS as the canonical source for duplicated feature guide pages', () => {
     const replacements = [
@@ -405,7 +425,7 @@ describe('guide page parser', () => {
     }
   });
 
-  it('uses the real Input/Output row as headers for DPDNS cube recipe categories', () => {
+  it('uses the real Input/Output row as headers for official cube recipe categories', () => {
     const entry = GUIDE_PAGE_CATALOG.find((page) => page.id === 'cubeRecipes');
     expect(entry).toBeDefined();
     if (!entry) return;
@@ -413,24 +433,32 @@ describe('guide page parser', () => {
     const page = parseGuidePage(readGuideFixture(entry), entry);
     const tables = page.blocks.filter((block) => block.kind === 'table');
     const recipeCaptions = [
-      '任务',
-      '超级/终局地图配方',
-      '杂项/回复',
-      '宝石/水晶',
-      '古代优惠券',
-      '赫拉迪姆方块-材料',
-      '普通物品',
-      '魔法/稀有物品',
-      '独特物品',
-      '套装物品',
-      '戒指/护身符',
-      '咒符',
-      '珠宝',
-      '箭矢/弩箭 箭袋',
-      '锻造',
-      '基础升级/更改',
-      '镶崁打孔',
-      '(原)秘密配方',
+      'Special',
+      'Uber/Endgame Map Recipes',
+      'Legendary Consumables',
+      'Misc/Repair',
+      'Gems/Crystals',
+      'Ancient Relics',
+      'Cubing Materials',
+      'Normal Items',
+      'Magic/Rare Items',
+      'Unique Items',
+      'Set Items',
+      'Rings/Amulets',
+      'Charms',
+      'Jewels',
+      'Arrow/Bolt Quivers',
+      'Forging',
+      'Dragon Stone Cycling',
+      'D-Stoning Weapon',
+      'D-Stoning Torso/Helm/Shield',
+      'D-Stoning Gloves/Belt/Boots',
+      'D-Stoning Ring/Amulet',
+      'Gem Melding',
+      'Tinkering',
+      'Base Upgrades/Changes',
+      'Socket Recipes',
+      '(Former) Secret Recipes',
     ];
 
     for (const caption of recipeCaptions) {
@@ -447,7 +475,7 @@ describe('guide page parser', () => {
     }
   }, 20000);
 
-  it('keeps DPDNS cube recipe category notes inside tables instead of loose pre-table paragraphs', () => {
+  it('keeps official cube recipe category notes inside tables instead of loose pre-table paragraphs', () => {
     const entry = GUIDE_PAGE_CATALOG.find((page) => page.id === 'cubeRecipes');
     expect(entry).toBeDefined();
     if (!entry) return;
@@ -455,50 +483,50 @@ describe('guide page parser', () => {
     const page = parseGuidePage(readGuideFixture(entry), entry);
     const tables = page.blocks.filter((block) => block.kind === 'table');
     const looseParagraphs = page.blocks.filter((block) => block.kind === 'paragraph').map((block) => block.text);
-    const uniqueItemsTable = tables.find((block) => block.caption === '独特物品');
-    const uniqueRerollRow = uniqueItemsTable?.rows.find((row) => row[0]?.includes('独特重铸'));
+    const uniqueItemsTable = tables.find((block) => block.caption === 'Unique Items');
+    const uniqueRerollRow = uniqueItemsTable?.rows.find((row) => row[0]?.includes('Unique Reroll'));
 
     expect(uniqueItemsTable).toBeDefined();
     expect(uniqueItemsTable?.headers).toEqual(['Input', 'Output']);
-    expect(uniqueItemsTable?.rows[0]?.[0]).toContain('套装');
-    expect(uniqueItemsTable?.rows[0]?.[1]).toContain('独特');
-    expect(uniqueRerollRow?.[0]).toContain('基础升级的独特物品无法重铸');
+    expect(uniqueItemsTable?.rows[0]?.[0]).toContain('Set Weapons/Armor');
+    expect(uniqueItemsTable?.rows[0]?.[1]).toContain('Unique Item');
+    expect(uniqueRerollRow?.[0]).toContain("Base upgraded uniques can't be rerolled");
 
-    expect(looseParagraphs).not.toContain('独特物品');
+    expect(looseParagraphs).not.toContain('Unique Items');
     expect(looseParagraphs).not.toContain('输入 输出');
-    expect(looseParagraphs).not.toContain('投入物 产物');
-    expect(looseParagraphs.some((paragraph) => paragraph.includes('套装武器/护甲同底材'))).toBe(false);
-    expect(looseParagraphs.some((paragraph) => paragraph.includes('暗金重置'))).toBe(false);
-    expect(looseParagraphs.some((paragraph) => paragraph.includes('基础升级的独特物品无法重铸'))).toBe(false);
+    expect(looseParagraphs).not.toContain('Input Output');
+    expect(looseParagraphs.some((paragraph) => paragraph.includes('Set Weapons/Armor of the Same Base Item'))).toBe(false);
+    expect(looseParagraphs.some((paragraph) => paragraph.includes('Unique Reroll'))).toBe(false);
+    expect(looseParagraphs.some((paragraph) => paragraph.includes("Base upgraded uniques can't be rerolled"))).toBe(false);
   }, 20000);
 
-  it('keeps DPDNS ring and jewel cube recipe preface notes out of table headers', () => {
+  it('keeps official ring and jewel cube recipe preface notes out of table headers', () => {
     const entry = GUIDE_PAGE_CATALOG.find((page) => page.id === 'cubeRecipes');
     expect(entry).toBeDefined();
     if (!entry) return;
 
     const page = parseGuidePage(readGuideFixture(entry), entry);
     const tables = page.blocks.filter((block) => block.kind === 'table');
-    const ringsTable = tables.find((block) => block.caption === '戒指/护身符');
-    const jewelsTable = tables.find((block) => block.caption === '珠宝');
+    const ringsTable = tables.find((block) => block.caption === 'Rings/Amulets');
+    const jewelsTable = tables.find((block) => block.caption === 'Jewels');
 
     expect(ringsTable).toBeDefined();
     expect(jewelsTable).toBeDefined();
     if (!ringsTable || !jewelsTable) return;
 
     expect(ringsTable.headers).toEqual(['Input', 'Output']);
-    expect(ringsTable.notes?.[0]).toContain('当你重置多个护身符或戒指');
-    expect(ringsTable.rows[0]).toEqual(['标准重铸', '']);
-    expect(ringsTable.rows[1]?.[0]).toContain('3 魔法戒指');
-    expect(ringsTable.rows[1]?.[1]).toContain('魔法戒指');
+    expect(ringsTable.notes?.[0]).toContain('When you reroll multiple Amulets or Rings');
+    expect(ringsTable.rows[0]).toEqual(['Standard Reroll', '']);
+    expect(ringsTable.rows[1]?.[0]).toContain('3 Magic Rings');
+    expect(ringsTable.rows[1]?.[1]).toContain('Magic Ring');
 
     expect(jewelsTable.headers).toEqual(['Input', 'Output']);
-    expect(jewelsTable.notes?.[0]).toContain('重铸之球不再接受');
-    expect(jewelsTable.rows[0]?.[0]).toContain('魔法珠宝');
-    expect(jewelsTable.rows[0]?.[1]).toContain('魔法珠宝');
+    expect(jewelsTable.notes?.[0]).toContain('Rerolling Orb no longer accepts');
+    expect(jewelsTable.rows[0]?.[0]).toContain('Magic Jewel');
+    expect(jewelsTable.rows[0]?.[1]).toContain('Magic Jewel');
   }, 20000);
 
-  it('compacts standalone DPDNS cube explanation tables into readable paragraphs', () => {
+  it('compacts standalone official cube explanation tables into readable paragraphs', () => {
     const entry = GUIDE_PAGE_CATALOG.find((page) => page.id === 'cubeRecipes');
     expect(entry).toBeDefined();
     if (!entry) return;
@@ -507,14 +535,15 @@ describe('guide page parser', () => {
     const paragraphs = page.blocks.filter((block) => block.kind === 'paragraph').map((block) => block.text);
 
     expect(paragraphs).toContain(
-      '大多数需要重新投入的配方，若输入物品带有锻造效果，则无法使用。 若发现配方无法使用，请检查输入物品是否带有锻造效果。'
+      "Most, but not all, recipes that reroll the input don't work if the input has a Forging. If you find a recipe doesn't work, please check if the input has a Forging or not."
     );
-    expect(paragraphs).toContain('“胸甲”指身体护甲。“护甲”指所有种类的护甲。');
-    expect(paragraphs).not.toContain('大多数需要重新投入的配方，若输入物品带有锻造效果，则无法使用。');
-    expect(paragraphs).not.toContain('若发现配方无法使用，请检查输入物品是否带有锻造效果。');
+    expect(paragraphs).toContain('Torso means Body Armor. Armor means all kinds of armor.');
+    expect(paragraphs).not.toContain("Most, but not all, recipes that reroll the input don't work if the input has a Forging.");
+    expect(paragraphs).not.toContain("If you find a recipe doesn't work, please check if the input has a Forging or not.");
+    expect(page.blocks.find((block) => block.kind === 'table' && block.caption.startsWith('Most, but not all, recipes'))).toBeUndefined();
   }, 20000);
 
-  it('parses d2r.dpdns.org guide fixtures as searchable guide pages', () => {
+  it('parses canonical guide fixtures as searchable guide pages', () => {
     const cubeEntry = GUIDE_PAGE_CATALOG.find((page) => page.id === 'cubeRecipes');
     const amazonEntry = GUIDE_PAGE_CATALOG.find((page) => page.id === 'd2rAmazonGuide');
     const armorEntry = GUIDE_PAGE_CATALOG.find((page) => page.id === 'armors');
@@ -534,10 +563,12 @@ describe('guide page parser', () => {
       .slice(0, 3)
       .map((block) => block.text);
 
-    expect(cubePage.sourceUrl).toBe('https://d2r.dpdns.org/CubeFormula.html');
-    expect(cubePage.textIndex).toContain('盒子公式');
+    expect(cubePage.sourceUrl).toBe('https://easternsunresurrected.com/Eastern%20Sun%20Resurrected%20Cube%20Recipes.html');
+    expect(cubePage.textIndex).toContain('D-Stoning Weapon');
     expect(cubeLeadingParagraphs).not.toContain('新手装备 手工装备 镶崁打孔 宝石/水晶 符文');
-    expect(cubePage.blocks.find((block) => block.kind === 'table' && block.caption.startsWith('大多数需要重新投入的配方'))).toBeUndefined();
+    expect(
+      cubePage.blocks.find((block) => block.kind === 'table' && block.caption.startsWith('Most, but not all, recipes'))
+    ).toBeUndefined();
     expect(cubePage.blocks.filter((block) => block.kind === 'table').length).toBeGreaterThan(20);
     expect(amazonPage.textIndex).toContain('亚马逊');
     expect(amazonPage.textIndex).not.toContain('tab2');

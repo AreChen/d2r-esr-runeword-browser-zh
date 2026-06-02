@@ -70,10 +70,7 @@ export const GUIDE_PAGE_CATALOG = [
     group: 'base',
     label: 'Cube Recipes',
     title: '赫拉迪克方块公式',
-    sourcePath: 'CubeFormula.html',
-    sourceBaseUrl: D2R_DPDNS_BASE_URL,
-    fixturePath: 'd2r-dpdns/CubeFormula.html',
-    parserProfile: 'dpdns',
+    sourcePath: 'Eastern Sun Resurrected Cube Recipes.html',
     order: 13,
   },
   {

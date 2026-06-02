@@ -234,6 +234,21 @@ function splitCubeRecipeCaption(text: string): { readonly caption: string; reado
   };
 }
 
+const D_STONING_COMPOUND_SECTION_CAPTIONS = new Set([
+  'Dragon Stone Cycling',
+  'D-Stoning Weapon',
+  'D-Stoning Torso/Helm/Shield',
+  'D-Stoning Gloves/Belt/Boots',
+  'D-Stoning Ring/Amulet',
+  'Gem Melding',
+  '龙石 循环',
+  'D-Stoning 武器',
+  'D-Stoning 胸甲/头盔/盾牌',
+  'D-Stoning 手套/腰带/靴子',
+  'D-Stoning 戒指/护身符',
+  '宝石融合',
+]);
+
 function normalizeCubeRecipeRow(row: ParsedTableRow, width: number): readonly string[] {
   if (!row.isSingleColspanRow) return padRow(row.cells, width);
 
@@ -246,6 +261,73 @@ function isLikelyTwoColumnCubeRecipeTable(caption: string, rows: readonly Parsed
   return rows
     .slice(startIndex)
     .some((row) => !row.isSingleColspanRow && row.cells.length >= 2 && Boolean(row.cells[0]) && Boolean(row.cells[1]));
+}
+
+interface CubeRecipeSubtable {
+  readonly caption: string;
+  readonly notes: string[];
+  readonly rows: ParsedTableRow[];
+}
+
+function getDStoningCompoundSection(text: string): { readonly caption: string; readonly notes: readonly string[] } | null {
+  const splitCaption = splitCubeRecipeCaption(text);
+  return D_STONING_COMPOUND_SECTION_CAPTIONS.has(splitCaption.caption) ? splitCaption : null;
+}
+
+function isDStoningCompoundTable(parsedRows: readonly ParsedTableRow[]): boolean {
+  if (!parsedRows[0]?.isSingleColspanRow) return false;
+  return splitCubeRecipeCaption(parsedRows[0].cells[0] ?? '').caption === 'D-Stoning';
+}
+
+function parseDStoningCompoundTable(parsedRows: readonly ParsedTableRow[], id: string): GuideTableBlock[] | null {
+  if (!isDStoningCompoundTable(parsedRows)) return null;
+
+  const intro = splitCubeRecipeCaption(parsedRows[0]?.cells[0] ?? '');
+  const sections: CubeRecipeSubtable[] = [];
+  let currentSection: CubeRecipeSubtable | null = null;
+
+  for (const row of parsedRows.slice(1)) {
+    const text = row.cells[0]?.trim() ?? '';
+    const section = row.isSingleColspanRow ? getDStoningCompoundSection(text) : null;
+
+    if (section) {
+      currentSection = {
+        caption: section.caption,
+        notes: [...(sections.length === 0 ? intro.notes : []), ...section.notes],
+        rows: [],
+      };
+      sections.push(currentSection);
+      continue;
+    }
+
+    if (!currentSection) continue;
+    if (isInputOutputHeaderRow(row.cells)) continue;
+
+    if (row.isSingleColspanRow) {
+      if (text) {
+        currentSection.notes.push(text);
+      }
+      continue;
+    }
+
+    currentSection.rows.push(row);
+  }
+
+  if (sections.length === 0) return null;
+
+  return sections.map((section, index) => {
+    const tableWidth = Math.max(2, ...section.rows.map((row) => row.cells.length));
+    const notes = section.notes.filter((note) => note.trim().length > 0);
+
+    return {
+      id: `${id}-${String(index + 1)}`,
+      kind: 'table',
+      caption: section.caption,
+      ...(notes.length > 0 ? { notes } : {}),
+      headers: ['Input', 'Output'],
+      rows: section.rows.map((row) => normalizeCubeRecipeRow(row, tableWidth)),
+    };
+  });
 }
 
 function parseCubeRecipeTable(parsedRows: readonly ParsedTableRow[], id: string): GuideTableBlock | null {
@@ -304,6 +386,14 @@ function parseCubeRecipeTable(parsedRows: readonly ParsedTableRow[], id: string)
   };
 }
 
+function parseCubeRecipeTables(parsedRows: readonly ParsedTableRow[], id: string): GuideTableBlock[] | null {
+  const dStoningTables = parseDStoningCompoundTable(parsedRows, id);
+  if (dStoningTables) return dStoningTables;
+
+  const cubeRecipeTable = parseCubeRecipeTable(parsedRows, id);
+  return cubeRecipeTable ? [cubeRecipeTable] : null;
+}
+
 function isDpdnsNoteOnlyTable(parsedRows: readonly ParsedTableRow[], rows: readonly (readonly string[])[], caption: string): boolean {
   if (parsedRows.some((row) => row.hasHeaderCell)) return false;
   if (rows.length > 4) return false;
@@ -332,7 +422,7 @@ function parseTable(
   id: string,
   pageId: string,
   parserProfile?: GuidePageCatalogEntry['parserProfile']
-): GuideTableBlock | null {
+): GuideTableBlock | GuideTableBlock[] | null {
   const rowElements = getDirectTableRows(table);
   const activeRowspans: number[] = [];
   const parsedRows = rowElements
@@ -345,8 +435,9 @@ function parseTable(
   if (parserProfile === 'dpdns' && isDpdnsNoteOnlyTable(parsedRows, rows, rows[0]?.[0] ?? '')) return null;
 
   if (pageId === 'cubeRecipes') {
-    const cubeRecipeTable = parseCubeRecipeTable(parsedRows, id);
-    if (cubeRecipeTable) return cubeRecipeTable;
+    const cubeRecipeTables = parseCubeRecipeTables(parsedRows, id);
+    if (cubeRecipeTables) return cubeRecipeTables;
+    return null;
   }
 
   let caption = '';
@@ -450,9 +541,11 @@ export function parseGuidePage(html: string, entry: GuidePageCatalogEntry): Guid
 
     if (node.tagName === 'TABLE') {
       const table = parseTable(node, nextId('table'), entry.id, entry.parserProfile);
-      if (table) {
+      if (Array.isArray(table)) {
+        blocks.push(...table);
+      } else if (table) {
         blocks.push(table);
-      } else if (entry.parserProfile === 'dpdns') {
+      } else if (entry.parserProfile === 'dpdns' || entry.id === 'cubeRecipes') {
         const paragraphs = getCompactFallbackTableParagraphs(node);
         if (paragraphs.length > 0) {
           for (const paragraph of paragraphs) {

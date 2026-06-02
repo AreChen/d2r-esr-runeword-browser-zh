@@ -188,7 +188,7 @@ describe('guide text translation', () => {
       '多数会重置投入物的公式在投入物带有锻造时不会生效，但并非全部如此。'
     );
     expect(translateGuideText('Torso means Body Armor. Armor means all kinds of armor.')).toBe(
-      '身体部位表示身体护甲。护甲表示所有类型的护甲。'
+      '“胸甲”指身体护甲。“护甲”指所有种类的护甲。'
     );
     expect(translateGuideText('Special')).toBe('特殊');
     expect(translateGuideText("Wirt's leg or Any Club Class Weapon")).toBe('维特之脚或任意木棒职业武器');

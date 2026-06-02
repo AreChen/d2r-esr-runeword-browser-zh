@@ -306,6 +306,9 @@ const guideExactTranslations: Readonly<Record<string, string>> = {
   'Other Generic Items/Materials': '其他通用物品/材料',
   'Generic Items/Materials': '通用物品/材料',
   Special: '特殊',
+  "Most, but not all, recipes that reroll the input don't work if the input has a Forging. If you find a recipe doesn't work, please check if the input has a Forging or not.":
+    '大多数需要重新投入的配方，若输入物品带有锻造效果，则无法使用。若发现配方无法使用，请检查输入物品是否带有锻造效果。',
+  'Torso means Body Armor. Armor means all kinds of armor.': '“胸甲”指身体护甲。“护甲”指所有种类的护甲。',
   'Viper amulet': '蝮蛇项链',
   'Viper Amulet': '蝮蛇项链',
   "Wirt's leg": '维特之脚',
@@ -936,7 +939,6 @@ const guideExactTranslations: Readonly<Record<string, string>> = {
   'Enable transmute key in D2Launcher for a much faster transmuting experience': '在 D2Launcher 中启用合成快捷键可以显著加快合成操作。',
   "*The feather works on ethereal items as well due to an engine bug, so be careful not to waste it. It doesn't work on missile weapons.":
     '*由于引擎缺陷，羽毛也会对无形物品生效，所以请小心不要浪费。它对投射武器无效。',
-  'Torso means Body Armor. Armor means all kinds of armor.': '身体部位表示身体护甲。护甲表示所有类型的护甲。',
   "Base upgraded uniques can't be rerolled. Please reroll before upgrade.": '底材已升级的暗金物品不能重置。请在升级前重置。',
   'Items that had sockets added before reroll will lose their sockets upon rerolling.':
     '重置前额外添加过镶孔的物品，在重置时会失去这些镶孔。',
