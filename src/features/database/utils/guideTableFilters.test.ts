@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { GuidePage } from '@/core/db';
 import {
+  buildGuideTableRowFavoriteId,
   filterGuidePageTables,
   getGuideRowMarkerOptions,
   getGuideTableSections,
@@ -137,6 +138,28 @@ describe('guide table filtering helpers', () => {
     expect(result.page.blocks.filter((block) => block.kind === 'table').map((block) => block.caption)).toEqual(['Helm']);
   });
 
+  it('can restrict visible rows to favorite concrete recipe rows', () => {
+    const bodyTable = samplePage.blocks.find((block) => block.kind === 'table' && block.id === 'body');
+    expect(bodyTable?.kind).toBe('table');
+    if (!bodyTable || bodyTable.kind !== 'table') return;
+
+    const favoriteRowId = buildGuideTableRowFavoriteId(bodyTable, bodyTable.rows[1] ?? []);
+    const result = filterGuidePageTables(samplePage, {
+      searchText: '',
+      selectedSections: [],
+      favoriteSections: [],
+      favoriteRows: [favoriteRowId],
+      showFavoritesOnly: true,
+      maxReqLevel: null,
+      selectedMarkers: [],
+    });
+
+    expect(result.visibleRowCount).toBe(1);
+    expect(result.page.blocks.filter((block) => block.kind === 'table').flatMap((block) => block.rows)).toEqual([
+      ['Mage Plate Mage Plate (xtp)', 'Item Level: 45 Required Level: 30', '+100 Defense'],
+    ]);
+  });
+
   it('parses required level from common database row formats', () => {
     expect(parseGuideRowRequiredLevel(['Lvl 5 / Req Lvl 3'])).toBe(3);
     expect(parseGuideRowRequiredLevel(['Item Level: 9 Required Level: 7'])).toBe(7);
@@ -155,7 +178,11 @@ describe('guide table filtering helpers', () => {
 
     expect(isGuideTableFilterState(oldSavedState)).toBe(true);
     expect(
-      isGuideTableFilterState({ ...oldSavedState, selectedMarkers: ['cube', 'dstone', 'forging', 'aura', 'socket', 'map', 'affix'] })
+      isGuideTableFilterState({
+        ...oldSavedState,
+        favoriteRows: ['Body Armor::abc123'],
+        selectedMarkers: ['cube', 'dstone', 'forging', 'aura', 'socket', 'map', 'affix'],
+      })
     ).toBe(true);
     expect(isGuideTableFilterState({ ...oldSavedState, selectedMarkers: ['not-a-marker'] })).toBe(false);
   });

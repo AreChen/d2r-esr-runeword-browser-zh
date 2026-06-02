@@ -67,7 +67,7 @@ function toggleMarker(
 }
 
 function hasFavorites(filters: GuideTableFilterState): boolean {
-  return filters.favoriteSections.length > 0;
+  return filters.favoriteSections.length > 0 || (filters.favoriteRows?.length ?? 0) > 0;
 }
 
 function getSectionCountLabel(section: GuideTableSection): string {
@@ -235,7 +235,7 @@ export function GuideTableFilterControls({
       </div>
 
       <div className="text-xs text-muted-foreground">
-        当前匹配 {visibleRowCount} / {totalRowCount} 行。星标会保存在本机，可用“收藏”快速只看常用部件或公式阶级。
+        当前匹配 {visibleRowCount} / {totalRowCount} 行。星标会保存在本机，可用“收藏”快速只看常用部件、公式阶级或具体公式行。
       </div>
 
       {visibleMarkerOptions.length > 0 && (

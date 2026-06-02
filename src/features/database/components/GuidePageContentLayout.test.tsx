@@ -211,6 +211,21 @@ describe('GuidePageContent layout', () => {
     expect(html).toContain('+1 所有技能等级');
   });
 
+  it('renders favorite controls for concrete guide table rows when row favorite props are provided', () => {
+    const favoriteId = 'Rings/Amulets::3-magic-rings';
+    const html = renderToStaticMarkup(
+      <GuidePageContent
+        page={pageWithTableSectionRows}
+        favoriteRowIds={[favoriteId]}
+        getRowFavoriteId={() => favoriteId}
+        onToggleFavoriteRow={() => {}}
+      />
+    );
+
+    expect(html).toContain('aria-label="取消收藏公式行"');
+    expect(html).toContain('data-guide-row-favorite="true"');
+  });
+
   it('renders long guide pages progressively by table count', () => {
     const html = renderToStaticMarkup(<GuidePageContent page={pageWithManyTables} />);
 

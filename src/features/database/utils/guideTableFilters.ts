@@ -16,6 +16,7 @@ export interface GuideTableFilterState {
   readonly searchText: string;
   readonly selectedSections: readonly string[];
   readonly favoriteSections: readonly string[];
+  readonly favoriteRows?: readonly string[];
   readonly showFavoritesOnly: boolean;
   readonly maxReqLevel: number | null;
   readonly selectedMarkers?: readonly GuideRowMarkerKind[];
@@ -45,6 +46,7 @@ export const DEFAULT_GUIDE_TABLE_FILTERS: GuideTableFilterState = {
   searchText: '',
   selectedSections: [],
   favoriteSections: [],
+  favoriteRows: [],
   showFavoritesOnly: false,
   maxReqLevel: null,
   selectedMarkers: [],
@@ -66,10 +68,30 @@ export function isGuideTableFilterState(value: unknown): value is GuideTableFilt
     typeof candidate.searchText === 'string' &&
     isStringArray(candidate.selectedSections) &&
     isStringArray(candidate.favoriteSections) &&
+    (candidate.favoriteRows === undefined || isStringArray(candidate.favoriteRows)) &&
     typeof candidate.showFavoritesOnly === 'boolean' &&
     (candidate.maxReqLevel === null || typeof candidate.maxReqLevel === 'number') &&
     (candidate.selectedMarkers === undefined || isGuideRowMarkerArray(candidate.selectedMarkers))
   );
+}
+
+function hashGuideFavoriteId(input: string): string {
+  let hash = 0;
+  for (let index = 0; index < input.length; index += 1) {
+    hash = Math.imul(hash, 31) + input.charCodeAt(index);
+    hash >>>= 0;
+  }
+  return hash.toString(36);
+}
+
+export function buildGuideTableRowFavoriteId(block: GuideTableBlock, row: readonly string[]): string {
+  const sectionKey = getGuideTableSectionKey(block.caption);
+  return `${sectionKey}::${hashGuideFavoriteId([sectionKey, ...block.headers, ...row].join('\u001f'))}`;
+}
+
+export function toggleGuideTableRowFavoriteId(favoriteId: string, favoriteRows: readonly string[]): readonly string[] {
+  if (favoriteRows.includes(favoriteId)) return favoriteRows.filter((entry) => entry !== favoriteId);
+  return [...favoriteRows, favoriteId];
 }
 
 export function getGuideTableSectionKey(caption: string): string {
@@ -105,7 +127,7 @@ function normalizeGuideTableBlock(block: GuideTableBlock): GuideTableBlock {
 
 function sectionHasActiveRowFilters(filters: GuideTableFilterState | undefined, searchTerms: readonly string[]): boolean {
   if (!filters) return false;
-  return searchTerms.length > 0 || filters.maxReqLevel !== null || (filters.selectedMarkers?.length ?? 0) > 0;
+  return searchTerms.length > 0 || filters.showFavoritesOnly || filters.maxReqLevel !== null || (filters.selectedMarkers?.length ?? 0) > 0;
 }
 
 function getSectionMatchedRowCount(
@@ -117,6 +139,7 @@ function getSectionMatchedRowCount(
   return block.rows.filter(
     (row) =>
       rowMatchesSearch(row, block, sectionKey, searchTerms) &&
+      rowMatchesFavorite(row, block, sectionKey, filters) &&
       rowMatchesRequiredLevel(row, block.headers, filters.maxReqLevel) &&
       rowMatchesMarkers(row, filters.selectedMarkers)
   ).length;
@@ -233,8 +256,12 @@ function rowMatchesMarkerOptionScope(
   searchTerms: readonly string[]
 ): boolean {
   if (!filters) return true;
-  if (!shouldKeepSection(sectionKey, filters)) return false;
-  return rowMatchesSearch(row, block, sectionKey, searchTerms) && rowMatchesRequiredLevel(row, block.headers, filters.maxReqLevel);
+  if (!isSectionSelected(sectionKey, filters.selectedSections)) return false;
+  return (
+    rowMatchesSearch(row, block, sectionKey, searchTerms) &&
+    rowMatchesFavorite(row, block, sectionKey, filters) &&
+    rowMatchesRequiredLevel(row, block.headers, filters.maxReqLevel)
+  );
 }
 
 export function getGuideRowMarkerOptions(page: GuidePage, filters?: GuideTableFilterState): readonly GuideRowMarkerOption[] {
@@ -268,10 +295,10 @@ function rowMatchesMarkers(row: readonly string[], selectedMarkers: readonly Gui
   return selectedMarkers.some((marker) => rowMarkers.has(marker));
 }
 
-function shouldKeepSection(sectionKey: string, filters: GuideTableFilterState): boolean {
-  if (!isSectionSelected(sectionKey, filters.selectedSections)) return false;
-  if (filters.showFavoritesOnly && !filters.favoriteSections.includes(sectionKey)) return false;
-  return true;
+function rowMatchesFavorite(row: readonly string[], block: GuideTableBlock, sectionKey: string, filters: GuideTableFilterState): boolean {
+  if (!filters.showFavoritesOnly) return true;
+  if (filters.favoriteSections.includes(sectionKey)) return true;
+  return (filters.favoriteRows ?? []).includes(buildGuideTableRowFavoriteId(block, row));
 }
 
 function hasActiveFilters(filters: GuideTableFilterState, searchTerms: readonly string[]): boolean {
@@ -303,13 +330,14 @@ export function filterGuidePageTables(page: GuidePage, filters: GuideTableFilter
     const sectionKey = getGuideTableSectionKey(normalizedBlock.caption);
     totalRowCount += normalizedBlock.rows.length;
 
-    if (!shouldKeepSection(sectionKey, filters)) {
+    if (!isSectionSelected(sectionKey, filters.selectedSections)) {
       continue;
     }
 
     const rows = normalizedBlock.rows.filter(
       (row) =>
         rowMatchesSearch(row, normalizedBlock, sectionKey, searchTerms) &&
+        rowMatchesFavorite(row, normalizedBlock, sectionKey, filters) &&
         rowMatchesRequiredLevel(row, normalizedBlock.headers, filters.maxReqLevel) &&
         rowMatchesMarkers(row, filters.selectedMarkers)
     );

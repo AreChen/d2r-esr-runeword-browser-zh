@@ -7,10 +7,12 @@ import { GuideTableFilterControls } from '@/features/database/components/GuideTa
 import { useGuidePages } from '@/features/database/hooks/useGuidePages';
 import {
   DEFAULT_GUIDE_TABLE_FILTERS,
+  buildGuideTableRowFavoriteId,
   filterGuidePageTables,
   getGuideRowMarkerOptions,
   getGuideTableSections,
   isGuideTableFilterState,
+  toggleGuideTableRowFavoriteId,
   type GuideTableFilterState,
 } from '@/features/database/utils/guideTableFilters';
 
@@ -45,6 +47,7 @@ export function VesselOfSoulsScreen() {
   const sections = getGuideTableSections(page, filters);
   const markerOptions = getGuideRowMarkerOptions(page, filters);
   const filteredPage = filterGuidePageTables(page, filters);
+  const favoriteRowIds = filters.favoriteRows ?? [];
 
   return (
     <div className="space-y-5">
@@ -62,7 +65,24 @@ export function VesselOfSoulsScreen() {
         onFiltersChange={setFilters}
       />
       <main className="rounded-md border bg-card p-4 md:p-6">
-        <GuidePageContent page={filteredPage.page} />
+        <GuidePageContent
+          page={filteredPage.page}
+          favoriteRowIds={favoriteRowIds}
+          getRowFavoriteId={buildGuideTableRowFavoriteId}
+          onToggleFavoriteRow={(favoriteId) => {
+            setFilters((current) => {
+              const nextFavoriteRows = toggleGuideTableRowFavoriteId(favoriteId, current.favoriteRows ?? []);
+              return {
+                ...current,
+                favoriteRows: nextFavoriteRows,
+                showFavoritesOnly:
+                  current.showFavoritesOnly && current.favoriteSections.length === 0 && nextFavoriteRows.length === 0
+                    ? false
+                    : current.showFavoritesOnly,
+              };
+            });
+          }}
+        />
       </main>
 
       <ScrollToTopButton />

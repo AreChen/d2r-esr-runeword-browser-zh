@@ -17,10 +17,12 @@ import { useGuidePages } from '../hooks/useGuidePages';
 import { getGuidePageBlockSummary } from '../utils/guidePageSummary';
 import {
   DEFAULT_GUIDE_TABLE_FILTERS,
+  buildGuideTableRowFavoriteId,
   filterGuidePageTables,
   getGuideRowMarkerOptions,
   getGuideTableSections,
   isGuideTableFilterState,
+  toggleGuideTableRowFavoriteId,
   type GuideTableFilterState,
 } from '../utils/guideTableFilters';
 
@@ -203,6 +205,7 @@ function GuidePagePanel({ page }: { readonly page: GuidePage }) {
   const sections = getGuideTableSections(page, filters);
   const markerOptions = getGuideRowMarkerOptions(page, filters);
   const filteredPage = filterGuidePageTables(page, filters);
+  const favoriteRowIds = filters.favoriteRows ?? [];
 
   return (
     <div className="space-y-4">
@@ -214,7 +217,24 @@ function GuidePagePanel({ page }: { readonly page: GuidePage }) {
         totalRowCount={filteredPage.totalRowCount}
         onFiltersChange={setFilters}
       />
-      <GuidePageContent page={filteredPage.page} />
+      <GuidePageContent
+        page={filteredPage.page}
+        favoriteRowIds={favoriteRowIds}
+        getRowFavoriteId={buildGuideTableRowFavoriteId}
+        onToggleFavoriteRow={(favoriteId) => {
+          setFilters((current) => {
+            const nextFavoriteRows = toggleGuideTableRowFavoriteId(favoriteId, current.favoriteRows ?? []);
+            return {
+              ...current,
+              favoriteRows: nextFavoriteRows,
+              showFavoritesOnly:
+                current.showFavoritesOnly && current.favoriteSections.length === 0 && nextFavoriteRows.length === 0
+                  ? false
+                  : current.showFavoritesOnly,
+            };
+          });
+        }}
+      />
     </div>
   );
 }

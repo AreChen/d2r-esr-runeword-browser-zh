@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { ExternalLink } from 'lucide-react';
+import { ExternalLink, Star } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ESR_BASE_URL } from '@/core/api';
@@ -16,6 +16,9 @@ const GUIDE_TABLE_BLOCK_RENDER_INCREMENT = 8;
 
 interface GuidePageContentProps {
   readonly page: GuidePage;
+  readonly favoriteRowIds?: readonly string[];
+  readonly getRowFavoriteId?: (block: GuideTableBlock, row: readonly string[]) => string;
+  readonly onToggleFavoriteRow?: (favoriteId: string) => void;
 }
 
 const AFFIX_LINE_CLASS = 'inline rounded-sm border border-sky-400/25 bg-sky-500/10 px-1 py-0.5 font-medium text-sky-700 dark:text-sky-300';
@@ -144,11 +147,23 @@ function getVisibleGuideBlocks(
   return { visibleBlocks, renderedTableCount, totalTableCount };
 }
 
-function GuideTable({ block }: { readonly block: GuideTableBlock }) {
+function GuideTable({
+  block,
+  favoriteRowIds,
+  getRowFavoriteId,
+  onToggleFavoriteRow,
+}: {
+  readonly block: GuideTableBlock;
+  readonly favoriteRowIds: readonly string[];
+  readonly getRowFavoriteId?: (block: GuideTableBlock, row: readonly string[]) => string;
+  readonly onToggleFavoriteRow?: (favoriteId: string) => void;
+}) {
   const [visibleRows, setVisibleRows] = useState(INITIAL_GUIDE_TABLE_RENDER_COUNT);
   const renderedRows = block.rows.slice(0, visibleRows);
   const hasMoreRows = renderedRows.length < block.rows.length;
   const compactNotes = renderCompactNotes(block.notes);
+  const favoriteRowIdSet = new Set(favoriteRowIds);
+  const canFavoriteRows = getRowFavoriteId !== undefined && onToggleFavoriteRow !== undefined;
 
   return (
     <section id={block.id} className="scroll-mt-20 space-y-2">
@@ -165,6 +180,7 @@ function GuideTable({ block }: { readonly block: GuideTableBlock }) {
           {block.headers.length > 0 && (
             <thead className="bg-muted/80">
               <tr>
+                {canFavoriteRows && <th className="w-10 border-b px-2 py-2 text-left font-semibold whitespace-nowrap">收藏</th>}
                 {block.headers.map((header, index) => (
                   <th key={`${header}-${String(index)}`} className="border-b px-3 py-2 text-left font-semibold whitespace-nowrap">
                     {translated(header)}
@@ -178,15 +194,36 @@ function GuideTable({ block }: { readonly block: GuideTableBlock }) {
               if (isFullWidthSectionRow(row)) {
                 return (
                   <tr key={`row-${String(rowIndex)}`} className="bg-muted/50">
-                    <td colSpan={Math.max(block.headers.length, row.length)} className="border-b px-3 py-2">
+                    <td colSpan={Math.max(block.headers.length, row.length) + (canFavoriteRows ? 1 : 0)} className="border-b px-3 py-2">
                       {renderTableSectionCell(row[0] ?? '')}
                     </td>
                   </tr>
                 );
               }
 
+              const favoriteId = canFavoriteRows ? getRowFavoriteId(block, row) : '';
+              const isFavorite = favoriteRowIdSet.has(favoriteId);
+
               return (
                 <tr key={`row-${String(rowIndex)}`} className="odd:bg-card even:bg-muted/30">
+                  {canFavoriteRows && (
+                    <td className="w-10 border-b px-2 py-2 align-top">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon-sm"
+                        className="size-7"
+                        data-guide-row-favorite={isFavorite ? 'true' : 'false'}
+                        aria-label={isFavorite ? '取消收藏公式行' : '收藏公式行'}
+                        title={isFavorite ? '取消收藏公式行' : '收藏公式行'}
+                        onClick={() => {
+                          onToggleFavoriteRow(favoriteId);
+                        }}
+                      >
+                        <Star className={cn('size-4', isFavorite ? 'fill-amber-400 text-amber-500' : 'text-muted-foreground')} />
+                      </Button>
+                    </td>
+                  )}
                   {row.map((cell, cellIndex) => (
                     <td key={`${String(rowIndex)}-${String(cellIndex)}`} className="border-b px-3 py-2 align-top">
                       {renderMultilineCell(cell)}
@@ -219,7 +256,19 @@ function GuideTable({ block }: { readonly block: GuideTableBlock }) {
   );
 }
 
-function GuideBlock({ block, sourceUrl }: { readonly block: GuideContentBlock; readonly sourceUrl: string }) {
+function GuideBlock({
+  block,
+  sourceUrl,
+  favoriteRowIds,
+  getRowFavoriteId,
+  onToggleFavoriteRow,
+}: {
+  readonly block: GuideContentBlock;
+  readonly sourceUrl: string;
+  readonly favoriteRowIds: readonly string[];
+  readonly getRowFavoriteId?: (block: GuideTableBlock, row: readonly string[]) => string;
+  readonly onToggleFavoriteRow?: (favoriteId: string) => void;
+}) {
   if (block.kind === 'heading') {
     return block.level === 2 ? (
       <h2 id={block.id} className="scroll-mt-20 text-xl font-semibold text-foreground">
@@ -249,10 +298,17 @@ function GuideBlock({ block, sourceUrl }: { readonly block: GuideContentBlock; r
     );
   }
 
-  return <GuideTable block={block} />;
+  return (
+    <GuideTable
+      block={block}
+      favoriteRowIds={favoriteRowIds}
+      getRowFavoriteId={getRowFavoriteId}
+      onToggleFavoriteRow={onToggleFavoriteRow}
+    />
+  );
 }
 
-export function GuidePageContent({ page }: GuidePageContentProps) {
+export function GuidePageContent({ page, favoriteRowIds = [], getRowFavoriteId, onToggleFavoriteRow }: GuidePageContentProps) {
   const groupLabel = page.group === 'base' ? '基础资料' : page.group === 'features' ? '机制说明' : '攻略资料';
   const loadMoreTablesRef = useRef<HTMLDivElement | null>(null);
   const [visibleTableLimit, setVisibleTableLimit] = useState(INITIAL_GUIDE_TABLE_BLOCK_RENDER_COUNT);
@@ -312,7 +368,14 @@ export function GuidePageContent({ page }: GuidePageContentProps) {
       <div className={headings.length > 0 ? 'grid gap-6 xl:grid-cols-[minmax(0,1fr)_14rem]' : 'grid gap-6'}>
         <div className="min-w-0 space-y-5">
           {visibleBlocks.map((block) => (
-            <GuideBlock key={block.id} block={block} sourceUrl={page.sourceUrl} />
+            <GuideBlock
+              key={block.id}
+              block={block}
+              sourceUrl={page.sourceUrl}
+              favoriteRowIds={favoriteRowIds}
+              getRowFavoriteId={getRowFavoriteId}
+              onToggleFavoriteRow={onToggleFavoriteRow}
+            />
           ))}
           {hasMoreTables && (
             <div ref={loadMoreTablesRef} className="flex flex-wrap items-center justify-between gap-3 rounded-md border bg-muted/20 p-3">
