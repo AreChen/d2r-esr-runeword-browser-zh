@@ -5,6 +5,7 @@ import {
   filterGuidePageTables,
   getGuideRowMarkerOptions,
   getGuideRowMarkers,
+  getGuideRowSearchText,
   getGuideTableSections,
   isGuideTableFilterState,
   parseGuideRowRequiredLevel,
@@ -319,6 +320,30 @@ describe('guide table filtering helpers', () => {
     expect([...getGuideRowMarkers(row, translateText)]).toEqual(['dstone', 'affix', 'skillAffix']);
     expect([...getGuideRowMarkers(row, translateText)]).toEqual(['dstone', 'affix', 'skillAffix']);
     expect(translateCount).toBe(2);
+  });
+
+  it('caches localized row search text for repeated searches in the same table context', () => {
+    const block = {
+      id: 'search-table',
+      kind: 'table',
+      caption: 'Body Armor',
+      notes: ['Search Note'],
+      headers: ['Input', 'Output'],
+      rows: [] as readonly (readonly string[])[],
+    } as const;
+    const row = ['Dragon Stone', '+1 to All Skills'];
+    let translateCount = 0;
+    const translateText = (text: string): string => {
+      translateCount += 1;
+      return `译:${text}`;
+    };
+
+    const firstSearchText = getGuideRowSearchText(row, block, 'Body Armor', translateText);
+    const secondSearchText = getGuideRowSearchText(row, block, 'Body Armor', translateText);
+
+    expect(firstSearchText).toBe(secondSearchText);
+    expect(firstSearchText).toContain('译:+1 to all skills');
+    expect(translateCount).toBe(7);
   });
 
   it('builds row marker filter options only for markers found on the current guide page', () => {

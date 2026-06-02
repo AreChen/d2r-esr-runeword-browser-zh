@@ -212,9 +212,41 @@ function buildGuideSearchText(parts: readonly string[], translateText: GuideText
   return buildLocalizedSearchText([...parts, ...translatedParts]);
 }
 
+const guideRowSearchTextCache = new WeakMap<
+  readonly string[],
+  {
+    readonly rowSignature: string;
+    readonly contextSignature: string;
+    readonly translateText: GuideTextTranslator;
+    readonly searchText: string;
+  }
+>();
+
+function getGuideRowSearchContextSignature(block: GuideTableBlock, sectionKey: string): string {
+  return [sectionKey, block.caption, ...(block.notes ?? []), ...block.headers].join('\u001f');
+}
+
+export function getGuideRowSearchText(
+  row: readonly string[],
+  block: GuideTableBlock,
+  sectionKey: string,
+  translateText: GuideTextTranslator = translateGuideText
+): string {
+  const rowSignature = getGuideRowSignature(row);
+  const contextSignature = getGuideRowSearchContextSignature(block, sectionKey);
+  const cached = guideRowSearchTextCache.get(row);
+  if (cached?.rowSignature === rowSignature && cached.contextSignature === contextSignature && cached.translateText === translateText) {
+    return cached.searchText;
+  }
+
+  const searchText = buildGuideSearchText([sectionKey, block.caption, ...(block.notes ?? []), ...block.headers, ...row], translateText);
+  guideRowSearchTextCache.set(row, { rowSignature, contextSignature, translateText, searchText });
+  return searchText;
+}
+
 function rowMatchesSearch(row: readonly string[], block: GuideTableBlock, sectionKey: string, searchTerms: readonly string[]): boolean {
   if (searchTerms.length === 0) return true;
-  const searchable = buildGuideSearchText([sectionKey, block.caption, ...(block.notes ?? []), ...block.headers, ...row]);
+  const searchable = getGuideRowSearchText(row, block, sectionKey);
   return searchTerms.every((term) => searchable.includes(term));
 }
 
