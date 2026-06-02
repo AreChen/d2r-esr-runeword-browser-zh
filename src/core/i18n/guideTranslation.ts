@@ -18,6 +18,7 @@ const guideExactTranslations: Readonly<Record<string, string>> = {
   'Cube Recipes': '方块公式',
   Maps: '地图',
   Materials: '材料',
+  'Charm Ring Amulet': '咒符饰品',
   'Quick Guide': '简要攻略',
   'Amazon Guide': '亚马逊攻略',
   'Assassin Guide': '刺客攻略',

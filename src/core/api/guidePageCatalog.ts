@@ -184,6 +184,16 @@ export const GUIDE_PAGE_CATALOG = [
   },
   {
     ...D2R_DPDNS_GUIDE_DEFAULTS,
+    id: 'd2rCharmRings',
+    group: 'base',
+    label: 'Charm Ring Amulet',
+    title: '咒符饰品资料',
+    sourcePath: 'CharmRing.html',
+    fixturePath: 'd2r-dpdns/CharmRing.html',
+    order: 16,
+  },
+  {
+    ...D2R_DPDNS_GUIDE_DEFAULTS,
     id: 'd2rQuickGuide',
     label: 'Quick Guide',
     title: '简要攻略',

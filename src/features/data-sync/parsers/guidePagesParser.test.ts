@@ -348,7 +348,7 @@ describe('guide page parser', () => {
   });
 
   it('fetches DPDNS-backed canonical base guide pages through the guide page catalog', () => {
-    const canonicalDpdnsBaseIds = ['weapons', 'armors', 'maps', 'uniqueMythicals'] as const;
+    const canonicalDpdnsBaseIds = ['weapons', 'armors', 'maps', 'uniqueMythicals', 'd2rMaterials', 'd2rCharmRings'] as const;
     const skippedCoreIds = new Set<string>(CORE_GUIDE_PAGE_IDS);
 
     for (const id of canonicalDpdnsBaseIds) {
@@ -365,6 +365,37 @@ describe('guide page parser', () => {
     expect(entry?.title).toBe('材料资料');
     expect(entry ? getGuidePageEntrySourceUrl(entry) : '').toBe('https://d2r.dpdns.org/Materials.html');
   });
+
+  it('integrates DPDNS charm, ring, amulet, and jewel data as a native base page', () => {
+    const entry = GUIDE_PAGE_CATALOG.find((page) => page.id === 'd2rCharmRings');
+
+    expect(entry).toBeDefined();
+    expect(entry?.group).toBe('base');
+    expect(entry?.label).toBe('Charm Ring Amulet');
+    expect(entry?.title).toBe('咒符饰品资料');
+    expect(entry ? getGuidePageEntrySourceUrl(entry) : '').toBe('https://d2r.dpdns.org/CharmRing.html');
+  });
+
+  it('parses DPDNS charm, ring, amulet, and jewel data into searchable tables', () => {
+    const entry = GUIDE_PAGE_CATALOG.find((page) => page.id === 'd2rCharmRings');
+    expect(entry).toBeDefined();
+    if (!entry) return;
+
+    const page = parseGuidePage(readGuideFixture(entry), entry);
+    const tables = page.blocks.filter((block) => block.kind === 'table');
+    const captions = tables.map((table) => table.caption);
+
+    expect(page.sourceUrl).toBe('https://d2r.dpdns.org/CharmRing.html');
+    expect(page.textIndex).toContain('黄色果冻');
+    expect(page.textIndex).toContain('乔丹之石');
+    expect(captions).toContain('大型咒符');
+    expect(captions).toContain('小型咒符');
+    expect(captions).toContain('戒指');
+    expect(captions).toContain('护身符');
+    expect(captions).toContain('珠宝');
+    expect(tables.length).toBeGreaterThan(10);
+    expect(tables.reduce((total, table) => total + table.rows.length, 0)).toBeGreaterThan(80);
+  }, 20000);
 
   it('splits the official D-Stone compound recipe table into searchable subtables', () => {
     const entry = GUIDE_PAGE_CATALOG.find((page) => page.id === 'cubeRecipes');

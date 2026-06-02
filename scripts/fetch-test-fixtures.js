@@ -36,6 +36,7 @@ const FILES = [
   { url: `${ESR_BASE_URL}/weapon_mastery.html`, name: 'weapon_mastery.html' },
   { url: `${D2R_DPDNS_BASE_URL}/CubeFormula.html`, name: 'd2r-dpdns/CubeFormula.html' },
   { url: `${D2R_DPDNS_BASE_URL}/Materials.html`, name: 'd2r-dpdns/Materials.html' },
+  { url: `${D2R_DPDNS_BASE_URL}/CharmRing.html`, name: 'd2r-dpdns/CharmRing.html' },
   { url: `${D2R_DPDNS_BASE_URL}/Anointment.html`, name: 'd2r-dpdns/Anointment.html' },
   { url: `${D2R_DPDNS_BASE_URL}/Corruption.html`, name: 'd2r-dpdns/Corruption.html' },
   { url: `${D2R_DPDNS_BASE_URL}/EndMap.html`, name: 'd2r-dpdns/EndMap.html' },

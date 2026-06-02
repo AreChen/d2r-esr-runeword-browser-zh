@@ -19,7 +19,7 @@ DPDNS standalone explanation tables are compacted into readable guide paragraphs
 | Unique Others | `https://easternsunresurrected.com/unique_others.htm` |
 | Mythical Uniques | `https://easternsunresurrected.com/unique_mythicals.htm` |
 | Ascendancies | `https://easternsunresurrected.com/ascendancies.htm` |
-| Guide Pages | Native base information, material, and mechanism pages, with DPDNS used as canonical source where it is more complete, plus supplemental class guides |
+| Guide Pages | Native base information, material, charm/jewelry, and mechanism pages, with DPDNS used as canonical source where it is more complete, plus supplemental class guides |
 
 Remote URLs are configured in `src/core/api/remoteConfig.ts`; guide page catalog entries live in `src/core/api/guidePageCatalog.ts`.
 
