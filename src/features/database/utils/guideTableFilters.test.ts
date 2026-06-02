@@ -4,6 +4,7 @@ import {
   buildGuideTableRowFavoriteId,
   filterGuidePageTables,
   getGuideRowMarkerOptions,
+  getGuideRowMarkers,
   getGuideTableSections,
   isGuideTableFilterState,
   parseGuideRowRequiredLevel,
@@ -305,6 +306,19 @@ describe('guide table filtering helpers', () => {
       { kind: 'speedAffix', label: '速度', rowCount: 1 },
       { kind: 'triggerAffix', label: '触发施法', rowCount: 1 },
     ]);
+  });
+
+  it('caches translated row markers for repeated marker filters on the same row', () => {
+    const row = ['Dragon Stone', '+1 to All Skills'];
+    let translateCount = 0;
+    const translateText = (text: string): string => {
+      translateCount += 1;
+      return text;
+    };
+
+    expect([...getGuideRowMarkers(row, translateText)]).toEqual(['dstone', 'affix', 'skillAffix']);
+    expect([...getGuideRowMarkers(row, translateText)]).toEqual(['dstone', 'affix', 'skillAffix']);
+    expect(translateCount).toBe(2);
   });
 
   it('builds row marker filter options only for markers found on the current guide page', () => {

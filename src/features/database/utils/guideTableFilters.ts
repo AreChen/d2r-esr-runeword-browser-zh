@@ -12,6 +12,8 @@ import {
 
 export const NO_SECTION_SELECTED = '__none__';
 
+type GuideTextTranslator = (text: string) => string;
+
 export interface GuideTableFilterState {
   readonly searchText: string;
   readonly selectedSections: readonly string[];
@@ -205,8 +207,8 @@ export function isGuideTableSectionSelected(sectionKey: string, selectedSections
   return isSectionSelected(sectionKey, selectedSections);
 }
 
-function buildGuideSearchText(parts: readonly string[]): string {
-  const translatedParts = parts.map((part) => translateGuideText(part));
+function buildGuideSearchText(parts: readonly string[], translateText: GuideTextTranslator = translateGuideText): string {
+  const translatedParts = parts.map((part) => translateText(part));
   return buildLocalizedSearchText([...parts, ...translatedParts]);
 }
 
@@ -222,19 +224,41 @@ function rowMatchesRequiredLevel(row: readonly string[], headers: readonly strin
   return requiredLevel === null || requiredLevel <= maxReqLevel;
 }
 
-function getTranslatedRowLines(row: readonly string[]): readonly string[] {
+function getTranslatedRowLines(row: readonly string[], translateText: GuideTextTranslator): readonly string[] {
   return row.flatMap((cell) =>
     cell
       .split(/\n+/u)
-      .map((line) => translateGuideText(line.trim()))
+      .map((line) => translateText(line.trim()))
       .filter((line) => line.length > 0)
   );
 }
 
-function getGuideRowMarkers(row: readonly string[]): ReadonlySet<GuideRowMarkerKind> {
+const guideRowMarkerCache = new WeakMap<
+  readonly string[],
+  {
+    readonly rowSignature: string;
+    readonly translateText: GuideTextTranslator;
+    readonly markers: ReadonlySet<GuideRowMarkerKind>;
+  }
+>();
+
+function getGuideRowSignature(row: readonly string[]): string {
+  return row.join('\u001f');
+}
+
+export function getGuideRowMarkers(
+  row: readonly string[],
+  translateText: GuideTextTranslator = translateGuideText
+): ReadonlySet<GuideRowMarkerKind> {
+  const rowSignature = getGuideRowSignature(row);
+  const cached = guideRowMarkerCache.get(row);
+  if (cached?.rowSignature === rowSignature && cached.translateText === translateText) {
+    return cached.markers;
+  }
+
   const markers = new Set<GuideRowMarkerKind>();
 
-  for (const line of getTranslatedRowLines(row)) {
+  for (const line of getTranslatedRowLines(row, translateText)) {
     const classification = getGuideCellLineClassification(line);
     if (classification.kind === 'affix') {
       markers.add('affix');
@@ -248,6 +272,7 @@ function getGuideRowMarkers(row: readonly string[]): ReadonlySet<GuideRowMarkerK
     }
   }
 
+  guideRowMarkerCache.set(row, { rowSignature, translateText, markers });
   return markers;
 }
 
