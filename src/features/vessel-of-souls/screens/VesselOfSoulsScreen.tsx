@@ -43,7 +43,7 @@ export function VesselOfSoulsScreen() {
   }
 
   const sections = getGuideTableSections(page, filters);
-  const markerOptions = getGuideRowMarkerOptions(page);
+  const markerOptions = getGuideRowMarkerOptions(page, filters);
   const filteredPage = filterGuidePageTables(page, filters);
 
   return (

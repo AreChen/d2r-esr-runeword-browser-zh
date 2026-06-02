@@ -225,14 +225,30 @@ function getGuideRowMarkers(row: readonly string[]): ReadonlySet<GuideRowMarkerK
   return markers;
 }
 
-export function getGuideRowMarkerOptions(page: GuidePage): readonly GuideRowMarkerOption[] {
+function rowMatchesMarkerOptionScope(
+  row: readonly string[],
+  block: GuideTableBlock,
+  sectionKey: string,
+  filters: GuideTableFilterState | undefined,
+  searchTerms: readonly string[]
+): boolean {
+  if (!filters) return true;
+  if (!shouldKeepSection(sectionKey, filters)) return false;
+  return rowMatchesSearch(row, block, sectionKey, searchTerms) && rowMatchesRequiredLevel(row, block.headers, filters.maxReqLevel);
+}
+
+export function getGuideRowMarkerOptions(page: GuidePage, filters?: GuideTableFilterState): readonly GuideRowMarkerOption[] {
   const rowCounts = new Map<GuideRowMarkerKind, number>();
+  const searchTerms = filters ? parseSearchTerms(filters.searchText) : [];
 
   for (const block of page.blocks) {
     if (block.kind !== 'table') continue;
 
     const normalizedBlock = normalizeGuideTableBlock(block);
+    const sectionKey = getGuideTableSectionKey(normalizedBlock.caption);
     for (const row of normalizedBlock.rows) {
+      if (!rowMatchesMarkerOptionScope(row, normalizedBlock, sectionKey, filters, searchTerms)) continue;
+
       for (const marker of getGuideRowMarkers(row)) {
         rowCounts.set(marker, (rowCounts.get(marker) ?? 0) + 1);
       }

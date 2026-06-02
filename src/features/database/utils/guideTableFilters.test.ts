@@ -197,4 +197,34 @@ describe('guide table filtering helpers', () => {
       { kind: 'affix', label: '属性词缀', rowCount: 4 },
     ]);
   });
+
+  it('counts row marker options against search and section filters while ignoring the active marker filter', () => {
+    expect(
+      getGuideRowMarkerOptions(samplePage, {
+        searchText: '',
+        selectedSections: ['Body Armor'],
+        favoriteSections: [],
+        showFavoritesOnly: false,
+        maxReqLevel: null,
+        selectedMarkers: ['affix'],
+      })
+    ).toEqual([
+      { kind: 'cube', label: '方块材料', rowCount: 1 },
+      { kind: 'affix', label: '属性词缀', rowCount: 2 },
+    ]);
+
+    expect(
+      getGuideRowMarkerOptions(samplePage, {
+        searchText: 'Thrown Axe',
+        selectedSections: [],
+        favoriteSections: [],
+        showFavoritesOnly: false,
+        maxReqLevel: null,
+        selectedMarkers: ['cube'],
+      })
+    ).toEqual([
+      { kind: 'organ', label: '器官', rowCount: 1 },
+      { kind: 'affix', label: '属性词缀', rowCount: 1 },
+    ]);
+  });
 });
