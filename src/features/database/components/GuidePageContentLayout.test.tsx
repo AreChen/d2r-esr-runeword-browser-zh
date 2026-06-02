@@ -109,7 +109,7 @@ const pageWithHighlightedCellLines: GuidePage = {
       rows: [
         [
           "El Rune\nPerfect Ruby\nWorldstone Shard\nDiablo's Demonic Horn\nDragon Stone\nGreen Aura Stone\n黑色光环石\nSocket Donut\nForging Hammer\nHoly Symbol\nBlackmoor\nEndgame Map Key\nRandomize Stone\nOre Shard\nUnique Stone\n碎裂甜酸石\nElixir\nAncient Decipherer",
-          '+(150 to 200)% Enhanced Damage\n+1 to All Skills',
+          '+(150 to 200)% Enhanced Damage\n+1 to All Skills\nCold Resist +5%\n5% Faster Cast Rate\n5% Chance to Cast Level 20 Fire Ball on Striking',
         ],
       ],
     },
@@ -207,6 +207,11 @@ describe('GuidePageContent layout', () => {
     expect(html).toMatch(/data-guide-material-kind="cube"[^>]*>矿石碎片<\/span>/u);
     expect(html).toMatch(/data-guide-material-kind="cube"[^>]*>暗金石头<\/span>/u);
     expect(html).toMatch(/data-guide-material-kind="gem"[^>]*>碎裂甜酸石<\/span>/u);
+    expect(html).toContain('data-guide-affix-kind="damageAffix"');
+    expect(html).toContain('data-guide-affix-kind="skillAffix"');
+    expect(html).toContain('data-guide-affix-kind="resistAffix"');
+    expect(html).toContain('data-guide-affix-kind="speedAffix"');
+    expect(html).toContain('data-guide-affix-kind="triggerAffix"');
     expect(html).toContain('+(150 to 200)% 增强伤害');
     expect(html).toContain('+1 所有技能等级');
   });

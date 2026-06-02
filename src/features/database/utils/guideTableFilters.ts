@@ -238,6 +238,9 @@ function getGuideRowMarkers(row: readonly string[]): ReadonlySet<GuideRowMarkerK
     const classification = getGuideCellLineClassification(line);
     if (classification.kind === 'affix') {
       markers.add('affix');
+      if (classification.affixKind !== 'affix') {
+        markers.add(classification.affixKind);
+      }
       continue;
     }
     if (classification.kind === 'material') {

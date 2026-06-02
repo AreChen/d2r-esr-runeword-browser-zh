@@ -6,7 +6,7 @@ import { ESR_BASE_URL } from '@/core/api';
 import type { GuideContentBlock, GuidePage, GuideTableBlock } from '@/core/db';
 import { translateGuideText } from '@/core/i18n/guideTranslation';
 import { cn } from '@/lib/utils';
-import { getGuideCellLineClassification, type GuideMaterialLineKind } from '../utils/guideCellClassification';
+import { getGuideCellLineClassification, type GuideAffixLineKind, type GuideMaterialLineKind } from '../utils/guideCellClassification';
 import { getGuidePageBlockSummary, getGuidePageHeadings } from '../utils/guidePageSummary';
 
 const INITIAL_GUIDE_TABLE_RENDER_COUNT = 80;
@@ -21,7 +21,15 @@ interface GuidePageContentProps {
   readonly onToggleFavoriteRow?: (favoriteId: string) => void;
 }
 
-const AFFIX_LINE_CLASS = 'inline rounded-sm border border-sky-400/25 bg-sky-500/10 px-1 py-0.5 font-medium text-sky-700 dark:text-sky-300';
+const AFFIX_LINE_CLASSES: Record<GuideAffixLineKind | 'affix', string> = {
+  affix: 'inline rounded-sm border border-sky-400/25 bg-sky-500/10 px-1 py-0.5 font-medium text-sky-700 dark:text-sky-300',
+  skillAffix: 'inline rounded-sm border border-blue-400/30 bg-blue-500/10 px-1 py-0.5 font-medium text-blue-700 dark:text-blue-300',
+  resistAffix: 'inline rounded-sm border border-lime-400/35 bg-lime-500/10 px-1 py-0.5 font-medium text-lime-800 dark:text-lime-300',
+  damageAffix: 'inline rounded-sm border border-rose-400/30 bg-rose-500/10 px-1 py-0.5 font-medium text-rose-700 dark:text-rose-300',
+  speedAffix: 'inline rounded-sm border border-cyan-400/35 bg-cyan-500/10 px-1 py-0.5 font-medium text-cyan-800 dark:text-cyan-300',
+  triggerAffix:
+    'inline rounded-sm border border-purple-400/35 bg-purple-500/10 px-1 py-0.5 font-medium text-purple-800 dark:text-purple-300',
+};
 
 const MATERIAL_LINE_CLASSES: Record<GuideMaterialLineKind, string> = {
   rune: 'inline rounded-sm border border-violet-400/30 bg-violet-500/10 px-1 py-0.5 font-medium text-violet-700 dark:text-violet-300',
@@ -60,7 +68,11 @@ function renderGuideCellLine(line: string): React.ReactNode {
 
   if (classification.kind === 'affix') {
     return (
-      <span data-guide-line-kind="affix" className={cn(AFFIX_LINE_CLASS)}>
+      <span
+        data-guide-line-kind="affix"
+        data-guide-affix-kind={classification.affixKind}
+        className={cn(AFFIX_LINE_CLASSES[classification.affixKind])}
+      >
         {line}
       </span>
     );

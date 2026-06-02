@@ -12,11 +12,13 @@ export type GuideMaterialLineKind =
   | 'consumable'
   | 'currency';
 
-export type GuideRowMarkerKind = GuideMaterialLineKind | 'affix';
+export type GuideAffixLineKind = 'skillAffix' | 'resistAffix' | 'damageAffix' | 'speedAffix' | 'triggerAffix';
+
+export type GuideRowMarkerKind = GuideMaterialLineKind | 'affix' | GuideAffixLineKind;
 
 export type GuideCellLineClassification =
   | { readonly kind: 'plain' }
-  | { readonly kind: 'affix' }
+  | { readonly kind: 'affix'; readonly affixKind: GuideAffixLineKind | 'affix' }
   | { readonly kind: 'material'; readonly materialKind: GuideMaterialLineKind };
 
 export const GUIDE_ROW_MARKER_LABELS: Record<GuideRowMarkerKind, string> = {
@@ -33,6 +35,11 @@ export const GUIDE_ROW_MARKER_LABELS: Record<GuideRowMarkerKind, string> = {
   consumable: '消耗品',
   currency: '优惠券/代币',
   affix: '属性词缀',
+  skillAffix: '技能加成',
+  resistAffix: '抗性',
+  damageAffix: '伤害/穿刺',
+  speedAffix: '速度',
+  triggerAffix: '触发施法',
 };
 
 export const GUIDE_ROW_MARKER_KINDS: readonly GuideRowMarkerKind[] = [
@@ -49,6 +56,11 @@ export const GUIDE_ROW_MARKER_KINDS: readonly GuideRowMarkerKind[] = [
   'consumable',
   'currency',
   'affix',
+  'skillAffix',
+  'resistAffix',
+  'damageAffix',
+  'speedAffix',
+  'triggerAffix',
 ] as const;
 
 const MATERIAL_KIND_PATTERNS: readonly { readonly kind: GuideMaterialLineKind; readonly patterns: readonly RegExp[] }[] = [
@@ -132,6 +144,35 @@ const AFFIX_LINE_PATTERNS = [
   /(?:增强伤害|所有技能|技能等级|抗性|防御|伤害|几率|攻击准确率|生命|法力|速度|吸取|镶孔|腐化|涂油|锻造)/u,
 ] as const;
 
+const SPECIFIC_AFFIX_KIND_PATTERNS: readonly { readonly kind: GuideAffixLineKind; readonly patterns: readonly RegExp[] }[] = [
+  {
+    kind: 'triggerAffix',
+    patterns: [/\b(?:Chance to Cast|Cast Level)\b/iu, /(?:几率.*施放|施放等级)/u],
+  },
+  {
+    kind: 'skillAffix',
+    patterns: [/\b(?:All Skills?|Skill Levels?|[A-Z][A-Za-z/ ]+ Skills?)\b/iu, /(?:所有技能|技能等级|[一-龥A-Za-z/]+技能(?:（|$|\s))/u],
+  },
+  {
+    kind: 'resistAffix',
+    patterns: [/\b(?:Resist|Resistance|Resistances)\b/iu, /(?:抗性|最大抗|降低敌人[^\n]*抗)/u],
+  },
+  {
+    kind: 'damageAffix',
+    patterns: [
+      /\b(?:Enhanced Damage|Damage|Piercing Attack|Crushing Blow|Deadly Strike|Open Wounds)\b/iu,
+      /(?:增强伤害|伤害|穿刺|压碎|致命|撕开伤口)/u,
+    ],
+  },
+  {
+    kind: 'speedAffix',
+    patterns: [
+      /\b(?:Faster|Speed|Run\/Walk|Increased Attack Speed|Attack Speed|Cast Rate|Block Rate|Hit Recovery)\b/iu,
+      /(?:速度|跑步|行走|攻击速度|施法速度|格挡速度|恢复速度)/u,
+    ],
+  },
+] as const;
+
 function getGuideMaterialLineKind(line: string): GuideMaterialLineKind | null {
   for (const entry of MATERIAL_KIND_PATTERNS) {
     if (entry.patterns.some((pattern) => pattern.test(line))) return entry.kind;
@@ -140,10 +181,21 @@ function getGuideMaterialLineKind(line: string): GuideMaterialLineKind | null {
   return null;
 }
 
+function getGuideAffixLineKind(line: string): GuideAffixLineKind | 'affix' | null {
+  if (!AFFIX_LINE_PATTERNS.some((pattern) => pattern.test(line))) return null;
+
+  for (const entry of SPECIFIC_AFFIX_KIND_PATTERNS) {
+    if (entry.patterns.some((pattern) => pattern.test(line))) return entry.kind;
+  }
+
+  return 'affix';
+}
+
 export function getGuideCellLineClassification(line: string): GuideCellLineClassification {
   const materialKind = getGuideMaterialLineKind(line);
   if (materialKind !== null) return { kind: 'material', materialKind };
-  if (AFFIX_LINE_PATTERNS.some((pattern) => pattern.test(line))) return { kind: 'affix' };
+  const affixKind = getGuideAffixLineKind(line);
+  if (affixKind !== null) return { kind: 'affix', affixKind };
   return { kind: 'plain' };
 }
 

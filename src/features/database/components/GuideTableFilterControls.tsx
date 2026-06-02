@@ -89,6 +89,11 @@ const MARKER_DOT_CLASSES: Record<GuideRowMarkerKind, string> = {
   consumable: 'bg-teal-500',
   currency: 'bg-yellow-500',
   affix: 'bg-sky-500',
+  skillAffix: 'bg-blue-500',
+  resistAffix: 'bg-lime-500',
+  damageAffix: 'bg-rose-500',
+  speedAffix: 'bg-cyan-500',
+  triggerAffix: 'bg-purple-500',
 };
 
 export function GuideTableFilterControls({

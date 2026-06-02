@@ -49,6 +49,33 @@ const samplePage: GuidePage = {
   ],
 };
 
+const affixMarkerPage: GuidePage = {
+  id: 'affixes',
+  group: 'base',
+  label: 'Affixes',
+  title: '词缀资料',
+  sourcePath: 'affixes.htm',
+  sourceUrl: 'https://example.test/affixes.htm',
+  order: 2,
+  textIndex: '',
+  blocks: [
+    {
+      id: 'affix-table',
+      kind: 'table',
+      caption: 'Affix Outcomes',
+      headers: ['Input', 'Output'],
+      rows: [
+        ['Skill result', '+1 to All Skills'],
+        ['Resist result', 'Cold Resist +5%'],
+        ['Damage result', '+(150 to 200)% Enhanced Damage'],
+        ['Speed result', '5% Faster Cast Rate'],
+        ['Trigger result', '5% Chance to Cast Level 20 Fire Ball on Striking'],
+        ['General result', '+100 Defense'],
+      ],
+    },
+  ],
+};
+
 describe('guide table filtering helpers', () => {
   it('extracts compact section keys from table captions', () => {
     expect(getGuideTableSections(samplePage)).toEqual([
@@ -181,7 +208,7 @@ describe('guide table filtering helpers', () => {
       isGuideTableFilterState({
         ...oldSavedState,
         favoriteRows: ['Body Armor::abc123'],
-        selectedMarkers: ['cube', 'dstone', 'forging', 'aura', 'socket', 'map', 'affix'],
+        selectedMarkers: ['cube', 'dstone', 'forging', 'aura', 'socket', 'map', 'affix', 'skillAffix', 'resistAffix', 'damageAffix'],
       })
     ).toBe(true);
     expect(isGuideTableFilterState({ ...oldSavedState, selectedMarkers: ['not-a-marker'] })).toBe(false);
@@ -234,6 +261,52 @@ describe('guide table filtering helpers', () => {
     ]);
   });
 
+  it('keeps generic affix filtering while adding specific affix marker filters', () => {
+    const genericAffixResult = filterGuidePageTables(affixMarkerPage, {
+      searchText: '',
+      selectedSections: [],
+      favoriteSections: [],
+      showFavoritesOnly: false,
+      maxReqLevel: null,
+      selectedMarkers: ['affix'],
+    });
+    const skillAffixResult = filterGuidePageTables(affixMarkerPage, {
+      searchText: '',
+      selectedSections: [],
+      favoriteSections: [],
+      showFavoritesOnly: false,
+      maxReqLevel: null,
+      selectedMarkers: ['skillAffix'],
+    });
+    const triggerAffixResult = filterGuidePageTables(affixMarkerPage, {
+      searchText: '',
+      selectedSections: [],
+      favoriteSections: [],
+      showFavoritesOnly: false,
+      maxReqLevel: null,
+      selectedMarkers: ['triggerAffix'],
+    });
+
+    expect(genericAffixResult.visibleRowCount).toBe(6);
+    expect(skillAffixResult.page.blocks.filter((block) => block.kind === 'table').flatMap((block) => block.rows)).toEqual([
+      ['Skill result', '+1 to All Skills'],
+    ]);
+    expect(triggerAffixResult.page.blocks.filter((block) => block.kind === 'table').flatMap((block) => block.rows)).toEqual([
+      ['Trigger result', '5% Chance to Cast Level 20 Fire Ball on Striking'],
+    ]);
+  });
+
+  it('builds row marker options for specific affix families', () => {
+    expect(getGuideRowMarkerOptions(affixMarkerPage)).toEqual([
+      { kind: 'affix', label: '属性词缀', rowCount: 6 },
+      { kind: 'skillAffix', label: '技能加成', rowCount: 1 },
+      { kind: 'resistAffix', label: '抗性', rowCount: 1 },
+      { kind: 'damageAffix', label: '伤害/穿刺', rowCount: 1 },
+      { kind: 'speedAffix', label: '速度', rowCount: 1 },
+      { kind: 'triggerAffix', label: '触发施法', rowCount: 1 },
+    ]);
+  });
+
   it('builds row marker filter options only for markers found on the current guide page', () => {
     expect(getGuideRowMarkerOptions(samplePage)).toEqual([
       { kind: 'organ', label: '器官', rowCount: 1 },
@@ -242,6 +315,9 @@ describe('guide table filtering helpers', () => {
       { kind: 'aura', label: '光环石', rowCount: 1 },
       { kind: 'socket', label: '镶孔材料', rowCount: 1 },
       { kind: 'affix', label: '属性词缀', rowCount: 4 },
+      { kind: 'skillAffix', label: '技能加成', rowCount: 1 },
+      { kind: 'resistAffix', label: '抗性', rowCount: 1 },
+      { kind: 'triggerAffix', label: '触发施法', rowCount: 1 },
     ]);
   });
 
@@ -261,6 +337,7 @@ describe('guide table filtering helpers', () => {
       { kind: 'aura', label: '光环石', rowCount: 1 },
       { kind: 'socket', label: '镶孔材料', rowCount: 1 },
       { kind: 'affix', label: '属性词缀', rowCount: 2 },
+      { kind: 'resistAffix', label: '抗性', rowCount: 1 },
     ]);
 
     expect(
@@ -275,6 +352,7 @@ describe('guide table filtering helpers', () => {
     ).toEqual([
       { kind: 'organ', label: '器官', rowCount: 1 },
       { kind: 'affix', label: '属性词缀', rowCount: 1 },
+      { kind: 'triggerAffix', label: '触发施法', rowCount: 1 },
     ]);
   });
 });
