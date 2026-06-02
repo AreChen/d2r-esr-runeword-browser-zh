@@ -3,12 +3,12 @@ import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 describe('database screen copy', () => {
-  function readDatabaseScreenSource(): string {
-    return readFileSync(resolve(process.cwd(), 'src/features/database/screens/DatabaseScreen.tsx'), 'utf8');
+  function readProjectSource(path: string): string {
+    return readFileSync(resolve(process.cwd(), path), 'utf8');
   }
 
   it('uses Chinese wording for visible guide database section names', () => {
-    const source = readDatabaseScreenSource();
+    const source = readProjectSource('src/features/database/screens/DatabaseScreen.tsx');
 
     expect(source).toContain('基础资料、机制说明与攻略资料的中文整理版。');
     expect(source).toContain('攻略资料');
@@ -19,8 +19,8 @@ describe('database screen copy', () => {
   });
 
   it('indexes translated guide page content for Chinese global database search', () => {
-    const source = readDatabaseScreenSource();
+    const source = readProjectSource('src/features/database/utils/databasePageSearch.ts');
 
-    expect(source).toContain('translateGuideText(page.textIndex)');
+    expect(source).toContain('getCachedTranslatedTextIndex(page, translateText)');
   });
 });

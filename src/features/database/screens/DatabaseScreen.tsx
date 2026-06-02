@@ -7,13 +7,13 @@ import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import { ScrollToTopButton } from '@/components/ScrollToTopButton';
 import { usePersistentState } from '@/core/hooks/usePersistentState';
-import { buildLocalizedSearchText } from '@/core/i18n';
 import { translateGuideText } from '@/core/i18n/guideTranslation';
 import type { GuidePage, GuidePageGroup } from '@/core/db';
 import { parseSearchTerms } from '@/features/runewords/utils/filteringHelpers';
 import { GuidePageContent } from '../components/GuidePageContent';
 import { GuideTableFilterControls } from '../components/GuideTableFilterControls';
 import { useGuidePages } from '../hooks/useGuidePages';
+import { pageMatchesDatabaseSearch } from '../utils/databasePageSearch';
 import { getGuidePageBlockSummary } from '../utils/guidePageSummary';
 import {
   DEFAULT_GUIDE_TABLE_FILTERS,
@@ -62,22 +62,9 @@ function isDatabaseBrowserState(value: unknown): value is DatabaseBrowserState {
   );
 }
 
-function pageMatchesSearch(page: GuidePage, terms: readonly string[]): boolean {
-  if (terms.length === 0) return true;
-  const shouldSearchTranslatedIndex = terms.some((term) => /[\u4e00-\u9fff]/u.test(term));
-  const searchable = buildLocalizedSearchText([
-    page.title,
-    page.label,
-    translateGuideText(page.label),
-    page.textIndex,
-    shouldSearchTranslatedIndex ? translateGuideText(page.textIndex) : '',
-  ]);
-  return terms.every((term) => searchable.includes(term));
-}
-
 function filterPages(pages: readonly GuidePage[], groupFilter: GroupFilter, searchText: string): GuidePage[] {
   const terms = parseSearchTerms(searchText);
-  return pages.filter((page) => (groupFilter === 'all' || page.group === groupFilter) && pageMatchesSearch(page, terms));
+  return pages.filter((page) => (groupFilter === 'all' || page.group === groupFilter) && pageMatchesDatabaseSearch(page, terms));
 }
 
 function getGroupName(group: GuidePageGroup): string {
