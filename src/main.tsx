@@ -2,8 +2,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { RouterProvider } from 'react-router-dom';
-import { store, registerSaga, runSagas, startupCheck } from '@/core/store';
-import { dataSyncSaga } from '@/features/data-sync';
+import { store, fatalError, registerSaga, runSagas, startupCheck } from '@/core/store';
 import { ThemeInitializer } from '@/features/settings';
 import { router } from '@/core/router';
 import './index.css';
@@ -29,14 +28,23 @@ if (typeof indexedDB.databases === 'function') {
     });
 }
 
-// Register feature sagas
-registerSaga(dataSyncSaga);
+function getStartupErrorMessage(error: unknown): string {
+  if (error instanceof Error && error.message) return error.message;
+  if (typeof error === 'string' && error) return error;
+  return '未知错误';
+}
 
-// Run all registered sagas
-runSagas();
-
-// Trigger startup data check
-store.dispatch(startupCheck());
+async function startDataSync(): Promise<void> {
+  try {
+    const { dataSyncSaga } = await import('@/features/data-sync');
+    registerSaga(dataSyncSaga);
+    runSagas();
+    store.dispatch(startupCheck());
+  } catch (error) {
+    console.error('[Startup] Failed to load data sync module', error);
+    store.dispatch(fatalError(`无法加载数据同步模块，请刷新页面重试：${getStartupErrorMessage(error)}`));
+  }
+}
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
@@ -51,3 +59,5 @@ createRoot(rootElement).render(
     </Provider>
   </StrictMode>
 );
+
+void startDataSync();
