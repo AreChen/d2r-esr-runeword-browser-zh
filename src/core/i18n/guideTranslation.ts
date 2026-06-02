@@ -460,6 +460,7 @@ const guideExactTranslations: Readonly<Record<string, string>> = {
   'Only works once': '仅生效一次',
   'Unique/Set/Crafted/Rare Equipment': '暗金/套装/手工/稀有装备',
   'Endgame Map': '终局地图',
+  'Endgame Map Key': '终局地图钥匙',
   'Endgame Map of the Next Tier': '下一阶终局地图',
   'Random Endgame Map of the Same Tier': '随机同阶终局地图',
   '2 Endgame Maps of the Same Tier': '2 张同阶终局地图',

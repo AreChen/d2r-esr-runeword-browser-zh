@@ -27,7 +27,8 @@ const samplePage: GuidePage = {
       rows: [
         ['Zuez Padding Quilted Armor (qui)\nGamble Item: Quilted Armor (qui)', 'Item Level: 9 Required Level: 7', 'Cold Resist +5%'],
         ['Mage Plate Mage Plate (xtp)', 'Item Level: 45 Required Level: 30', '+100 Defense'],
-        ['Forged Plate', 'Dragon Stone\nGreen Aura Stone', 'Same Item'],
+        ['Forged Plate', 'Dragon Stone\nGreen Aura Stone\nSocket Donut', 'Same Item'],
+        ['Forging Plate', 'Forging Hammer\nHoly Symbol\nBlackmoor', 'Same Item'],
       ],
     },
     {
@@ -50,7 +51,7 @@ const samplePage: GuidePage = {
 describe('guide table filtering helpers', () => {
   it('extracts compact section keys from table captions', () => {
     expect(getGuideTableSections(samplePage)).toEqual([
-      { key: 'Body Armor', label: 'Body Armor', rowCount: 3 },
+      { key: 'Body Armor', label: 'Body Armor', rowCount: 4 },
       { key: 'Helm', label: 'Helm', rowCount: 1 },
       { key: 'Tier 1', label: 'Tier 1', rowCount: 1 },
     ]);
@@ -67,7 +68,7 @@ describe('guide table filtering helpers', () => {
         selectedMarkers: [],
       })
     ).toEqual([
-      { key: 'Body Armor', label: 'Body Armor', rowCount: 3, matchedRowCount: 0 },
+      { key: 'Body Armor', label: 'Body Armor', rowCount: 4, matchedRowCount: 0 },
       { key: 'Helm', label: 'Helm', rowCount: 1, matchedRowCount: 0 },
       { key: 'Tier 1', label: 'Tier 1', rowCount: 1, matchedRowCount: 1 },
     ]);
@@ -83,7 +84,7 @@ describe('guide table filtering helpers', () => {
       selectedMarkers: [],
     });
 
-    expect(result.totalRowCount).toBe(5);
+    expect(result.totalRowCount).toBe(6);
     expect(result.visibleRowCount).toBe(1);
     expect(result.page.blocks).toContainEqual({
       id: 'body',
@@ -153,23 +154,39 @@ describe('guide table filtering helpers', () => {
     };
 
     expect(isGuideTableFilterState(oldSavedState)).toBe(true);
-    expect(isGuideTableFilterState({ ...oldSavedState, selectedMarkers: ['cube', 'affix'] })).toBe(true);
+    expect(
+      isGuideTableFilterState({ ...oldSavedState, selectedMarkers: ['cube', 'dstone', 'forging', 'aura', 'socket', 'map', 'affix'] })
+    ).toBe(true);
     expect(isGuideTableFilterState({ ...oldSavedState, selectedMarkers: ['not-a-marker'] })).toBe(false);
   });
 
-  it('filters rows by semantic material and affix markers', () => {
-    const cubeResult = filterGuidePageTables(samplePage, {
+  it('filters rows by specific material and affix markers', () => {
+    const dstoneResult = filterGuidePageTables(samplePage, {
       searchText: '',
       selectedSections: [],
       favoriteSections: [],
       showFavoritesOnly: false,
       maxReqLevel: null,
-      selectedMarkers: ['cube'],
+      selectedMarkers: ['dstone'],
     });
 
-    expect(cubeResult.visibleRowCount).toBe(1);
-    expect(cubeResult.page.blocks.filter((block) => block.kind === 'table').flatMap((block) => block.rows)).toEqual([
-      ['Forged Plate', 'Dragon Stone\nGreen Aura Stone', 'Same Item'],
+    expect(dstoneResult.visibleRowCount).toBe(1);
+    expect(dstoneResult.page.blocks.filter((block) => block.kind === 'table').flatMap((block) => block.rows)).toEqual([
+      ['Forged Plate', 'Dragon Stone\nGreen Aura Stone\nSocket Donut', 'Same Item'],
+    ]);
+
+    const forgingResult = filterGuidePageTables(samplePage, {
+      searchText: '',
+      selectedSections: [],
+      favoriteSections: [],
+      showFavoritesOnly: false,
+      maxReqLevel: null,
+      selectedMarkers: ['forging'],
+    });
+
+    expect(forgingResult.visibleRowCount).toBe(1);
+    expect(forgingResult.page.blocks.filter((block) => block.kind === 'table').flatMap((block) => block.rows)).toEqual([
+      ['Forging Plate', 'Forging Hammer\nHoly Symbol\nBlackmoor', 'Same Item'],
     ]);
 
     const affixResult = filterGuidePageTables(samplePage, {
@@ -193,7 +210,10 @@ describe('guide table filtering helpers', () => {
   it('builds row marker filter options only for markers found on the current guide page', () => {
     expect(getGuideRowMarkerOptions(samplePage)).toEqual([
       { kind: 'organ', label: '器官', rowCount: 1 },
-      { kind: 'cube', label: '方块材料', rowCount: 1 },
+      { kind: 'dstone', label: 'D-Stoning/龙石', rowCount: 1 },
+      { kind: 'forging', label: '锻造材料', rowCount: 1 },
+      { kind: 'aura', label: '光环石', rowCount: 1 },
+      { kind: 'socket', label: '镶孔材料', rowCount: 1 },
       { kind: 'affix', label: '属性词缀', rowCount: 4 },
     ]);
   });
@@ -209,7 +229,10 @@ describe('guide table filtering helpers', () => {
         selectedMarkers: ['affix'],
       })
     ).toEqual([
-      { kind: 'cube', label: '方块材料', rowCount: 1 },
+      { kind: 'dstone', label: 'D-Stoning/龙石', rowCount: 1 },
+      { kind: 'forging', label: '锻造材料', rowCount: 1 },
+      { kind: 'aura', label: '光环石', rowCount: 1 },
+      { kind: 'socket', label: '镶孔材料', rowCount: 1 },
       { kind: 'affix', label: '属性词缀', rowCount: 2 },
     ]);
 
@@ -220,7 +243,7 @@ describe('guide table filtering helpers', () => {
         favoriteSections: [],
         showFavoritesOnly: false,
         maxReqLevel: null,
-        selectedMarkers: ['cube'],
+        selectedMarkers: ['dstone'],
       })
     ).toEqual([
       { kind: 'organ', label: '器官', rowCount: 1 },

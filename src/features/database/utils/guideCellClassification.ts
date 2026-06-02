@@ -1,4 +1,16 @@
-export type GuideMaterialLineKind = 'rune' | 'gem' | 'corruption' | 'organ' | 'cube' | 'consumable' | 'currency';
+export type GuideMaterialLineKind =
+  | 'rune'
+  | 'gem'
+  | 'corruption'
+  | 'organ'
+  | 'dstone'
+  | 'forging'
+  | 'aura'
+  | 'socket'
+  | 'map'
+  | 'cube'
+  | 'consumable'
+  | 'currency';
 
 export type GuideRowMarkerKind = GuideMaterialLineKind | 'affix';
 
@@ -12,6 +24,11 @@ export const GUIDE_ROW_MARKER_LABELS: Record<GuideRowMarkerKind, string> = {
   gem: '宝石',
   corruption: '世界石/腐化',
   organ: '器官',
+  dstone: 'D-Stoning/龙石',
+  forging: '锻造材料',
+  aura: '光环石',
+  socket: '镶孔材料',
+  map: '地图/钥匙',
   cube: '方块材料',
   consumable: '消耗品',
   currency: '优惠券/代币',
@@ -23,6 +40,11 @@ export const GUIDE_ROW_MARKER_KINDS: readonly GuideRowMarkerKind[] = [
   'gem',
   'corruption',
   'organ',
+  'dstone',
+  'forging',
+  'aura',
+  'socket',
+  'map',
   'cube',
   'consumable',
   'currency',
@@ -47,6 +69,35 @@ const MATERIAL_KIND_PATTERNS: readonly { readonly kind: GuideMaterialLineKind; r
     patterns: [/\b[A-Z][a-z]+ Rune\b/u, /(?:符文|新符|古符|汉字符文|空白符文)/u],
   },
   {
+    kind: 'dstone',
+    patterns: [/\b(?:Dragon Stones?|D-Stones?|Dragonstone)\b/iu, /(?:龙石|D打造|D-Stoning)/iu],
+  },
+  {
+    kind: 'forging',
+    patterns: [
+      /\b(?:Forging Hammers?|Anvil Stones?|Anvils?|Holy Symbols?|Blackmoores?|Crushed Gems?|Spider'?s Silk|Tyranium Ores?)\b/iu,
+      /(?:锻造(?:之)?锤|铁砧(?:之石|石)?|神圣符号|圣徽|黑沼|粉碎宝石|蛛丝|钛金矿石)/u,
+    ],
+  },
+  {
+    kind: 'aura',
+    patterns: [
+      /\b(?:Aura Stones?|Green Aura Stone|Red Aura Stone|Violet Aura Stone|Yellow Aura Stone|Black Aura Stone|White Aura Stone|Blue Aura Stone)\b/iu,
+      /(?:光环石)/u,
+    ],
+  },
+  {
+    kind: 'socket',
+    patterns: [/\bSocket Donuts?\b/iu, /(?:镶孔甜甜圈|甜甜圈)/u],
+  },
+  {
+    kind: 'map',
+    patterns: [
+      /\b(?:Endgame Maps?|Map Keys?|Chaos Keys?|Pandemonium Key Set|Key of (?:Terror|Hate|Destruction)|Terror Key|Hate Key|Destruction Key)\b/iu,
+      /(?:终局地图|地图钥匙|混沌钥匙|混沌钥匙套装|恐惧之钥|憎恨之钥|仇恨之钥|毁灭之钥)/u,
+    ],
+  },
+  {
     kind: 'gem',
     patterns: [
       /\b(?:Chipped|Flawed|Blemished|Flawless|Perfect)?\s*(?:Gem|Ruby|Sapphire|Emerald|Topaz|Diamond|Amethyst|Skull|Obsidian)s?\b/iu,
@@ -57,8 +108,8 @@ const MATERIAL_KIND_PATTERNS: readonly { readonly kind: GuideMaterialLineKind; r
   {
     kind: 'cube',
     patterns: [
-      /\b(?:Dragon Stones?|Maple Leaves?|Anvil Stones?|Anvils?|Aura Stones?|Socket Donuts?|D-Stones?|Randomiz(?:e|ing) Stones?|Ore Shards?|Tyranium Ores?|Unique Stones?)\b/iu,
-      /(?:龙石|枫叶|铁砧(?:之石|石)?|锻造石|光环石|(?:镶孔)?甜甜圈|随机化?石|随机化之石|矿石碎片|钛金矿石|独特的?石头|暗金石头)/u,
+      /\b(?:Maple Leaves?|Randomiz(?:e|ing) Stones?|Ore Shards?|Unique Stones?)\b/iu,
+      /(?:枫叶|锻造石|随机化?石|随机化之石|矿石碎片|独特的?石头|暗金石头)/u,
     ],
   },
   {
@@ -77,7 +128,7 @@ const MATERIAL_KIND_PATTERNS: readonly { readonly kind: GuideMaterialLineKind; r
 const AFFIX_LINE_PATTERNS = [
   /^[+-](?:\(|\d)/u,
   /\b(?:Enhanced Damage|All Skills|Skill Levels?|Resist|Resistance|Defense|Damage|Chance to Cast|Attack Rating)\b/iu,
-  /\b(?:Life|Mana|Faster|Speed|Leech|Sockets?|Corrupted|Anointed|Forging|Crushing Blow|Deadly Strike)\b/iu,
+  /\b(?:Life|Mana|Faster|Speed|Leech|Sockets?|Corrupted|Anointed|Crushing Blow|Deadly Strike)\b/iu,
   /(?:增强伤害|所有技能|技能等级|抗性|防御|伤害|几率|攻击准确率|生命|法力|速度|吸取|镶孔|腐化|涂油|锻造)/u,
 ] as const;
 
