@@ -334,6 +334,7 @@ describe('guide page parser', () => {
       ['armors', 'd2rArmors', 'https://d2r.dpdns.org/Armor.html'],
       ['maps', 'd2rMaps', 'https://d2r.dpdns.org/Map.html'],
       ['uniqueMythicals', 'd2rMythicals', 'https://d2r.dpdns.org/Mythicals.html'],
+      ['sets', 'd2rSets', 'https://d2r.dpdns.org/Sets.html'],
     ] as const;
     const catalogIds = GUIDE_PAGE_CATALOG.map((page) => page.id as string);
 
@@ -348,7 +349,7 @@ describe('guide page parser', () => {
   });
 
   it('fetches DPDNS-backed canonical base guide pages through the guide page catalog', () => {
-    const canonicalDpdnsBaseIds = ['weapons', 'armors', 'maps', 'uniqueMythicals', 'd2rMaterials', 'd2rCharmRings'] as const;
+    const canonicalDpdnsBaseIds = ['weapons', 'armors', 'maps', 'uniqueMythicals', 'sets', 'd2rMaterials', 'd2rCharmRings'] as const;
     const skippedCoreIds = new Set<string>(CORE_GUIDE_PAGE_IDS);
 
     for (const id of canonicalDpdnsBaseIds) {

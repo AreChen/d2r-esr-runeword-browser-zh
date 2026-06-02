@@ -44,6 +44,7 @@ const FILES = [
   { url: `${D2R_DPDNS_BASE_URL}/kill_ledger.html`, name: 'd2r-dpdns/kill_ledger.html' },
   { url: `${D2R_DPDNS_BASE_URL}/Ascendancies.html`, name: 'd2r-dpdns/Ascendancies.html' },
   { url: `${D2R_DPDNS_BASE_URL}/Mythicals.html`, name: 'd2r-dpdns/Mythicals.html' },
+  { url: `${D2R_DPDNS_BASE_URL}/Sets.html`, name: 'd2r-dpdns/Sets.html' },
   { url: `${D2R_DPDNS_BASE_URL}/Weapons.html`, name: 'd2r-dpdns/Weapons.html' },
   { url: `${D2R_DPDNS_BASE_URL}/Armor.html`, name: 'd2r-dpdns/Armor.html' },
   { url: `${D2R_DPDNS_BASE_URL}/Map.html`, name: 'd2r-dpdns/Map.html' },
