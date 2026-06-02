@@ -64,7 +64,14 @@ function isDatabaseBrowserState(value: unknown): value is DatabaseBrowserState {
 
 function pageMatchesSearch(page: GuidePage, terms: readonly string[]): boolean {
   if (terms.length === 0) return true;
-  const searchable = buildLocalizedSearchText([page.title, page.label, translateGuideText(page.label), page.textIndex]);
+  const shouldSearchTranslatedIndex = terms.some((term) => /[\u4e00-\u9fff]/u.test(term));
+  const searchable = buildLocalizedSearchText([
+    page.title,
+    page.label,
+    translateGuideText(page.label),
+    page.textIndex,
+    shouldSearchTranslatedIndex ? translateGuideText(page.textIndex) : '',
+  ]);
   return terms.every((term) => searchable.includes(term));
 }
 

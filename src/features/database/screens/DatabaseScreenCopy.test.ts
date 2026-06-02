@@ -3,8 +3,12 @@ import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 describe('database screen copy', () => {
+  function readDatabaseScreenSource(): string {
+    return readFileSync(resolve(process.cwd(), 'src/features/database/screens/DatabaseScreen.tsx'), 'utf8');
+  }
+
   it('uses Chinese wording for visible guide database section names', () => {
-    const source = readFileSync(resolve(process.cwd(), 'src/features/database/screens/DatabaseScreen.tsx'), 'utf8');
+    const source = readDatabaseScreenSource();
 
     expect(source).toContain('基础资料、机制说明与攻略资料的中文整理版。');
     expect(source).toContain('攻略资料');
@@ -12,5 +16,11 @@ describe('database screen copy', () => {
     expect(source).not.toContain('基础资料、DPDNS 补全机制与攻略资料的中文整理版。');
     expect(source).not.toContain('官方基础资料、DPDNS 补全机制与攻略资料的中文整理版。');
     expect(source).not.toContain('官方 Base Information 与 Features 子页面的中文整理版。');
+  });
+
+  it('indexes translated guide page content for Chinese global database search', () => {
+    const source = readDatabaseScreenSource();
+
+    expect(source).toContain('translateGuideText(page.textIndex)');
   });
 });
