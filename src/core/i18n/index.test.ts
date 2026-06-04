@@ -47,6 +47,9 @@ describe('game text i18n facade', () => {
     expect(translateGameText('Grand Charm')).toBe('超大型咒符');
     expect(translateGameText('Special Small Charm')).toBe('特殊小型咒符');
     expect(translateGameText('Standard of Heroes')).toBe('英雄旗帜');
+    expect(translateGameText('Anvil Stone')).toBe('锻造石');
+    expect(translateGameText('Anvil Stones')).toBe('锻造石');
+    expect(translateGameText('Anvil Stone point')).toBe('锻造石点数');
   });
 
   it('translates unique item scaled affixes', () => {

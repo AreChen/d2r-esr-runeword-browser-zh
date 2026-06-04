@@ -24,6 +24,8 @@ describe('guide text translation', () => {
     expect(translateGuideText('Orb of Anointment')).toBe('涂抹之球');
     expect(translateGuideText("Diablo's Demonic Horn")).toBe('迪亚布罗的恶魔之角');
     expect(translateGuideText('Anvil Stone')).toBe('锻造石');
+    expect(translateGuideText('Anvil Stones')).toBe('锻造石');
+    expect(translateGuideText('Anvil Stone points')).toBe('锻造石点数');
     expect(translateGuideText('Corruptions are unique bonuses obtained through transmuting a Worldstone Shard with any item.')).toBe(
       '腐化是通过将世界石碎片与任意物品合成获得的独特加成。'
     );
@@ -245,7 +247,7 @@ describe('guide text translation', () => {
     expect(translateGuideText('Normal Weapon of the Same Type')).toBe('同类型普通武器');
     expect(translateGuideText('Set/Unique Weapons/Armor (Elite)')).toBe('套装/暗金武器/护甲（精英）');
     expect(translateGuideText('Adds 4 Ancient Decipherer points')).toBe('增加 4 点古代解读器点数');
-    expect(translateGuideText('into an Anvil Stone point')).toBe('转为铁砧石点数');
+    expect(translateGuideText('into an Anvil Stone point')).toBe('转为锻造石点数');
     expect(translateGuideText('(25% chance of success)')).toBe('（25% 成功几率）');
     expect(translateGuideText("Base upgraded uniques can't be rerolled. Please reroll before upgrade.")).toBe(
       '底材已升级的暗金物品不能重置。请在升级前重置。'
