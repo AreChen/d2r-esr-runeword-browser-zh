@@ -2,6 +2,11 @@ import { lazy, Suspense, type ComponentType, type LazyExoticComponent } from 're
 import { createBrowserRouter } from 'react-router-dom';
 import { AppLayout } from '@/core/layouts/AppLayout';
 import { Spinner } from '@/components/ui/spinner';
+import { restoreGitHubPagesRedirect } from './githubPagesRedirect';
+
+if (typeof window !== 'undefined') {
+  restoreGitHubPagesRedirect(window, import.meta.env.BASE_URL);
+}
 
 const RunewordsScreen = lazy(async () => {
   const module = await import('@/features/runewords');
