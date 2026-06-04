@@ -17,7 +17,7 @@ describe('guide text translation', () => {
     expect(translateGuideText('Awakened Weapon Mastery Token')).toBe(translateGameText('Awakened Weapon Mastery Token'));
     expect(translateGuideText('Rare Weapon')).toBe('稀有武器');
     expect(translateGuideText('Rare Equippable Gear')).toBe('稀有可装备物品');
-    expect(translateGuideText('Unique Charm')).toBe('暗金护身符');
+    expect(translateGuideText('Unique Charm')).toBe('暗金咒符');
     expect(translateGuideText('Any Class Weapon')).toBe('任意职业武器');
     expect(translateGuideText('Random highest tier suffix')).toBe('随机最高阶后缀');
     expect(translateGuideText('*** Anointed **')).toBe('*** 已涂油 **');
@@ -79,7 +79,7 @@ describe('guide text translation', () => {
         "For Unique Charms , anointments can be obtained through transmuting all Eye of the Storm boss body parts ( Diablo's Demonic Horn , Baal's Demonic Eye , Mephisto's Demonic Brain ) with a Unique Charm for a one-time bonus. For Rare Equippable Gear , anointments can be obtained through transmuting an Orb of Anointment with a rare item."
       )
     ).toBe(
-      '暗金护身符可以通过将全部风暴之眼首领器官（迪亚布罗的恶魔之角、巴尔的恶魔之眼、梅菲斯托的恶魔大脑）与暗金护身符合成，获得一次性涂油加成。稀有可装备物品可以通过将涂抹之球与稀有物品合成来获得涂油。'
+      '暗金咒符可以通过将全部风暴之眼首领器官（迪亚布罗的恶魔之角、巴尔的恶魔之眼、梅菲斯托的恶魔大脑）与暗金咒符合成，获得一次性涂油加成。稀有可装备物品可以通过将涂抹之球与稀有物品合成来获得涂油。'
     );
 
     expect(
@@ -176,7 +176,7 @@ describe('guide text translation', () => {
     expect(translateGuideText("Mechanist's")).toBe('机械师之');
     expect(translateGuideText("Nature's")).toBe('自然之');
     expect(translateGuideText('of Cold Arrows')).toBe('之冰箭');
-    expect(translateGuideText('Grand Charms')).toBe('超大型护身符');
+    expect(translateGuideText('Grand Charms')).toBe('超大型咒符');
     expect(translateGuideText('Arrow/Bolt Quivers')).toBe('箭/弩矢袋');
     expect(translateGuideText('+(10 to 20)% chance for finishing moves to not consume charges')).toBe(
       '+(10 to 20)% 几率使终结技不消耗充能'
@@ -204,13 +204,13 @@ describe('guide text translation', () => {
     expect(translateGuideText('Min iLvl')).toBe('最低物品等级');
     expect(translateGuideText('Stats')).toBe('属性');
     expect(translateGuideText('Item Type')).toBe('物品类型');
-    expect(translateGuideText('mcha = Medium Charm')).toBe('mcha = 中型护身符');
+    expect(translateGuideText('mcha = Medium Charm')).toBe('mcha = 中型咒符');
     expect(translateGuideText('of Anima')).toBe('之灵魂');
     expect(translateGuideText('Kill Ledger (see Kill Ledger Page )')).toBe('击杀账本（见击杀账本页面）');
     expect(translateGuideText('-(25-100)% Better Chance of Getting Magic Item')).toBe('-(25-100)% 魔法装备掉落率');
     expect(translateGuideText('(25% chance to apply a small bonus)')).toBe('（25% 几率获得小型加成）');
     expect(translateGuideText('Any Perfect Gem/x2/x3')).toBe('任意完美宝石/x2/x3');
-    expect(translateGuideText('Any Unique Charm, Unique/Set/Crafted/Rare Equipment')).toBe('任意暗金护身符、暗金/套装/手工/稀有装备');
+    expect(translateGuideText('Any Unique Charm, Unique/Set/Crafted/Rare Equipment')).toBe('任意暗金咒符、暗金/套装/手工/稀有装备');
     expect(translateGuideText('Endgame Map of the Next Tier')).toBe('下一阶终局地图');
     expect(translateGuideText('Random Endgame Map of the Same Tier')).toBe('随机同阶终局地图');
     expect(translateGuideText('5 organs')).toBe('5 个器官');
@@ -268,7 +268,7 @@ describe('guide text translation', () => {
     ).toBe('是否恐怖化（恐怖化区域会提高受影响怪物的等级，因此会有帮助）。');
     expect(
       translateGuideText('For Unique Charms , anointments can be obtained through transmuting all Eye of the Storm boss body parts')
-    ).toBe('暗金护身符可以通过合成全部风暴之眼首领器官获得涂油');
+    ).toBe('暗金咒符可以通过合成全部风暴之眼首领器官获得涂油');
     expect(
       translateGuideText(
         'After you exhausted all souls, you can transform the amulet in 1 out of 8 mythical weapon bases. Doing this will allow you to wear the weapon without restrictions and any flavor text will be removed.'

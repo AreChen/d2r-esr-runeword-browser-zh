@@ -42,6 +42,11 @@ describe('game text i18n facade', () => {
 
   it('matches exact dictionary entries regardless of guide capitalization', () => {
     expect(translateGameText('Rejuvenation Potion')).toBe('复苏药水');
+    expect(translateGameText('Charm')).toBe('咒符');
+    expect(translateGameText('Charms')).toBe('咒符');
+    expect(translateGameText('Grand Charm')).toBe('超大型咒符');
+    expect(translateGameText('Special Small Charm')).toBe('特殊小型咒符');
+    expect(translateGameText('Standard of Heroes')).toBe('英雄旗帜');
   });
 
   it('translates unique item scaled affixes', () => {

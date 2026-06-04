@@ -88,7 +88,8 @@ const manualExactTranslations = {
   'Quilted Armor': '绗缝铠甲',
   '(Quilted Armor)': '(绗缝盔甲)',
   '(Quilted Armor) Ancient Coupon': '(绗缝盔甲) 古代优惠券',
-  Charm: '护身符',
+  Charm: '咒符',
+  Charms: '咒符',
   Circlet: '头环',
   'Class-Specific': '职业专属',
   Club: '木棒',
@@ -101,7 +102,8 @@ const manualExactTranslations = {
   'Dru Amulet': '德鲁伊项链',
   'Dru Ring': '德鲁伊戒指',
   Gloves: '手套',
-  'Grand Charm': '大护符',
+  'Grand Charm': '超大型咒符',
+  'Grand Charms': '超大型咒符',
   Hammer: '锤',
   'Hand to Hand': '格斗武器',
   'Hand to Hand 1': '格斗武器 1',
@@ -111,8 +113,11 @@ const manualExactTranslations = {
   Jewel: '珠宝',
   Knife: '小刀',
   Knuckle: '拳套',
-  'Large Charm': '大型护符',
+  'Large Charm': '大型咒符',
+  'Large Charms': '大型咒符',
   Mace: '钉锤',
+  'Medium Charm': '中型咒符',
+  'Medium Charms': '中型咒符',
   'Melee Weapon': '近战武器',
   Missile: '远程',
   'Missile Weapon': '远程武器',
@@ -120,7 +125,8 @@ const manualExactTranslations = {
   'Necromancer Polearm': '死灵法师长柄武器',
   'Nec Amulet': '死灵法师项链',
   'Nec Ring': '死灵法师戒指',
-  'Odd Charm': '奇异护符',
+  'Odd Charm': '奇异咒符',
+  'Odd Charms': '奇异咒符',
   Orb: '法球',
   'Pal Amulet': '圣骑士项链',
   'Paladin Item': '圣骑士物品',
@@ -134,13 +140,19 @@ const manualExactTranslations = {
   Scepter: '权杖',
   Shield: '盾牌',
   Shuriken: '手里剑',
-  'Small Charm': '小护符',
+  'Small Charm': '小型咒符',
+  'Small Charms': '小型咒符',
   'Sor Amulet': '女巫项链',
   'Sor Ring': '女巫戒指',
   'Sorceress Mana Blade': '女巫法力刃',
   Spear: '长矛',
   'Spirit Crown': '灵魂之冠',
   Staff: '法杖',
+  'Standard of Heroes': '英雄旗帜',
+  'Special Small Charm': '特殊小型咒符',
+  'Special Small Charms': '特殊小型咒符',
+  'Square Charm': '方形咒符',
+  'Square Charms': '方形咒符',
   Sword: '剑',
   'Voodoo Heads': '巫毒头颅',
   Wand: '魔杖',
@@ -304,7 +316,7 @@ const manualExactTranslations = {
     '灵狼和狂狼都可以使用猛扑。猛扑既是强力范围攻击也是单体攻击，会将狼传送到目标身上进行打击。',
   'Direct damage spells mean spells that can be casted directly (e.g. Rain of Fire). The damage bonus is a total multiplier to all bonuses (effectively a double damage increase)':
     '直接伤害法术指可以直接施放的法术（例如火雨）。该伤害加成是作用于所有加成的总乘区（实际相当于伤害翻倍）。',
-  'Corrupted items can include both equipped items and charms (unique or not)': '腐化物品可以包括已装备物品和护身符（无论是否暗金）。',
+  'Corrupted items can include both equipped items and charms (unique or not)': '腐化物品可以包括已装备物品和咒符（无论是否暗金）。',
   "but the level is based off Teleport's level and each nova deals 3 times less damage":
     '但等级基于传送的等级，且每个新星造成的伤害降低为三分之一',
   "The triple damage effect applies to all damage dealt, from all sources. That includes attacks, spells, holy auras etc. The effect stacks multiplicativiely with critical strike and deadly strike, but additively with the crossbow bonus damage (as well as other similar effects, like sorceress' exclusive skills).":
@@ -325,7 +337,7 @@ const manualExactTranslations = {
   'Eternal Winter benefits from the Aegis of Corruption spell damage increase.': '永恒寒冬受腐化庇护提供的法术伤害提高影响。',
   'Can be obtained on killing Rathma.': '击杀拉斯玛即可获得。',
   "Can be upgraded by killing Rathma and Kor'nac, The Hollow Apostle within one minute of each other on /players 8 and transmuting the charm with itself. The charm gains +(10 to 20) to Raise Kor'nac, The Hollow Apostle.":
-    '在 8 人难度下于一分钟内击杀拉斯玛和空洞使徒 Kor’nac，并将护身符合成本体即可升级。该护身符获得 +(10 to 20) 复生 Kor’nac，空洞使徒。',
+    '在 8 人难度下于一分钟内击杀拉斯玛和空洞使徒 Kor’nac，并将咒符合成本体即可升级。该咒符获得 +(10 to 20) 复生 Kor’nac，空洞使徒。',
   '*Each type of speed (block, cast, move, attack, recovery) is counted separately. E.g. +1% to All Speeds counts as +5% to ascendancy bonuses.':
     '*每种速度（格挡、施法、移动、攻击、打击恢复）会分别计算。例如 +1% 所有速度会按 +5% 计入升华加成。',
   '*Breakpoints are reached for total number of attributes (e.g. you gain +1 to All Skills if you have 250 of each attribute).':
@@ -620,6 +632,44 @@ function normalizeLines(text) {
     .filter(Boolean);
 }
 
+const sourceTermTranslationCorrections = {
+  Charm: '咒符',
+  Charms: '咒符',
+  'Grand Charm': '超大型咒符',
+  'Grand Charms': '超大型咒符',
+  'Large Charm': '大型咒符',
+  'Large Charms': '大型咒符',
+  'Lunar Charm': '月亮咒符',
+  'Medium Charm': '中型咒符',
+  'Medium Charms': '中型咒符',
+  'Odd Charm': '奇异咒符',
+  'Odd Charms': '奇异咒符',
+  'Small Charm': '小型咒符',
+  'Small Charms': '小型咒符',
+  'Special Small Charm': '特殊小型咒符',
+  'Special Small Charms': '特殊小型咒符',
+  'Square Charm': '方形咒符',
+  'Square Charms': '方形咒符',
+  'Standard of Heroes': '英雄旗帜',
+};
+
+function correctTranslationForSource(source, target) {
+  const normalizedSource = normalizeText(source);
+  const exactCorrection = sourceTermTranslationCorrections[normalizedSource];
+  if (exactCorrection) return exactCorrection;
+
+  if (!/\bCharms?\b/u.test(normalizedSource)) return target;
+
+  return target
+    .replace(/\bCharms?\b/giu, '咒符')
+    .replace(/护身符/g, '咒符')
+    .replace(/護身符/g, '咒符')
+    .replace(/护符/g, '咒符')
+    .replace(/護符/g, '咒符')
+    .replace(/之魅/g, '之咒符')
+    .replace(/魅/g, '咒符');
+}
+
 function hasPlaceholder(text) {
   return PLACEHOLDER_REGEX.test(text);
 }
@@ -759,6 +809,8 @@ function chooseChineseTextRaw(entry) {
 
 function addTranslationCandidate(exactTranslations, templateTranslations, source, target) {
   if (!source || !target || source === target) return;
+
+  target = correctTranslationForSource(source, target);
 
   const sourceHasPlaceholder = hasPlaceholder(source);
   const targetHasPlaceholder = hasPlaceholder(target);

@@ -102,7 +102,7 @@ const LABEL_TRANSLATIONS: readonly [RegExp, string][] = [
   [/Mythical/gi, '神话'],
   [/Rare/gi, '稀有'],
   [/Jewels?/gi, '珠宝'],
-  [/Charms?/gi, '护身符'],
+  [/Charms?/gi, '咒符'],
   [/Runes?/gi, '符文'],
   [/Tooltip/gi, '提示说明'],
   [/Display/gi, '显示'],

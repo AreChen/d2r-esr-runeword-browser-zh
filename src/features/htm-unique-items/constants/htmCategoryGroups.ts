@@ -91,7 +91,7 @@ const HTM_CATEGORY_GROUPS: readonly HtmCategoryDefinition[] = [
   },
   {
     id: 'charms',
-    label: '护身符',
+    label: '咒符',
     categories: ['Grand Charm', 'Large Charm', 'Odd Charm', 'Small Charm'],
   },
   {

@@ -72,7 +72,7 @@ const guideExactTranslations: Readonly<Record<string, string>> = {
   Gems: '宝石',
   'Allowed Items': '允许物品',
   'Weapons / Gloves': '武器 / 手套',
-  'Helms / Boots / Rings / Amulets / Charms': '头盔 / 靴子 / 戒指 / 项链 / 护身符',
+  'Helms / Boots / Rings / Amulets / Charms': '头盔 / 靴子 / 戒指 / 项链 / 咒符',
   'Armor / Shields / Belts': '护甲 / 盾牌 / 腰带',
   'General Recipes': '通用公式',
   Specializations: '专精',
@@ -107,8 +107,8 @@ const guideExactTranslations: Readonly<Record<string, string>> = {
   Rings: '戒指',
   Amulet: '项链',
   Amulets: '项链',
-  Charm: '护身符',
-  Charms: '护身符',
+  Charm: '咒符',
+  Charms: '咒符',
   Quiver: '箭袋',
   Quivers: '箭袋',
   'Amazon Item': '亚马逊物品',
@@ -200,7 +200,7 @@ const guideExactTranslations: Readonly<Record<string, string>> = {
   'Dragon Stone': '龙石',
   'Maple Leaf': '枫叶',
   'Maple Leaves': '枫叶',
-  'Medium Charm': '中型护身符',
+  'Medium Charm': '中型咒符',
   'Unique/Set/Crafted/Rare Weapon': '暗金/套装/手工/稀有武器',
   'Unique/Set/Crafted/Rare Armor': '暗金/套装/手工/稀有护甲',
   'Unique/Set/Crafted/Rare Shield': '暗金/套装/手工/稀有盾牌',
@@ -212,7 +212,7 @@ const guideExactTranslations: Readonly<Record<string, string>> = {
   'Unique/Set/Crafted/Rare Amulet': '暗金/套装/手工/稀有项链',
   'Unique/Set/Crafted/Rare Helm': '暗金/套装/手工/稀有头盔',
   'Unique/Set/Crafted/Rare Jewelry': '暗金/套装/手工/稀有首饰',
-  'Unique/Set/Crafted/Rare Charm': '暗金/套装/手工/稀有护身符',
+  'Unique/Set/Crafted/Rare Charm': '暗金/套装/手工/稀有咒符',
   'Unique/Rare Quiver': '暗金/稀有箭袋',
   'Unique Ring': '暗金戒指',
   'Unique Amulet': '暗金项链',
@@ -223,9 +223,9 @@ const guideExactTranslations: Readonly<Record<string, string>> = {
   'Rare Jewelry': '稀有首饰',
   'Rare Equippable Gear': '稀有可装备物品',
   'Rare Equipment': '稀有装备',
-  'Unique Charm': '暗金护身符',
-  'Small Charm': '小护身符',
-  'Special Small Charm': '特殊小护身符',
+  'Unique Charm': '暗金咒符',
+  'Small Charm': '小型咒符',
+  'Special Small Charm': '特殊小型咒符',
   Amazon: '亚马逊',
   Assassin: '刺客',
   Barbarian: '野蛮人',
@@ -665,9 +665,9 @@ const guideExactTranslations: Readonly<Record<string, string>> = {
   Vermillion: '朱红',
   Ambergris: '龙涎香',
   Aureolin: '金黄',
-  'Grand Charms': '超大型护身符',
-  'Large Charms': '大型护身符',
-  'Small Charms': '小型护身符',
+  'Grand Charms': '超大型咒符',
+  'Large Charms': '大型咒符',
+  'Small Charms': '小型咒符',
   Jewels: '珠宝',
   'Arrow/Bolt Quivers': '箭/弩矢袋',
   'Bolt Quivers': '弩矢袋',
@@ -829,11 +829,11 @@ const guideExactTranslations: Readonly<Record<string, string>> = {
   'Magic Ring point': '魔法戒指点数',
   'Gem Points': '宝石点数',
   'Same Runes': '相同符文',
-  "Veteran's Odd Charm": '老兵的奇异护符',
-  "Noob's Odd Charm": '新手的奇异护符',
-  'Square Charm': '方形护身符',
-  'Odd Charm': '奇异护符',
-  'Grand/Odd Charm': '超大型/奇异护符',
+  "Veteran's Odd Charm": '老兵的奇异咒符',
+  "Noob's Odd Charm": '新手的奇异咒符',
+  'Square Charm': '方形咒符',
+  'Odd Charm': '奇异咒符',
+  'Grand/Odd Charm': '超大型/奇异咒符',
   'Tyranium Ores': '钛金矿石',
   'Tyranium Ore': '钛金矿石',
   'Crushed Gems': '粉碎宝石',
@@ -1056,10 +1056,9 @@ const guideExactTranslations: Readonly<Record<string, string>> = {
   '(You can use a Rerolling Orb instead)': '（可以改用重置之球）',
   '(You can use a Rerolling Orb instead.': '（可以改用重置之球。',
   "25 Devil's Food points are used)": '会消耗 25 点恶魔食粮点数）',
-  "Veteran's Odd Charm that can have up to 3 sockets": '最多可拥有 3 个镶孔的老兵的奇异护符',
-  "You can carry only one of Noob's or Veteran's Odd Charm": '新手的奇异护符和老兵的奇异护符只能携带其中一个',
-  'This recipe is meant to restore old charms to new ones without wasting more mats':
-    '此公式用于把旧护身符恢复为新版护身符，避免浪费更多材料',
+  "Veteran's Odd Charm that can have up to 3 sockets": '最多可拥有 3 个镶孔的老兵的奇异咒符',
+  "You can carry only one of Noob's or Veteran's Odd Charm": '新手的奇异咒符和老兵的奇异咒符只能携带其中一个',
+  'This recipe is meant to restore old charms to new ones without wasting more mats': '此公式用于把旧咒符恢复为新版咒符，避免浪费更多材料',
   CAUTION: '注意',
   'If you applied D-Stoning before making a Runeword, you need to remove the runes': '如果在制作符文之语前应用了 D-Stoning，需要先移除符文',
   "before removing the penalty added by such D-Stoning, or you'll lose the materials for nothing.":
@@ -1128,11 +1127,11 @@ const guideExactTranslations: Readonly<Record<string, string>> = {
   'This item was designed by TiltedPrimate over the ESR Discord as a winner of the Mythical Unique Contest.':
     '此物品由 TiltedPrimate 在 ESR Discord 的神话暗金竞赛中设计，是获胜作品之一。',
   "Can be upgraded by killing Rathma and Kor'nac, The Hollow Apostle within one minute of each other on /players 8 and transmuting the charm with itself. The charm gains +(10 to 20) to Raise Kor'nac, The Hollow Apostle.":
-    "可在 /players 8 下于一分钟内击杀拉斯玛和空洞使徒 Kor'nac，并将护身符与自身合成来升级。该护身符获得 +(10 to 20) 复活空洞使徒 Kor'nac。",
+    "可在 /players 8 下于一分钟内击杀拉斯玛和空洞使徒 Kor'nac，并将咒符与自身合成来升级。该咒符获得 +(10 to 20) 复活空洞使徒 Kor'nac。",
   'Ascendancies are powerful specializations that shape how you play, granting unique skills and bonuses.':
     '升华是强力专精，会塑造你的玩法，并提供独特技能和加成。',
   'Ascendancies are granted through a special charm called the Ascendancy Stone that can only be obtained after completing several special encounters.':
-    '升华由一种名为升华之石的特殊护身符提供，只有完成数个特殊遭遇后才能获得。',
+    '升华由一种名为升华之石的特殊咒符提供，只有完成数个特殊遭遇后才能获得。',
   'Ascendancy stones can be further upgraded (meaning you can further ascend) by completing specific challenges, some of which are tied to very hard endgame content.':
     '升华之石可以通过完成特定挑战进一步升级（也就是进一步升华），其中部分挑战与高难度终局内容相关。',
   'There are 5 ascendancy tiers you can attain, each challenge being harder than the previous one, but the bonuses being stronger as well.':
@@ -1175,7 +1174,7 @@ const guideExactTranslations: Readonly<Record<string, string>> = {
     '是否恐怖化（恐怖化区域会提高受影响怪物的等级，因此会有帮助）。',
   'All items have a 25% chance to be turned into a rare (brick) upon corrupting.': '所有物品在腐化时都有 25% 几率变成稀有物品（损坏）。',
   'The chance of getting a successful corruption (bonus) is 75% (66% for unique charms).':
-    '成功腐化并获得加成的几率为 75%（暗金护身符为 66%）。',
+    '成功腐化并获得加成的几率为 75%（暗金咒符为 66%）。',
   'Certain items cannot be corrupted to avoid abuse or too powerful items (e.g. Damage Augmenter).':
     '为避免滥用或产生过强物品，部分物品不能腐化（例如伤害增强器）。',
   'After transmuting an item with a Worldstone Shard, you need to transmute it again to effectively corrupt it.':
@@ -1184,11 +1183,11 @@ const guideExactTranslations: Readonly<Record<string, string>> = {
   'Anointments are unique bonuses obtained through transmuting specific cube regents with certain items.':
     '涂油是通过将特定方块材料与指定物品合成获得的独特加成。',
   "For Unique Charms, anointments can be obtained through transmuting all Eye of the Storm boss body parts (Diablo's Demonic Horn, Baal's Demonic Eye, Mephisto's Demonic Brain) with a Unique Charm for a one-time bonus.":
-    '暗金护身符可以通过将全部风暴之眼首领器官（迪亚布罗的恶魔之角、巴尔的恶魔之眼、梅菲斯托的恶魔大脑）与暗金护身符合成，获得一次性涂油加成。',
+    '暗金咒符可以通过将全部风暴之眼首领器官（迪亚布罗的恶魔之角、巴尔的恶魔之眼、梅菲斯托的恶魔大脑）与暗金咒符合成，获得一次性涂油加成。',
   'For Unique Charms, anointments can be obtained through transmuting all Eye of the Storm boss body parts':
-    '暗金护身符可以通过合成全部风暴之眼首领器官获得涂油',
+    '暗金咒符可以通过合成全部风暴之眼首领器官获得涂油',
   "(Diablo's Demonic Horn, Baal's Demonic Eye, Mephisto's Demonic Brain) with a Unique Charm for a one-time bonus.":
-    '（迪亚布罗的恶魔之角、巴尔的恶魔之眼、墨菲斯托的恶魔大脑）与暗金护身符合成可获得一次性加成。',
+    '（迪亚布罗的恶魔之角、巴尔的恶魔之眼、墨菲斯托的恶魔大脑）与暗金咒符合成可获得一次性加成。',
   'For Rare Equippable Gear, anointments can be obtained through transmuting an Orb of Anointment with a rare item.':
     '稀有可装备物品可以通过将涂抹之球与稀有物品合成来获得涂油。',
   'Unlike corruptions, anointing an item cannot brick it.': '不同于腐化，给物品涂油不会使其损坏。',
@@ -1446,7 +1445,7 @@ const guideExactTranslations: Readonly<Record<string, string>> = {
   '(8 points for an Ethereal one)': '（无形物品为 8 点）',
   '(4 points for an Ethereal one)': '（无形物品为 4 点）',
   '(2 point for an Ethereal one)': '（无形物品为 2 点）',
-  '(Charms need to be unforged first)': '（护身符需要先移除锻造）',
+  '(Charms need to be unforged first)': '（咒符需要先移除锻造）',
   '(Will attempt to pull rejuvenation points from the stocker if no rejuvenation is provided)':
     '（若未提供复苏药水，会尝试从储存器中提取复苏点数）',
   '(with wildcard or any organ selected)': '（选择万能点或任意器官时）',
@@ -1713,7 +1712,7 @@ const guideEndgameExactTranslations: Readonly<Record<string, string>> = {
     '魔法斧新星 - 马道克极少数情况下会汲取时间本身的力量，召唤毁灭性魔法斧新星；魔法斧会悬停在墙中，并在短时间后追踪附近玩家。',
   "Timeless - The returned ancients are enraged by the state of sanctuary, making them absolutely immortal to all damage. Once you have both the empowering effects of the Eternal Pendulum and Heaven's Light, you will be able to damage them.":
     '永恒 - 归来的远古人因庇护之地的现状而愤怒，因此对所有伤害完全不朽。只有同时拥有永恒钟摆与天之光的强化效果后，你才能伤害他们。',
-  'Eternal Hourglass of Timeless Sand (Unique Large Charm)': '永恒沙漏（暗金大型护身符）',
+  'Eternal Hourglass of Timeless Sand (Unique Large Charm)': '永恒沙漏（暗金大型咒符）',
   '(you need to kill them all to forge it)': '（需要将他们全部击杀才能锻造）',
   "The boundaries between worlds are not as unbreakable as the scholars of Sanctuary once believed. The Worldstone stood as the anchor of reality, a divine barrier that separated Sanctuary from the influence of both the High Heavens and the Burning Hells. But when Tyrael shattered it, that barrier was forever weakened. And something else took notice. Far beyond the realms of the Eternal Conflict, in a world consumed by war and death, the Lich King ruled in cold silence. His dominion was absolute, his legions endless, yet the hunger for conquest knows no borders. For death is not confined to a single world, and the power of the Worldstone's destruction echoed through the void between realities, calling to something beyond Sanctuary's understanding. The Lich King does not seek to burn the world like the Prime Evils, nor to corrupt it with lies. He seeks to claim it. The Burning Hells revel in chaos; he brings order through death. The Heavens fight for justice; he believes justice is an illusion. To him, all things end in undeath, and even the angels and demons who have warred since time immemorial will bow before the frozen silence of eternity. Will you not put an end to his reign, he will enslave all of sanctuary. This is the end of all things.":
     '世界之间的边界，并不像庇护之地学者曾经相信的那样不可打破。世界之石曾是现实的锚点，是将庇护之地与高阶天堂和燃烧地狱影响隔开的神圣屏障。但当泰瑞尔击碎它时，那屏障便永远削弱了。还有别的存在注意到了这一点。在永恒之战远方，在一个被战争与死亡吞噬的世界里，巫妖王于冰冷沉默中统治。他的支配绝对，军团无尽，而征服的饥渴没有边界。死亡并不局限于单一世界，世界之石毁灭的力量回响于现实之间的虚空，呼唤着某种超出庇护之地理解的存在。巫妖王不像三大魔神那样要焚毁世界，也不以谎言腐化世界。他要占有它。燃烧地狱沉溺混乱，而他以死亡带来秩序。天堂为正义而战，而他认为正义只是幻象。对他而言，万物终将归于亡灵；自太古以来征战不休的天使与恶魔，也会在永恒的冰封沉默前屈膝。若不终结他的统治，他将奴役整个庇护之地。这就是万物的终结。',
