@@ -292,12 +292,13 @@ function filterEndgameBossSections(sections: readonly EndgameBossSection[], rewa
 
 function renderEndgameTaggedText(text: string): React.ReactNode {
   const valuePattern =
-    /[+-]?\d+(?:\.\d+)?\s*(?:%|秒|阶|级|层|生命|抗性|人难度|hp|HP|k hp|K HP)?(?:\s*(?:-|至|到|~)\s*[+-]?\d+(?:\.\d+)?\s*(?:%|秒|阶|级|层|生命|抗性|hp|HP)?)?/giu;
+    /[+-]?\d+(?:\.\d+)?\s*(?:%|秒|阶|级|层|生命|抗性|人难度|pp|hp|HP|k hp|K HP)?(?:\s*(?:-|至|到|~)\s*[+-]?\d+(?:\.\d+)?\s*(?:%|秒|阶|级|层|生命|抗性|pp|hp|HP)?)?/giu;
   const nodes: React.ReactNode[] = [];
   let lastIndex = 0;
 
   for (const match of text.matchAll(valuePattern)) {
     const value = match[0];
+    const displayValue = value.replace(/\s+(pp)$/iu, '$1');
     const index = match.index;
     if (!value.trim()) continue;
     if (index > lastIndex) nodes.push(text.slice(lastIndex, index));
@@ -307,7 +308,7 @@ function renderEndgameTaggedText(text: string): React.ReactNode {
         data-endgame-value="true"
         className="rounded-sm border border-cyan-400/30 bg-cyan-500/10 px-1 py-0.5 font-semibold text-cyan-800 dark:text-cyan-300"
       >
-        {value}
+        {displayValue}
       </span>
     );
     lastIndex = index + value.length;

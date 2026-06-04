@@ -162,7 +162,7 @@ const endgameMapPage: GuidePage = {
     {
       id: 'lucion-lore',
       kind: 'paragraph',
-      text: 'Eternal Flame - Lucion can summon flames that deal very high fire damage. Reward: Orb of Anointment (5% chance on average). Tier 2 Map (25% chance on average). Random Pandemonium Key (25% chance each on average). Note: Tier 1-4 bosses have an Immunity Shield that falls off from time to time.',
+      text: 'Eternal Flame - Lucion can summon flames that deal very high fire damage. Ultimate Form - Fighting this battle in / 8 pp mode will activate the ultimate form. Reward: Orb of Anointment (5% chance on average). Tier 2 Map (25% chance on average). Random Pandemonium Key (25% chance each on average). Note: Tier 1-4 bosses have an Immunity Shield that falls off from time to time.',
     },
     {
       id: 'hellhound',
@@ -328,6 +328,8 @@ describe('GuidePageContent layout', () => {
     expect(html).toContain('data-endgame-reward-section="true"');
     expect(html).toContain('data-endgame-reward-item="true"');
     expect(html).toContain('data-endgame-value="true"');
+    expect(html).toMatch(/data-endgame-value="true"[^>]*>8pp<\/span>/u);
+    expect(html).not.toMatch(/data-endgame-value="true"[^>]*>8<\/span>\s*pp/u);
     expect(html).toContain('data-endgame-note="true"');
     expect(html).toContain('注意');
   });
