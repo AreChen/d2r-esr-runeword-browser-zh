@@ -127,6 +127,57 @@ const pageWithManyTables: GuidePage = {
   })),
 };
 
+const endgameMapPage: GuidePage = {
+  ...pageWithoutHeadings,
+  id: 'endgameMaps',
+  group: 'features',
+  label: 'Endgame Maps',
+  title: '终局地图机制',
+  sourcePath: 'EndMap.html',
+  sourceUrl: 'https://d2r.dpdns.org/EndMap.html',
+  blocks: [
+    {
+      id: 'intro',
+      kind: 'paragraph',
+      text: 'Warning: endgame map zones are much more difficult than all other content. You can enter endgame map zones by transmuting map items in Act 5 Hell.',
+    },
+    {
+      id: 'boss-title',
+      kind: 'heading',
+      level: 2,
+      text: 'Endgame Bosses',
+    },
+    {
+      id: 'lucion',
+      kind: 'heading',
+      level: 3,
+      text: 'Lucion Whisper - Pit of Anguish',
+    },
+    {
+      id: 'lucion-image',
+      kind: 'image',
+      src: 'img/map-bosses/lucionwhisper.png',
+      alt: 'Lucion Whisper',
+    },
+    {
+      id: 'lucion-lore',
+      kind: 'paragraph',
+      text: 'Eternal Flame - Lucion can summon flames that deal very high fire damage. Reward: Orb of Anointment (5% chance on average). Tier 2 Map (25% chance on average). Random Pandemonium Key (25% chance each on average). Note: Tier 1-4 bosses have an Immunity Shield that falls off from time to time.',
+    },
+    {
+      id: 'hellhound',
+      kind: 'heading',
+      level: 3,
+      text: "Diablo's Hellhound - Chaos Rift",
+    },
+    {
+      id: 'hellhound-lore',
+      kind: 'paragraph',
+      text: 'Frenzy - The boss gains 20% attack speed. Reward: Worldstone Shard (100% chance on average).',
+    },
+  ],
+};
+
 describe('GuidePageContent layout', () => {
   it('does not reserve the table-of-contents column when the page has no headings', () => {
     const html = renderToStaticMarkup(<GuidePageContent page={pageWithoutHeadings} />);
@@ -240,5 +291,42 @@ describe('GuidePageContent layout', () => {
     expect(html).not.toContain('Extra Table 9');
     expect(html).toContain('已显示 8 / 10 张表格');
     expect(html).toContain('显示更多表格');
+  });
+
+  it('renders the endgame map mechanism page as a curated briefing and boss layout', () => {
+    const html = renderToStaticMarkup(<GuidePageContent page={endgameMapPage} />);
+
+    expect(html).toContain('data-endgame-map-layout="true"');
+    expect(html).toContain('战前简报');
+    expect(html).toContain('终局首领');
+    expect(html).toContain('data-endgame-boss-card="true"');
+    expect(html).toContain('卢西昂之影 - 痛苦地窖');
+    expect(html).toContain('永恒烈焰');
+  });
+
+  it('renders endgame boss images as cropped top banners', () => {
+    const html = renderToStaticMarkup(<GuidePageContent page={endgameMapPage} />);
+
+    expect(html).toContain('data-endgame-boss-banner="true"');
+    expect(html).toContain('object-cover');
+    expect(html).not.toContain('object-contain');
+    expect(html).not.toContain('lg:grid-cols-[18rem_minmax(0,1fr)]');
+  });
+
+  it('highlights endgame map rewards, notes, values, and exposes a reward filter', () => {
+    const html = renderToStaticMarkup(<GuidePageContent page={endgameMapPage} />);
+
+    expect(html).toContain('data-endgame-reward-filter="true"');
+    expect(html).toContain('奖励筛选');
+    expect(html).toContain('data-endgame-reward-chip="true"');
+    expect(html).toContain('涂抹之球');
+    expect(html).toContain('2 阶地图');
+    expect(html).toContain('随机混沌钥匙');
+    expect(html).toContain('世界石碎片');
+    expect(html).toContain('data-endgame-reward-section="true"');
+    expect(html).toContain('data-endgame-reward-item="true"');
+    expect(html).toContain('data-endgame-value="true"');
+    expect(html).toContain('data-endgame-note="true"');
+    expect(html).toContain('注意');
   });
 });

@@ -3,7 +3,8 @@ import { ExternalLink, Star } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ESR_BASE_URL } from '@/core/api';
-import type { GuideContentBlock, GuidePage, GuideTableBlock } from '@/core/db';
+import type { GuideContentBlock, GuideHeadingBlock, GuidePage, GuideTableBlock } from '@/core/db';
+import { usePersistentState } from '@/core/hooks/usePersistentState';
 import { translateGuideText } from '@/core/i18n/guideTranslation';
 import { cn } from '@/lib/utils';
 import { getGuideCellLineClassification, type GuideAffixLineKind, type GuideMaterialLineKind } from '../utils/guideCellClassification';
@@ -13,6 +14,7 @@ const INITIAL_GUIDE_TABLE_RENDER_COUNT = 80;
 const GUIDE_TABLE_RENDER_INCREMENT = 160;
 const INITIAL_GUIDE_TABLE_BLOCK_RENDER_COUNT = 8;
 const GUIDE_TABLE_BLOCK_RENDER_INCREMENT = 8;
+const ENDGAME_REWARD_FILTER_ALL = '__all__';
 
 interface GuidePageContentProps {
   readonly page: GuidePage;
@@ -53,6 +55,18 @@ function resolveImageUrl(src: string, sourceUrl: string): string {
 
 function translated(text: string): string {
   return translateGuideText(text);
+}
+
+function translatedEndgameText(text: string): string {
+  return translated(text)
+    .replace(/\bEndgame Bosses\b/giu, '终局首领')
+    .replace(/\bLucion Whisper\b/giu, '卢西昂之影')
+    .replace(/卢西恩的低语/gu, '卢西昂之影')
+    .replace(/\bPit of Anguish\b/giu, '痛苦地窖')
+    .replace(/\bEternal Flame\b/giu, '永恒烈焰')
+    .replace(/\bReward\b/giu, '奖励')
+    .replace(/\bNote\b/giu, '注意')
+    .replace(/\bWarning\b/giu, '警告');
 }
 
 function getTranslatedLines(text: string): string[] {
@@ -120,6 +134,450 @@ function renderTableSectionCell(text: string): React.ReactNode {
       <p className="font-semibold text-amber-700 dark:text-amber-400">{title}</p>
       <p className="font-normal text-muted-foreground">{detail}</p>
     </div>
+  );
+}
+
+function getEndgameSentences(text: string): string[] {
+  return translatedEndgameText(text)
+    .split(/(?<=[。.!?])\s*/u)
+    .map((sentence) => sentence.trim())
+    .filter((sentence) => sentence.length > 0);
+}
+
+function getEndgameBriefingLabel(text: string): string {
+  if (/警告|困难|survive|生存|抗性|生命/u.test(text)) return '生存门槛';
+  if (/进入|地狱第五幕|access|transmut/u.test(text)) return '进入方式';
+  if (/阶|tier|地图物品|18/u.test(text)) return '地图阶级';
+  if (/掉落|drop|奖励|reward/u.test(text)) return '掉落规则';
+  if (/恐怖化|terror/u.test(text)) return '恐怖化';
+  if (/护盾|shield|免疫/u.test(text)) return '首领机制';
+  return '机制说明';
+}
+
+interface EndgameRewardOption {
+  readonly label: string;
+  readonly count: number;
+}
+
+type EndgameParagraphPart =
+  | {
+      readonly kind: 'text' | 'note';
+      readonly line: string;
+    }
+  | {
+      readonly kind: 'reward';
+      readonly items: readonly string[];
+    };
+
+function isString(value: unknown): value is string {
+  return typeof value === 'string';
+}
+
+function trimEndgamePunctuation(text: string): string {
+  return text.replace(/[\s。.;；]+$/u, '').trim();
+}
+
+function stripEndgameLabel(text: string): string {
+  return text.replace(/^(?:奖励|注意|警告)\s*[-－:：]\s*/iu, '').trim();
+}
+
+function isEndgameNoteLine(line: string): boolean {
+  return (
+    /^(?:注意|警告)\s*[-－:：]/iu.test(line) || /(?:免疫护盾|引擎限制|无法修复|不建议|必须|建议|survive|cannot|recommended)/iu.test(line)
+  );
+}
+
+function isEndgameRewardLine(line: string): boolean {
+  if (/^奖励\s*[-－:：]/iu.test(line)) return true;
+
+  return (
+    (/(?:涂抹之球|祝福宝珠|世界石碎片|混沌钥匙|Pandemonium Key|Worldstone Shard|Orb of Anointment)/iu.test(line) ||
+      /(?:\d+\s*阶地图|Tier\s+\d+\s+Map)/iu.test(line)) &&
+    /(?:平均|几率|chance|掉落|drop|必定|always)/iu.test(line)
+  );
+}
+
+function getEndgameRewardItemsFromLine(line: string): readonly string[] {
+  if (!isEndgameRewardLine(line)) return [];
+
+  const rewardText = trimEndgamePunctuation(stripEndgameLabel(line));
+  if (!rewardText) return [];
+
+  return rewardText
+    .split(/\s*(?:[；;]|\s+\|\s+)\s*/u)
+    .map(trimEndgamePunctuation)
+    .filter((item) => item.length > 0);
+}
+
+function getEndgameRewardLabel(item: string): string {
+  return trimEndgamePunctuation(item)
+    .replace(/[（(][^）)]*(?:平均|几率|chance|average)[^）)]*[）)]/giu, '')
+    .replace(/\s+/gu, ' ')
+    .trim();
+}
+
+function getEndgameBlockLines(block: GuideContentBlock): readonly string[] {
+  if (block.kind === 'paragraph' || block.kind === 'heading') return getEndgameSentences(block.text);
+  if (block.kind !== 'table') return [];
+
+  return [...(block.notes ?? []), ...block.headers, ...block.rows.flat()].flatMap(getTranslatedLines).flatMap(getEndgameSentences);
+}
+
+function getEndgameSectionRewardLabels(section: EndgameBossSection): readonly string[] {
+  const labels = new Set<string>();
+
+  for (const block of section.blocks) {
+    for (const line of getEndgameBlockLines(block)) {
+      for (const item of getEndgameRewardItemsFromLine(line)) {
+        const label = getEndgameRewardLabel(item);
+        if (label) labels.add(label);
+      }
+    }
+  }
+
+  return [...labels];
+}
+
+function getEndgameRewardOptions(sections: readonly EndgameBossSection[]): readonly EndgameRewardOption[] {
+  const counts = new Map<string, number>();
+
+  for (const section of sections) {
+    for (const label of getEndgameSectionRewardLabels(section)) {
+      counts.set(label, (counts.get(label) ?? 0) + 1);
+    }
+  }
+
+  return [...counts.entries()]
+    .map(([label, count]) => ({ label, count }))
+    .sort((a, b) => a.label.localeCompare(b.label, 'zh-Hans-CN', { numeric: true }));
+}
+
+function filterEndgameBossSections(sections: readonly EndgameBossSection[], rewardFilter: string): readonly EndgameBossSection[] {
+  if (rewardFilter === ENDGAME_REWARD_FILTER_ALL) return sections;
+
+  return sections.filter((section) => getEndgameSectionRewardLabels(section).includes(rewardFilter));
+}
+
+function renderEndgameTaggedText(text: string): React.ReactNode {
+  const valuePattern =
+    /[+-]?\d+(?:\.\d+)?\s*(?:%|秒|阶|级|层|生命|抗性|人难度|hp|HP|k hp|K HP)?(?:\s*(?:-|至|到|~)\s*[+-]?\d+(?:\.\d+)?\s*(?:%|秒|阶|级|层|生命|抗性|hp|HP)?)?/giu;
+  const nodes: React.ReactNode[] = [];
+  let lastIndex = 0;
+
+  for (const match of text.matchAll(valuePattern)) {
+    const value = match[0];
+    const index = match.index;
+    if (!value.trim()) continue;
+    if (index > lastIndex) nodes.push(text.slice(lastIndex, index));
+    nodes.push(
+      <span
+        key={`${value}-${String(index)}`}
+        data-endgame-value="true"
+        className="rounded-sm border border-cyan-400/30 bg-cyan-500/10 px-1 py-0.5 font-semibold text-cyan-800 dark:text-cyan-300"
+      >
+        {value}
+      </span>
+    );
+    lastIndex = index + value.length;
+  }
+
+  if (lastIndex < text.length) nodes.push(text.slice(lastIndex));
+  return nodes.length > 0 ? nodes : text;
+}
+
+function getEndgameParagraphParts(text: string): readonly EndgameParagraphPart[] {
+  const parts: EndgameParagraphPart[] = [];
+  let pendingRewards: string[] = [];
+
+  function flushRewards(): void {
+    if (pendingRewards.length === 0) return;
+    parts.push({ kind: 'reward', items: pendingRewards });
+    pendingRewards = [];
+  }
+
+  for (const line of getTranslatedLines(text).flatMap(getEndgameSentences)) {
+    const rewardItems = getEndgameRewardItemsFromLine(line);
+    if (rewardItems.length > 0) {
+      pendingRewards.push(...rewardItems);
+      continue;
+    }
+
+    flushRewards();
+    parts.push({ kind: isEndgameNoteLine(line) ? 'note' : 'text', line });
+  }
+
+  flushRewards();
+  return parts;
+}
+
+function EndgameRewardSection({ items }: { readonly items: readonly string[] }) {
+  return (
+    <div data-endgame-reward-section="true" className="rounded-md border border-amber-400/35 bg-amber-500/5 p-3">
+      <div className="mb-3 flex items-center gap-2">
+        <span className="h-px flex-1 bg-amber-400/30" />
+        <span className="rounded-full border border-amber-400/40 bg-amber-500/15 px-2 py-0.5 text-xs font-semibold text-amber-800 dark:text-amber-300">
+          奖励
+        </span>
+        <span className="h-px flex-1 bg-amber-400/30" />
+      </div>
+      <div className="grid gap-2 sm:grid-cols-2">
+        {items.map((item, index) => {
+          const label = getEndgameRewardLabel(item);
+          return (
+            <div
+              key={`${item}-${String(index)}`}
+              data-endgame-reward-item="true"
+              className="rounded-md border border-amber-400/25 bg-background/70 px-3 py-2 text-sm leading-6"
+            >
+              <div className="mb-1 flex items-center gap-2">
+                <span className="size-1.5 rounded-full bg-amber-400" />
+                <span className="font-semibold text-amber-800 dark:text-amber-300">{label || '奖励'}</span>
+              </div>
+              <p className="text-muted-foreground">{renderEndgameTaggedText(item)}</p>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function EndgameRewardFilter({
+  options,
+  selectedReward,
+  onSelectReward,
+}: {
+  readonly options: readonly EndgameRewardOption[];
+  readonly selectedReward: string;
+  readonly onSelectReward: (reward: string) => void;
+}) {
+  if (options.length === 0) return null;
+
+  return (
+    <section data-endgame-reward-filter="true" className="space-y-3 rounded-md border bg-muted/20 p-3">
+      <div className="flex flex-wrap items-end justify-between gap-2">
+        <div className="space-y-1">
+          <p className="text-sm font-semibold">奖励筛选</p>
+          <p className="text-xs text-muted-foreground">按掉落奖励快速定位对应地图首领。</p>
+        </div>
+        <Button
+          type="button"
+          variant={selectedReward === ENDGAME_REWARD_FILTER_ALL ? 'default' : 'outline'}
+          size="sm"
+          data-endgame-reward-chip="true"
+          aria-pressed={selectedReward === ENDGAME_REWARD_FILTER_ALL}
+          onClick={() => {
+            onSelectReward(ENDGAME_REWARD_FILTER_ALL);
+          }}
+        >
+          全部奖励
+        </Button>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        {options.map((option) => {
+          const selected = selectedReward === option.label;
+          return (
+            <Button
+              key={option.label}
+              type="button"
+              variant={selected ? 'default' : 'outline'}
+              size="sm"
+              data-endgame-reward-chip="true"
+              aria-pressed={selected}
+              className={cn(
+                'h-auto gap-2 rounded-full py-1.5',
+                selected
+                  ? 'border-amber-500 bg-amber-500 text-amber-950 hover:bg-amber-400'
+                  : 'border-amber-400/30 bg-amber-500/5 text-amber-800 hover:bg-amber-500/15 dark:text-amber-300'
+              )}
+              onClick={() => {
+                onSelectReward(option.label);
+              }}
+            >
+              <span>{option.label}</span>
+              <span className="rounded-full bg-background/80 px-1.5 py-0.5 text-[11px] text-foreground">{option.count}</span>
+            </Button>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+function renderEndgameParagraphLines(text: string): React.ReactNode {
+  const parts = getEndgameParagraphParts(text);
+  if (parts.length === 0) return null;
+
+  return (
+    <div className="space-y-3">
+      {parts.map((part, index) => {
+        if (part.kind === 'reward') {
+          return <EndgameRewardSection key={`reward-${String(index)}`} items={part.items} />;
+        }
+
+        const line = part.line;
+        if (part.kind === 'note') {
+          return (
+            <p
+              key={`${line}-${String(index)}`}
+              data-endgame-note="true"
+              className="rounded-md border border-rose-400/30 bg-rose-500/10 px-3 py-2 text-sm leading-6 text-rose-950 dark:text-rose-200"
+            >
+              <span className="mr-2 rounded-sm border border-rose-400/35 bg-rose-500/15 px-1.5 py-0.5 font-semibold text-rose-800 dark:text-rose-300">
+                注意
+              </span>
+              {renderEndgameTaggedText(stripEndgameLabel(line))}
+            </p>
+          );
+        }
+
+        const separatorMatch = line.match(/^(.{2,32}?)[\s\p{Zs}]*[-－：:][\s\p{Zs}]*(.+)$/u);
+        if (!separatorMatch || !isString(separatorMatch[1]) || !isString(separatorMatch[2])) {
+          return (
+            <p key={`${line}-${String(index)}`} className="leading-7 text-muted-foreground">
+              {renderEndgameTaggedText(line)}
+            </p>
+          );
+        }
+
+        return (
+          <p key={`${line}-${String(index)}`} className="leading-7 text-muted-foreground">
+            <span className="mr-2 rounded-sm border border-amber-400/30 bg-amber-500/10 px-1.5 py-0.5 font-semibold text-amber-800 dark:text-amber-300">
+              {separatorMatch[1]}
+            </span>
+            {renderEndgameTaggedText(separatorMatch[2])}
+          </p>
+        );
+      })}
+    </div>
+  );
+}
+
+interface EndgameBossSection {
+  readonly title: string;
+  readonly blocks: readonly GuideContentBlock[];
+}
+
+function isEndgameBossListHeading(block: GuideContentBlock): boolean {
+  return block.kind === 'heading' && /(?:Endgame Bosses|终局\s*(?:BOSS|Boss|首领))/iu.test(block.text);
+}
+
+function isEndgameBossTitle(block: GuideContentBlock): block is GuideHeadingBlock {
+  return block.kind === 'heading' && (block.level === 3 || /[-－]/u.test(block.text)) && !isEndgameBossListHeading(block);
+}
+
+function splitEndgameMapBlocks(blocks: readonly GuideContentBlock[]): {
+  readonly briefingBlocks: readonly GuideContentBlock[];
+  readonly bossSections: readonly EndgameBossSection[];
+  readonly otherBlocks: readonly GuideContentBlock[];
+} {
+  const briefingBlocks: GuideContentBlock[] = [];
+  const bossSections: EndgameBossSection[] = [];
+  const otherBlocks: GuideContentBlock[] = [];
+  let collectingBosses = false;
+  let currentBoss: { title: string; blocks: GuideContentBlock[] } | null = null;
+
+  function flushBoss(): void {
+    if (!currentBoss) return;
+    bossSections.push({ title: currentBoss.title, blocks: currentBoss.blocks });
+    currentBoss = null;
+  }
+
+  for (const block of blocks) {
+    if (isEndgameBossListHeading(block)) {
+      flushBoss();
+      collectingBosses = true;
+      continue;
+    }
+
+    if (collectingBosses && isEndgameBossTitle(block)) {
+      flushBoss();
+      currentBoss = { title: translatedEndgameText(block.text), blocks: [] };
+      continue;
+    }
+
+    if (currentBoss) {
+      currentBoss.blocks.push(block);
+      continue;
+    }
+
+    if (!collectingBosses && block.kind === 'paragraph') {
+      briefingBlocks.push(block);
+      continue;
+    }
+
+    otherBlocks.push(block);
+  }
+
+  flushBoss();
+  return { briefingBlocks, bossSections, otherBlocks };
+}
+
+function EndgameBriefing({ blocks }: { readonly blocks: readonly GuideContentBlock[] }) {
+  const items = blocks
+    .filter((block) => block.kind === 'paragraph')
+    .flatMap((block) => getEndgameSentences(block.text))
+    .filter((line) => line.length > 0);
+
+  if (items.length === 0) return null;
+
+  return (
+    <section className="space-y-3 rounded-md border bg-muted/20 p-4">
+      <div className="space-y-1">
+        <p className="text-xs font-semibold tracking-wide text-amber-700 uppercase dark:text-amber-400">战前简报</p>
+        <h2 className="text-xl font-semibold">进入终局地图前先看这些</h2>
+      </div>
+      <div className="grid gap-3 md:grid-cols-2">
+        {items.map((item, index) => (
+          <div key={`${item}-${String(index)}`} className="rounded-md border bg-card/70 p-3">
+            <p className="mb-1 text-xs font-semibold text-amber-700 dark:text-amber-400">{getEndgameBriefingLabel(item)}</p>
+            <p className="text-sm leading-6 text-muted-foreground">{item}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function EndgameBossCard({ section, sourceUrl }: { readonly section: EndgameBossSection; readonly sourceUrl: string }) {
+  const imageBlock = section.blocks.find((block) => block.kind === 'image');
+  const detailBlocks = section.blocks.filter((block) => block !== imageBlock);
+
+  return (
+    <section data-endgame-boss-card="true" className="overflow-hidden rounded-md border bg-card/70">
+      {imageBlock?.kind === 'image' && (
+        <figure data-endgame-boss-banner="true" className="relative h-44 overflow-hidden border-b bg-background sm:h-52 lg:h-56">
+          <img
+            src={resolveImageUrl(imageBlock.src, sourceUrl)}
+            alt={translatedEndgameText(imageBlock.alt)}
+            className="h-full w-full object-cover object-center"
+            loading="lazy"
+          />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background/35 via-transparent to-transparent" />
+        </figure>
+      )}
+      <div className="min-w-0 space-y-3 p-4">
+        <h3 className="text-lg font-semibold text-amber-700 dark:text-amber-400">{section.title}</h3>
+        <div className="space-y-3">
+          {detailBlocks.map((block) => {
+            if (block.kind === 'paragraph') {
+              return <div key={block.id}>{renderEndgameParagraphLines(block.text)}</div>;
+            }
+            if (block.kind === 'table') {
+              return (
+                <GuideTable key={block.id} block={block} favoriteRowIds={[]} getRowFavoriteId={undefined} onToggleFavoriteRow={undefined} />
+              );
+            }
+            if (block.kind === 'image') return null;
+            return (
+              <h4 key={block.id} className="text-base font-semibold text-foreground">
+                {translatedEndgameText(block.text)}
+              </h4>
+            );
+          })}
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -324,11 +782,25 @@ export function GuidePageContent({ page, favoriteRowIds = [], getRowFavoriteId, 
   const groupLabel = page.group === 'base' ? '基础资料' : page.group === 'features' ? '机制说明' : '攻略资料';
   const loadMoreTablesRef = useRef<HTMLDivElement | null>(null);
   const [visibleTableLimit, setVisibleTableLimit] = useState(INITIAL_GUIDE_TABLE_BLOCK_RENDER_COUNT);
+  const [endgameRewardFilter, setEndgameRewardFilter] = usePersistentState<string>(
+    'd2r-esr.database.endgameRewardFilter.v1',
+    ENDGAME_REWARD_FILTER_ALL,
+    isString
+  );
   const { visibleBlocks, renderedTableCount, totalTableCount } = getVisibleGuideBlocks(page.blocks, visibleTableLimit);
   const visiblePage = { ...page, blocks: visibleBlocks };
   const headings = getGuidePageHeadings(visiblePage);
   const summary = getGuidePageBlockSummary(page);
   const hasMoreTables = renderedTableCount < totalTableCount;
+  const endgameMapBlocks = page.id === 'endgameMaps' ? splitEndgameMapBlocks(visibleBlocks) : null;
+  const endgameRewardOptions = endgameMapBlocks ? getEndgameRewardOptions(endgameMapBlocks.bossSections) : [];
+  const selectedEndgameRewardFilter =
+    endgameRewardFilter === ENDGAME_REWARD_FILTER_ALL || endgameRewardOptions.some((option) => option.label === endgameRewardFilter)
+      ? endgameRewardFilter
+      : ENDGAME_REWARD_FILTER_ALL;
+  const filteredEndgameBossSections = endgameMapBlocks
+    ? filterEndgameBossSections(endgameMapBlocks.bossSections, selectedEndgameRewardFilter)
+    : [];
 
   useEffect(() => {
     if (!hasMoreTables) return;
@@ -379,16 +851,61 @@ export function GuidePageContent({ page, favoriteRowIds = [], getRowFavoriteId, 
 
       <div className={headings.length > 0 ? 'grid gap-6 xl:grid-cols-[minmax(0,1fr)_14rem]' : 'grid gap-6'}>
         <div className="min-w-0 space-y-5">
-          {visibleBlocks.map((block) => (
-            <GuideBlock
-              key={block.id}
-              block={block}
-              sourceUrl={page.sourceUrl}
-              favoriteRowIds={favoriteRowIds}
-              getRowFavoriteId={getRowFavoriteId}
-              onToggleFavoriteRow={onToggleFavoriteRow}
-            />
-          ))}
+          {endgameMapBlocks ? (
+            <div data-endgame-map-layout="true" className="space-y-6">
+              <EndgameBriefing blocks={endgameMapBlocks.briefingBlocks} />
+              {endgameMapBlocks.otherBlocks.map((block) => (
+                <GuideBlock
+                  key={block.id}
+                  block={block}
+                  sourceUrl={page.sourceUrl}
+                  favoriteRowIds={favoriteRowIds}
+                  getRowFavoriteId={getRowFavoriteId}
+                  onToggleFavoriteRow={onToggleFavoriteRow}
+                />
+              ))}
+              <EndgameRewardFilter
+                options={endgameRewardOptions}
+                selectedReward={selectedEndgameRewardFilter}
+                onSelectReward={setEndgameRewardFilter}
+              />
+              {endgameMapBlocks.bossSections.length > 0 && (
+                <section className="space-y-3">
+                  <div className="flex flex-wrap items-end justify-between gap-2">
+                    <div>
+                      <p className="text-xs font-semibold tracking-wide text-amber-700 uppercase dark:text-amber-400">终局首领</p>
+                      <h2 className="text-xl font-semibold">地图首领与关键机制</h2>
+                    </div>
+                    <Badge variant="outline">
+                      {filteredEndgameBossSections.length} / {endgameMapBlocks.bossSections.length} 名首领
+                    </Badge>
+                  </div>
+                  {filteredEndgameBossSections.length > 0 ? (
+                    <div className="space-y-4">
+                      {filteredEndgameBossSections.map((section) => (
+                        <EndgameBossCard key={section.title} section={section} sourceUrl={page.sourceUrl} />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="rounded-md border border-dashed bg-muted/20 p-6 text-center text-sm text-muted-foreground">
+                      没有匹配这个奖励的地图首领。
+                    </div>
+                  )}
+                </section>
+              )}
+            </div>
+          ) : (
+            visibleBlocks.map((block) => (
+              <GuideBlock
+                key={block.id}
+                block={block}
+                sourceUrl={page.sourceUrl}
+                favoriteRowIds={favoriteRowIds}
+                getRowFavoriteId={getRowFavoriteId}
+                onToggleFavoriteRow={onToggleFavoriteRow}
+              />
+            ))
+          )}
           {hasMoreTables && (
             <div ref={loadMoreTablesRef} className="flex flex-wrap items-center justify-between gap-3 rounded-md border bg-muted/20 p-3">
               <span className="text-sm text-muted-foreground">
