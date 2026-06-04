@@ -578,7 +578,7 @@ function EndgameBossCard({ section, sourceUrl }: { readonly section: EndgameBoss
   return (
     <section data-endgame-boss-card="true" className="overflow-hidden rounded-md border bg-card/70">
       {imageBlock?.kind === 'image' && (
-        <figure data-endgame-boss-banner="true" className="relative h-56 overflow-hidden border-b bg-background sm:h-72 lg:h-80 xl:h-96">
+        <figure data-endgame-boss-banner="true" className="relative aspect-[2/1] overflow-hidden border-b bg-background">
           <img
             src={resolveEndgameBossImageUrl(imageBlock.src, sourceUrl)}
             alt={translatedEndgameText(imageBlock.alt)}
