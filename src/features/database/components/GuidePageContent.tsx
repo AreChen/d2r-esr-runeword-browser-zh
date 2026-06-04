@@ -15,6 +15,30 @@ const GUIDE_TABLE_RENDER_INCREMENT = 160;
 const INITIAL_GUIDE_TABLE_BLOCK_RENDER_COUNT = 8;
 const GUIDE_TABLE_BLOCK_RENDER_INCREMENT = 8;
 const ENDGAME_REWARD_FILTER_ALL = '__all__';
+const ENDGAME_BOSS_BANNER_URLS: Record<string, string> = {
+  'img/map-bosses/ancientfallenangel.png': new URL('../../../assets/endgame-boss-banners/ancientfallenangel.webp', import.meta.url).href,
+  'img/map-bosses/arbiterofsouls.png': new URL('../../../assets/endgame-boss-banners/arbiterofsouls.webp', import.meta.url).href,
+  'img/map-bosses/avatarofthenight.png': new URL('../../../assets/endgame-boss-banners/avatarofthenight.webp', import.meta.url).href,
+  'img/map-bosses/baaldisfiguredharbinger.png': new URL(
+    '../../../assets/endgame-boss-banners/baaldisfiguredharbinger.webp',
+    import.meta.url
+  ).href,
+  'img/map-bosses/baaltheinvincible.png': new URL('../../../assets/endgame-boss-banners/baaltheinvincible.webp', import.meta.url).href,
+  'img/map-bosses/diablohellhound.png': new URL('../../../assets/endgame-boss-banners/diablohellhound.webp', import.meta.url).href,
+  'img/map-bosses/diablotheinvincible.png': new URL('../../../assets/endgame-boss-banners/diablotheinvincible.webp', import.meta.url).href,
+  'img/map-bosses/doubleboss.png': new URL('../../../assets/endgame-boss-banners/doubleboss.webp', import.meta.url).href,
+  'img/map-bosses/glacialbehemoth.png': new URL('../../../assets/endgame-boss-banners/glacialbehemoth.webp', import.meta.url).href,
+  'img/map-bosses/guardiansoftime.png': new URL('../../../assets/endgame-boss-banners/guardiansoftime.webp', import.meta.url).href,
+  'img/map-bosses/heraldofdoom.png': new URL('../../../assets/endgame-boss-banners/heraldofdoom.webp', import.meta.url).href,
+  'img/map-bosses/lucion.png': new URL('../../../assets/endgame-boss-banners/lucion.webp', import.meta.url).href,
+  'img/map-bosses/lucionwhisper.png': new URL('../../../assets/endgame-boss-banners/lucionwhisper.webp', import.meta.url).href,
+  'img/map-bosses/mephistotheinvincible.png': new URL('../../../assets/endgame-boss-banners/mephistotheinvincible.webp', import.meta.url)
+    .href,
+  'img/map-bosses/rathma.png': new URL('../../../assets/endgame-boss-banners/rathma.webp', import.meta.url).href,
+  'img/map-bosses/terrorintheshadows.png': new URL('../../../assets/endgame-boss-banners/terrorintheshadows.webp', import.meta.url).href,
+  'img/map-bosses/thelichking.png': new URL('../../../assets/endgame-boss-banners/thelichking.webp', import.meta.url).href,
+  'img/map-bosses/thetaskmaster.png': new URL('../../../assets/endgame-boss-banners/thetaskmaster.webp', import.meta.url).href,
+};
 
 interface GuidePageContentProps {
   readonly page: GuidePage;
@@ -51,6 +75,14 @@ const MATERIAL_LINE_CLASSES: Record<GuideMaterialLineKind, string> = {
 function resolveImageUrl(src: string, sourceUrl: string): string {
   if (/^https?:\/\//i.test(src)) return src;
   return new URL(src, sourceUrl || `${ESR_BASE_URL}/`).href;
+}
+
+function resolveEndgameBossImageUrl(src: string, sourceUrl: string): string {
+  const normalizedSrc = src
+    .replace(/\\/gu, '/')
+    .replace(/^https?:\/\/[^/]+\//iu, '')
+    .replace(/^\.?\//u, '');
+  return ENDGAME_BOSS_BANNER_URLS[normalizedSrc] ?? resolveImageUrl(src, sourceUrl);
 }
 
 function translated(text: string): string {
@@ -548,7 +580,7 @@ function EndgameBossCard({ section, sourceUrl }: { readonly section: EndgameBoss
       {imageBlock?.kind === 'image' && (
         <figure data-endgame-boss-banner="true" className="relative h-44 overflow-hidden border-b bg-background sm:h-52 lg:h-56">
           <img
-            src={resolveImageUrl(imageBlock.src, sourceUrl)}
+            src={resolveEndgameBossImageUrl(imageBlock.src, sourceUrl)}
             alt={translatedEndgameText(imageBlock.alt)}
             className="h-full w-full object-cover object-center"
             loading="lazy"

@@ -308,6 +308,8 @@ describe('GuidePageContent layout', () => {
     const html = renderToStaticMarkup(<GuidePageContent page={endgameMapPage} />);
 
     expect(html).toContain('data-endgame-boss-banner="true"');
+    expect(html).toContain('lucionwhisper.webp');
+    expect(html).not.toContain('img/map-bosses/lucionwhisper.png');
     expect(html).toContain('object-cover');
     expect(html).not.toContain('object-contain');
     expect(html).not.toContain('lg:grid-cols-[18rem_minmax(0,1fr)]');
